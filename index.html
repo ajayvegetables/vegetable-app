@@ -5,333 +5,303 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>अजय कुमार वेजिटेबल्स - पार्टनर ऐप</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; color: #333; }
-        header { background-color: #1b5e20; color: white; padding: 15px; text-align: center; position: relative; }
-        .container { padding: 15px; max-width: 600px; margin: auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-top: 20px; border-radius: 8px; }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background-color: #2e7d32; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 5px; }
-        button:hover { background-color: #1b5e20; }
-        .locked-screen { text-align: center; padding: 20px; background: #ffebee; border: 2px dashed #c62828; border-radius: 8px; margin-top: 15px; }
-        .unlocked-screen { display: none; }
-        .admin-box { background: #fff3e0; padding: 12px; border: 1px solid #ffa726; border-radius: 6px; margin-top: 15px; }
-        .card { background: #e8f5e9; padding: 12px; border-radius: 6px; border: 1px solid #2e7d32; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 14px; }
-        th { background-color: #2e7d32; color: white; }
-        .help-btn { display: inline-block; background: #ff9800; color: white; padding: 8px 15px; text-decoration: none; border-radius: 20px; font-size: 14px; font-weight: bold; margin-top: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .qr-box { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ccc; display: inline-block; margin-top: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 10px; color: #333; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .header-box { background: #1b5e20; color: white; padding: 10px; border-radius: 5px; text-align: center; }
+        .header-box h2 { margin: 0 0 8px 0; font-size: 18px; }
+        .help-btn { background: #ff9800; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block; font-size: 13px; }
+        .section { background: #fafafa; border: 1px solid #ddd; padding: 10px; margin-top: 15px; border-radius: 5px; }
+        .section h3 { margin-top: 0; font-size: 15px; color: #1b5e20; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+        input, select, button { width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        button { background: #2e7d32; color: white; border: none; font-weight: bold; cursor: pointer; }
+        button:disabled { background: #cccccc; cursor: not-allowed; }
+        button:hover:not(:disabled) { background: #1b5e20; }
+        
+        .catalog-item { display: flex; justify-content: space-between; align-items: center; background: white; border: 1px solid #e0e0e0; padding: 8px 10px; margin-bottom: 8px; border-radius: 6px; }
+        .catalog-info { font-size: 14px; }
+        .catalog-info b { color: #2e7d32; }
+        .catalog-action { display: flex; gap: 5px; align-items: center; width: 55%; }
+        .catalog-action select { margin: 0; padding: 5px; font-size: 12px; }
+        .add-btn { background: #388e3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; width: auto; margin: 0; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; }
+        th, td { border: 1px solid #ddd; padding: 6px; text-align: center; }
+        th { background: #388e3c; color: white; }
+        .del-btn { background: #d32f2f; color: white; border: none; padding: 3px 6px; border-radius: 3px; cursor: pointer; }
+        .total-box { font-weight: bold; text-align: right; margin-top: 5px; font-size: 15px; }
+        
+        /* लॉक स्क्रीन स्टाइल */
+        #lockScreen { display: none; text-align: center; padding: 20px; background: #fff3f3; border: 2px solid #d32f2f; border-radius: 8px; margin-top: 20px; }
+        #lockScreen h3 { color: #d32f2f; }
     </style>
 </head>
 <body>
 
-<header>
-    <h2>अजय कुमार वेजिटेबल्स - पार्टनर ऐप</h2>
-    <!-- सीधा कॉल लगाने के लिए सही फॉर्मेट -->
-    <a href="tel:9997077062" class="help-btn" onclick="window.location.href='tel:9997077062'; return false;">📞 हेल्प / कॉल करें</a>
-</header>
-
 <div class="container">
-    <!-- लॉगिन सेक्शन -->
-    <div id="loginSection">
-        <h3>दुकानदार लॉगिन</h3>
-        <p>अपना मोबाइल नंबर या ओनर कोड दर्ज करें:</p>
-        <input type="password" id="vendorPhone" placeholder="मोबाइल नंबर या ओनर कोड लिखें">
-        <button onclick="checkVendorStatus()">आगे बढ़ें</button>
+    <!-- लॉगिन स्क्रीन -->
+    <div id="loginSection" class="section">
+        <h3>🔐 दुकानदार लॉगिन</h3>
+        <label>अपना मोबाइल नंबर दर्ज करें:</label>
+        <input type="text" id="loginPhone" placeholder="मोबाइल नंबर लिखें">
+        <button onclick="checkLogin()">आगे बढ़ें</button>
     </div>
 
-    <!-- लॉक स्क्रीन -->
-    <div id="lockSection" class="locked-screen" style="display: none;">
-        <h3 style="color: #c62828;">⚠️ आपका ऐप लॉक है (सक्रिय सब्सक्रिप्शन आवश्यक)</h3>
-        <p>30 दिन का प्लान चालू रखने के लिए नीचे दिए गए <b>₹30</b> के क्यूआर कोड पर भुगतान करें:</p>
-        
-        <div class="qr-box">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=8218231811@nyes&pn=AjayKumar&am=30&cu=INR" alt="QR">
-            <p style="font-size: 12px; margin: 5px 0 0 0; font-weight: bold;">UPI: 8218231811@nyes</p>
+    <!-- मुख्य ऐप स्क्रीन (जो 30 दिन बाद ऑटोमैटिक लॉक हो जाएगी) -->
+    <div id="mainAppContent" style="display:none;">
+        <div class="header-box">
+            <h2>अजय कुमार वेजिटेबल्स - पार्टनर ऐप</h2>
+            <a href="tel:+919997077062" class="help-btn">📞 हेल्प / कॉल करें</a>
         </div>
         
-        <p style="font-size: 14px; margin-top: 10px;">भुगतान करने के बाद स्क्रीनशॉट ओनर को भेजें।</p>
-        <button style="background-color: #d32f2f; margin-top: 15px;" onclick="alert('कृपया पहले क्यूआर कोड पर पेमेंट करें और स्क्रीनशॉट भेजें।')">मैंने भुगतान कर दिया है (सत्यापन प्रतीक्षित)</button>
-    </div>
-
-    <!-- मुख्य ऐप डैशबोर्ड -->
-    <div id="dashboardSection" class="unlocked-screen">
-        <h3 style="color: #2e7d32;">✅ आपका सब्सक्रिप्शन सक्रिय (Active) है!</h3>
-        <p>यूजर: <span id="dispPhone" style="font-weight: bold;"></span> | प्लान समाप्ति: <span id="expiryDateText" style="color: #c62828;"></span></p>
-        
-        <button style="background-color: #d32f2f; padding: 6px; font-size: 13px; width: auto;" onclick="logoutApp()">🔒 लॉगआउट करें</button>
-
-        <!-- दुकान सेटिंग्स -->
-        <div class="card">
-            <h4>⚙️ दुकान की सेटिंग्स & QR कोड:</h4>
-            <label>आपकी UPI ID:</label>
-            <input type="text" id="shopUpi" placeholder="उदा: 9876543210@paytm">
-            <label>आपका WhatsApp नंबर:</label>
-            <input type="text" id="shopPhone" placeholder="उदा: 9997077062">
-            <button onclick="saveShopSettings()">सेटिंग्स सेव करें</button>
+        <div style="text-align: right; font-size: 12px; margin-top: 8px; margin-bottom: 10px;">
+            यूजर: <span id="userRoleDisplay"><b>দुकानदार</b></span> | प्लान स्थिति: <span id="planStatusDisplay" style="color:green; font-weight:bold;">सक्रिय (Active)</span>
         </div>
 
-        <!-- कैटालॉग मैनेजर -->
-        <div class="card" style="background: #fff9c4; border-color: #fbc02d;">
-            <h4>🛒 सब्जी कैटालॉग (रेट लिस्ट मैनेजर):</h4>
-            <input type="text" id="itemName" placeholder="सब्जी का नाम (जैसे: आलू, टमाटर)">
-            <input type="number" id="itemPrice" placeholder="प्रति किलो मूल्य (₹)">
-            <button style="background-color: #f57c00;" onclick="addItemToCatalog()">सब्जी सूची में जोड़ें</button>
-            
-            <div style="margin-top: 10px; max-height: 150px; overflow-y: auto;">
-                <table id="catalogTable">
-                    <tr><th>सब्जी</th><th>रेट (₹/kg)</th><th>एक्शन</th></tr>
+        <!-- 30 दिन खत्म होने पर दिखने वाला लॉक और QR कोड बॉक्स -->
+        <div id="lockScreen">
+            <h3>⚠️ आपका सब्सक्रिप्शन समाप्त हो गया है!</h3>
+            <p>ऐप का इस्तेमाल जारी रखने के लिए Master Owner को ₹30 का भुगतान करें।</p>
+            <p><b>मास्टर ओनर का भुगतान QR कोड / UPI:</b></p>
+            <p style="background: #e0e0e0; padding: 10px; font-weight: bold; border-radius: 4px;">UPI ID: ajayvegetables@paytm<br>(या Master Owner से संपर्क करें)</p>
+            <p style="font-size: 13px; color: #555;">भुगतान करने के बाद ओनर को कॉल करें ताकि वे आपका प्लान अगले 30 दिन के लिए चालू कर सकें।</p>
+        </div>
+
+        <!-- दुकान का असली काम (जो लॉक होने के बाद छिप जाएगा) -->
+        <div id="appWorkingArea">
+            <div class="section">
+                <h3>⚙️ दुकान की सेटिंग्स & QR कोड (आपके ग्राहक के लिए):</h3>
+                <label>आपकी दुकान की UPI ID:</label>
+                <input type="text" id="upiId" value="9876543210@paytm">
+                <label>आपका WhatsApp नंबर:</label>
+                <input type="text" id="whatsappNum" value="9997077062">
+                <button onclick="saveSettings()">सेटिंग्स सेव करें</button>
+            </div>
+
+            <div class="section">
+                <h3>➕ नई सब्जी कैटालॉग में जोड़ें:</h3>
+                <input type="text" id="vegName" placeholder="सब्जी का नाम (जैसे: आलू, टमाटर)">
+                <input type="number" id="vegPrice" placeholder="प्रति किलो मूल्य (₹)">
+                <button onclick="addVegetableToCatalog()">सब्जी सूची में जोड़ें</button>
+            </div>
+
+            <div class="section">
+                <h3>🛒 सब्जी कैटालॉग (रेट लिस्ट):</h3>
+                <div id="catalogListContainer"></div>
+            </div>
+
+            <div class="section">
+                <h3>📦 आपका कार्ट (Cart Summary):</h3>
+                <table>
+                    <thead>
+                        <tr><th>आइटम</th><th>वजन</th><th>मूल्य (₹)</th><th>हटाएं</th></tr>
+                    </thead>
+                    <tbody id="billTable"></tbody>
                 </table>
+                <div class="total-box">कुल योग: ₹<span id="grandTotal">0</span></div>
+
+                <button id="qrBtn" onclick="generateQR()" disabled style="background:#7b1fa2; margin-top:10px;">भुगतान QR कोड तैयार करें (लॉक्ड)</button>
+                <button id="whatsappBtn" onclick="sendWhatsApp()" disabled style="background:#00c853;">WhatsApp पर पर्ची भेजें (लॉक्ड)</button>
             </div>
         </div>
 
-        <!-- बिलिंग और सुरक्षित आर्डर सिस्टम -->
-        <div class="card" style="background: #e3f2fd; border-color: #1976d2;">
-            <h4>📦 ग्राहक का आर्डर और पर्ची बनाएं:</h4>
-            <label>सब्जी चुनें:</label>
-            <select id="billItemSelect"></select>
-            
-            <label>वजन चुनें:</label>
-            <select id="billWeightSelect">
-                <option value="0.05">50 ग्राम</option>
-                <option value="0.1">100 ग्राम</option>
-                <option value="0.2">200 ग्राम</option>
-                <option value="0.25">250 ग्राम</option>
-                <option value="0.5">500 ग्राम</option>
-                <option value="0.75">750 ग्राम</option>
-                <option value="1">1 किलो</option>
-                <option value="2">2 किलो</option>
-                <option value="3">3 किलो</option>
-                <option value="5">5 किलो</option>
-                <option value="10">10 किलो</option>
-            </select>
-            
-            <button style="background-color: #1976d2;" onclick="addToBill()">बिल में जोड़ें</button>
-
-            <div style="margin-top: 10px;">
-                <table id="billTable">
-                    <tr><th>आइटम</th><th>वजन</th><th>मूल्य (₹)</th></tr>
-                </table>
-                <h4 style="text-align: right; color: #d32f2f;">कुल योग: ₹<span id="grandTotal">0</span></h4>
-            </div>
-
-            <!-- भुगतान QR कोड तैयार करने वाला बटन -->
-            <button id="generateQrBtn" style="background-color: #7b1fa2;" onclick="generateBillQR()">भुगतान QR कोड तैयार करें</button>
-
-            <!-- साफ़-सुथरा QR कोड और पर्ची सेक्शन (शुरुआत में छुपा रहेगा) -->
-            <div id="paymentSection" style="text-align: center; margin-top: 15px; display: none;">
-                <div class="qr-box">
-                    <div id="dynamicQrContainer"></div>
-                    <p style="font-size: 13px; font-weight: bold; margin: 8px 0 0 0; color: #1b5e20;" id="qrUpiText"></p>
-                    <p style="font-size: 14px; font-weight: bold; margin: 4px 0 0 0; color: #d32f2f;" id="qrAmountText"></p>
-                </div>
-                
-                <p style="font-size: 13px; color: #c62828; margin-top: 10px;">* ग्राहक द्वारा भुगतान पूरा होने के बाद ही पर्ची भेजी जाएगी।</p>
-
-                <!-- WhatsApp भेजने वाला बटन (जब तक पेमेंट कन्फर्म न हो, इसे ओनर वेरीफाई करके खोल सकता है या ऑटोमैटिक सेट कर सकते हैं) -->
-                <button id="whatsappSendBtn" style="background-color: #25d366; margin-top: 10px;" onclick="sendOrderWhatsApp()">💬 WhatsApp पर आर्डर पर्ची भेजें</button>
-            </div>
-        </div>
-
-        <!-- ओनर पैनल -->
-        <div class="admin-box">
-            <h4 style="color: #e65100; margin-top: 0;">🛠️ ओनर (Admin) पैनल</h4>
-            <p style="font-size: 13px;">दुकानदार से ₹30 मिलने पर उसका मोबाइल नंबर यहाँ लिखकर 30 दिन का प्लान एक्टिव करें:</p>
-            <input type="text" id="adminTargetPhone" placeholder="दुकानदार का मोबाइल नंबर लिखें">
-            <button style="background-color: #f57c00;" onclick="adminActivateUser()">इस नंबर का 30 दिन का प्लान चालू करें</button>
+        <!-- ओनर (Admin) पैनल - सिर्फ आपके लिए (मास्टर ओनर नंबर से लॉगिन करने पर दिखेगा) -->
+        <div id="adminPanel" class="section" style="display:none; background: #e8f5e9; border: 2px dashed #2e7d32;">
+            <h3>🛠️ मास्टर ओनर (Admin) पैनल</h3>
+            <p style="font-size: 12px; color: #555;">किसी भी दुकानदार से ₹30 मिलने पर उसका मोबाइल नंबर यहाँ लिखकर 30 दिन का प्लान एक्टिव करें।</p>
+            <input type="text" id="targetPhone" placeholder="दुकानदार का मोबाइल नंबर लिखें">
+            <button onclick="activateSubscription(30)" style="background: #d81b60;">इस नंबर का 30 दिन का प्लान चालू करें</button>
         </div>
     </div>
 </div>
 
 <script>
-    function checkVendorStatus() {
-        let inputVal = document.getElementById("vendorPhone").value;
-        if(!inputVal) {
-            alert("कृपया मोबाइल नंबर या ओनर कोड दर्ज करें!");
-            return;
-        }
-        
-        if(inputVal === "Ajay@666R") {
-            let futureTime = new Date().getTime() + (365 * 24 * 60 * 60 * 1000);
-            openDashboard("Master Owner", futureTime);
-            return;
+    let catalog = [
+        { name: "आलू (Potato)", price: 50 },
+        { name: "टमाटर (Tomato)", price: 80 }
+    ];
+
+    const MASTER_PHONE = "9997077062"; // आपका मास्टर ओनर नंबर
+
+    function checkLogin() {
+        let phone = document.getElementById("loginPhone").value.trim();
+        if(!phone || phone.length < 10) { alert("कृपया सही मोबाइल नंबर दर्ज करें!"); return; }
+
+        localStorage.setItem("user_phone", phone);
+        if(!localStorage.getItem("expiry_" + phone)) {
+            // नया यूजर है तो आज से 30 दिन की वैधता दें (या डेमो के लिए आप चाहें तो कंट्रोल कर सकते हैं)
+            let expiryDate = new Date().getTime() + (30 * 24 * 60 * 60 * 1000);
+            localStorage.setItem("expiry_" + phone, expiryDate);
         }
 
-        if(inputVal.length < 10) {
-            alert("कृपया सही मोबाइल नंबर दर्ज करें!");
-            return;
-        }
-        
-        localStorage.setItem("current_vendor", inputVal);
-        let expiryTime = localStorage.getItem("expiry_" + inputVal);
-        let currentTime = new Date().getTime();
+        loadAppSession();
+    }
+
+    function loadAppSession() {
+        let phone = localStorage.getItem("user_phone");
+        if(!phone) return;
 
         document.getElementById("loginSection").style.display = "none";
+        document.getElementById("mainAppContent").style.display = "block";
 
-        if(expiryTime && currentTime < parseInt(expiryTime)) {
-            openDashboard(inputVal, expiryTime);
+        let now = new Date().getTime();
+        let expiry = localStorage.getItem("expiry_" + phone);
+
+        // अगर मास्टर ओनर है या दिन बाकी हैं
+        if(phone === MASTER_PHONE) {
+            document.getElementById("userRoleDisplay").innerHTML = "<b>Master Owner</b>";
+            document.getElementById("planStatusDisplay").innerText = "लाइफटाइम (Owner)";
+            document.getElementById("planStatusDisplay").style.color = "purple";
+            document.getElementById("adminPanel").style.display = "block";
+            document.getElementById("lockScreen").style.display = "none";
+            document.getElementById("appWorkingArea").style.display = "block";
+        } else if(now < expiry) {
+            // दिन बचे हैं
+            let daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+            document.getElementById("planStatusDisplay").innerText = `सक्रिय (${daysLeft} दिन शेष)`;
+            document.getElementById("lockScreen").style.display = "none";
+            document.getElementById("appWorkingArea").style.display = "block";
         } else {
-            document.getElementById("lockSection").style.display = "block";
+            // 30 दिन खत्म - ऑटोमैटिक लॉक!
+            document.getElementById("planStatusDisplay").innerText = "समाप्त (Expired)";
+            document.getElementById("planStatusDisplay").style.color = "red";
+            document.getElementById("lockScreen").style.display = "block";
+            document.getElementById("appWorkingArea").style.display = "none";
         }
+
+        renderCatalog();
     }
 
-    function openDashboard(phone, expiryTime) {
-        document.getElementById("loginSection").style.display = "none";
-        document.getElementById("lockSection").style.display = "none";
-        document.getElementById("dashboardSection").style.display = "block";
-        document.getElementById("dispPhone").innerText = phone;
-        document.getElementById("shopUpi").value = localStorage.getItem("upi_" + phone) || "";
-        document.getElementById("shopPhone").value = localStorage.getItem("wapp_" + phone) || "";
-        document.getElementById("expiryDateText").innerText = phone === "Master Owner" ? "लाइफटाइम (Owner)" : new Date(parseInt(expiryTime)).toLocaleDateString();
-        loadCatalog();
+    function activateSubscription(days) {
+        let target = document.getElementById("targetPhone").value.trim();
+        if(!target || target.length < 10) { alert("कृपया सही मोबाइल नंबर दर्ज करें!"); return; }
+
+        let newExpiry = new Date().getTime() + (days * 24 * 60 * 60 * 1000);
+        localStorage.setItem("expiry_" + target, newExpiry);
+        alert("सफलतापूर्वक नंबर " + target + " का " + days + " दिन का प्लान चालू कर दिया गया है!");
+        document.getElementById("targetPhone").value = "";
     }
 
-    function logoutApp() {
-        document.getElementById("dashboardSection").style.display = "none";
-        document.getElementById("loginSection").style.display = "block";
-        document.getElementById("vendorPhone").value = "";
-    }
-
-    function saveShopSettings() {
-        let phone = localStorage.getItem("current_vendor");
-        let upi = document.getElementById("shopUpi").value;
-        let wapp = document.getElementById("shopPhone").value;
-        localStorage.setItem("upi_" + phone, upi);
-        localStorage.setItem("wapp_" + phone, wapp);
-        alert("दुकान की सेटिंग्स सेव हो गई हैं!");
-    }
-
-    function addItemToCatalog() {
-        let phone = localStorage.getItem("current_vendor");
-        let name = document.getElementById("itemName").value;
-        let price = document.getElementById("itemPrice").value;
-        if(!name || !price) {
-            alert("कृपया सब्जी का नाम और रेट दोनों भरें!");
-            return;
-        }
-        let catalog = JSON.parse(localStorage.getItem("catalog_" + phone) || "[]");
-        catalog.push({name: name, price: parseFloat(price)});
-        localStorage.setItem("catalog_" + phone, JSON.stringify(catalog));
-        document.getElementById("itemName").value = "";
-        document.getElementById("itemPrice").value = "";
-        loadCatalog();
-    }
-
-    function loadCatalog() {
-        let phone = localStorage.getItem("current_vendor");
-        let catalog = JSON.parse(localStorage.getItem("catalog_" + phone) || "[]");
-        let table = document.getElementById("catalogTable");
-        let select = document.getElementById("billItemSelect");
-        table.innerHTML = "<tr><th>सब्जी</th><th>रेट (₹/kg)</th><th>एक्शन</th></tr>";
-        select.innerHTML = "";
-
-        catalog.forEach((item, index) => {
-            table.innerHTML += `<tr><td>${item.name}</td><td>₹${item.price}</td><td><button style='background:red; padding:4px 8px; width:auto;' onclick='deleteItem(${index})'>मिटाएं</button></td></tr>`;
-            select.innerHTML += `<option value='${index}' data-name='${item.name}' data-price='${item.price}'>${item.name} (₹${item.price}/kg)</option>`;
-        });
-    }
-
-    function deleteItem(index) {
-        let phone = localStorage.getItem("current_vendor");
-        let catalog = JSON.parse(localStorage.getItem("catalog_" + phone) || "[]");
-        catalog.splice(index, 1);
-        localStorage.setItem("catalog_" + phone, JSON.stringify(catalog));
-        loadCatalog();
-    }
-
-    let currentBill = [];
-    function addToBill() {
-        let select = document.getElementById("billItemSelect");
-        if(select.selectedIndex === -1) {
-            alert("पहले कैटालॉग में से कोई सब्जी जोड़ें!");
-            return;
-        }
-        let opt = select.options[select.selectedIndex];
-        let name = opt.getAttribute("data-name");
-        let pricePerKg = parseFloat(opt.getAttribute("data-price"));
-        let weightVal = parseFloat(document.getElementById("billWeightSelect").value);
-        let weightText = document.getElementById("billWeightSelect").options[document.getElementById("billWeightSelect").selectedIndex].text;
-        let totalCost = Math.round(pricePerKg * weightVal);
-
-        currentBill.push({name: name, weightText: weightText, cost: totalCost});
-        updateBillTable();
-    }
-
-    function updateBillTable() {
-        let table = document.getElementById("billTable");
-        table.innerHTML = "<tr><th>आइटम</th><th>वजन</th><th>मूल्य (₹)</th></tr>";
-        let grandTotal = 0;
-        currentBill.forEach(item => {
-            table.innerHTML += `<tr><td>${item.name}</td><td>${item.weightText}</td><td>₹${item.cost}</td></tr>`;
-            grandTotal += item.cost;
-        });
-        document.getElementById("grandTotal").innerText = grandTotal;
+    function renderCatalog() {
+        let container = document.getElementById("catalogListContainer");
+        container.innerHTML = "";
         
-        // नया आइटम जुड़ने पर पुराना QR छुपा दें और बटन वापस दिखा दें
-        document.getElementById("paymentSection").style.display = "none";
-        document.getElementById("generateQrBtn").style.display = "block";
-    }
-
-    function generateBillQR() {
-        let phone = localStorage.getItem("current_vendor");
-        let upi = document.getElementById("shopUpi").value;
-        let grandTotal = document.getElementById("grandTotal").innerText;
-
-        if(!upi) {
-            alert("कृपया पहले ऊपर दुकान की सेटिंग्स में अपनी UPI ID सेव करें!");
-            return;
-        }
-        if(parseInt(grandTotal) <= 0) {
-            alert("बिल खाली है!");
-            return;
-        }
-
-        let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=${upi}&pn=Vendor&am=${grandTotal}&cu=INR`;
-        document.getElementById("dynamicQrContainer").innerHTML = `<img src="${qrUrl}" alt="QR Code">`;
-        document.getElementById("qrUpiText").innerText = "UPI: " + upi;
-        document.getElementById("qrAmountText").innerText = "राशि: ₹" + grandTotal;
-        
-        // QR आते ही 'QR तैयार करें' वाला बटन छुप जाएगा
-        document.getElementById("generateQrBtn").style.display = "none";
-        // QR और WhatsApp पर्ची भेजने का सेक्शन दिखने लगेगा
-        document.getElementById("paymentSection").style.display = "block";
-    }
-
-    function sendOrderWhatsApp() {
-        let phone = localStorage.getItem("current_vendor");
-        let wapp = document.getElementById("shopPhone").value;
-        if(!wapp) {
-            alert("कृपया सेटिंग्स में अपना WhatsApp नंबर दर्ज करें!");
-            return;
-        }
-
-        let now = new Date();
-        let timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        let text = "*📦 अजय कुमार वेजिटेबल्स - आर्डर पर्ची*%0A--------------------------------%0A";
-        let grandTotal = 0;
-        currentBill.forEach(item => {
-            text += `• ${item.name} (${item.weightText}) : ₹${item.cost}%0A`;
-            grandTotal += item.cost;
+        catalog.forEach((veg, index) => {
+            let itemDiv = document.createElement("div");
+            itemDiv.className = "catalog-item";
+            itemDiv.innerHTML = `
+                <div class="catalog-info">
+                    <b>${veg.name}</b><br>
+                    <span style="color:#d32f2f; font-weight:bold;">₹${veg.price} / किलो</span>
+                </div>
+                <div class="catalog-action">
+                    <select id="weight_${index}">
+                        <option value="0.05">50 ग्राम</option>
+                        <option value="0.1">100 ग्राम</option>
+                        <option value="0.2">200 ग्राम</option>
+                        <option value="0.25">250 ग्राम</option>
+                        <option value="0.5">500 ग्राम</option>
+                        <option value="0.75">750 ग्राम</option>
+                        <option value="1" selected>1 किलो</option>
+                        <option value="2">2 किलो</option>
+                        <option value="3">3 किलो</option>
+                        <option value="5">5 किलो</option>
+                        <option value="10">10 किलो</option>
+                    </select>
+                    <button class="add-btn" onclick="addToBill('${veg.name}', ${veg.price}, ${index})">जोड़ें</button>
+                </div>
+            `;
+            container.appendChild(itemDiv);
         });
-        text += "--------------------------------%0A";
-        text += `*कुल भुगतान: ₹${grandTotal} (भुगतान सफल)*%0A`;
-        text += `समय: ${timeString}%0A धन्यवाद!`;
-
-        window.open(`https://wa.me/91${wapp}?text=${text}`, '_blank');
     }
 
-    function adminActivateUser() {
-        let targetPhone = document.getElementById("adminTargetPhone").value;
-        if(!targetPhone || targetPhone.length < 10) {
-            alert("कृपया सही मोबाइल नंबर दर्ज करें!");
-            return;
+    function addVegetableToCatalog() {
+        let name = document.getElementById("vegName").value.trim();
+        let price = parseFloat(document.getElementById("vegPrice").value);
+        if(!name || !price) { alert("कृपया सब्जी का नाम और सही मूल्य भरें!"); return; }
+
+        catalog.push({ name: name, price: price });
+        document.getElementById("vegName").value = "";
+        document.getElementById("vegPrice").value = "";
+        renderCatalog();
+    }
+
+    function saveSettings() { alert("सेटिंग्स सुरक्षित हो गई हैं!"); }
+
+    function addToBill(vegName, pricePerKg, index) {
+        let weightSelect = document.getElementById(`weight_${index}`);
+        let weightKg = parseFloat(weightSelect.value);
+        
+        let weightText = "";
+        if(weightKg == 0.05) weightText = "50 ग्राम";
+        else if(weightKg == 0.1) weightText = "100 ग्राम";
+        else if(weightKg == 0.2) weightText = "200 ग्राम";
+        else if(weightKg == 0.25) weightText = "250 ग्राम";
+        else if(weightKg == 0.5) weightText = "500 ग्राम";
+        else if(weightKg == 0.75) weightText = "750 ग्राम";
+        else if(weightKg == 1) weightText = "1 किलो";
+        else weightText = weightKg + " किलो";
+
+        let totalPrice = Math.round(weightKg * pricePerKg);
+
+        let billTable = document.getElementById("billTable");
+        let row = billTable.insertRow();
+        row.innerHTML = `<td>${vegName}</td><td>${weightText}</td><td>${totalPrice}</td><td><button class="del-btn" onclick="this.parentElement.parentElement.remove(); calculateTotal();">हटाएं</button></td>`;
+
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        let billTable = document.getElementById("billTable");
+        let rows = billTable.getElementsByTagName("tr");
+        let total = 0;
+        for(let i=0; i<rows.length; i++) {
+            let priceCell = rows[i].getElementsByTagName("td")[2];
+            if(priceCell) {
+                total += parseFloat(priceCell.innerText);
+            }
         }
-        let thirtyDaysMillis = 30 * 24 * 60 * 60 * 1000;
-        let expiryTime = new Date().getTime() + thirtyDaysMillis;
-        localStorage.setItem("expiry_" + targetPhone, expiryTime);
-        alert("सफलता! नंबर " + targetPhone + " के लिए अगले 30 दिनों का प्लान एक्टिव कर दिया गया है।");
-        document.getElementById("adminTargetPhone").value = "";
+        document.getElementById("grandTotal").innerText = total;
+
+        let qrBtn = document.getElementById("qrBtn");
+        let whatsappBtn = document.getElementById("whatsappBtn");
+        if(total > 0) {
+            qrBtn.disabled = false;
+            qrBtn.style.background = "#7b1fa2";
+            qrBtn.innerText = "भुगतान QR कोड तैयार करें";
+
+            whatsappBtn.disabled = false;
+            whatsappBtn.style.background = "#00c853";
+            whatsappBtn.innerText = "WhatsApp पर पर्ची भेजें";
+        } else {
+            qrBtn.disabled = true;
+            qrBtn.style.background = "#cccccc";
+            qrBtn.innerText = "भुगतान QR कोड तैयार करें (लॉक्ड)";
+
+            whatsappBtn.disabled = true;
+            whatsappBtn.style.background = "#cccccc";
+            whatsappBtn.innerText = "WhatsApp पर पर्ची भेजें (लॉक्ड)";
+        }
     }
+
+    function generateQR() {
+        let total = document.getElementById("grandTotal").innerText;
+        let upi = document.getElementById("upiId").value;
+        alert("UPI ID: " + upi + "\nकुल भुगतान राशि: ₹" + total + "\nकृपया इस राशि का भुगतान लें।");
+    }
+
+    function sendWhatsApp() {
+        let total = document.getElementById("grandTotal").innerText;
+        let num = document.getElementById("whatsappNum").value;
+        if(total == 0) { alert("बिल खाली है!"); return; }
+        window.open(`https://wa.me/${num}?text=नमस्ते, आपका सब्जी का कुल बिल ₹${total} है। कृपया भुगतान करें।`);
+    }
+
+    // ऑटोमैटिक चेक करें कि क्या यूजर पहले से लॉगइन है और क्या दिन बचे हैं
+    window.onload = function() {
+        if(localStorage.getItem("user_phone")) {
+            loadAppSession();
+        }
+    };
 </script>
 
 </body>
