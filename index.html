@@ -30,9 +30,11 @@
         .del-btn { background: #d32f2f; color: white; border: none; padding: 3px 6px; border-radius: 3px; cursor: pointer; }
         .total-box { font-weight: bold; text-align: right; margin-top: 5px; font-size: 15px; }
         
-        /* लॉक स्क्रीन स्टाइल */
         #lockScreen { display: none; text-align: center; padding: 20px; background: #fff3f3; border: 2px solid #d32f2f; border-radius: 8px; margin-top: 20px; }
         #lockScreen h3 { color: #d32f2f; }
+        
+        /* QR कोड दिखने का बॉक्स */
+        #qrDisplayArea { display: none; text-align: center; background: white; border: 2px solid #7b1fa2; padding: 15px; margin-top: 10px; border-radius: 6px; }
     </style>
 </head>
 <body>
@@ -46,7 +48,7 @@
         <button onclick="checkLogin()">आगे बढ़ें</button>
     </div>
 
-    <!-- मुख्य ऐप स्क्रीन (जो 30 दिन बाद ऑटोमैटिक लॉक हो जाएगी) -->
+    <!-- मुख्य ऐप स्क्रीन -->
     <div id="mainAppContent" style="display:none;">
         <div class="header-box">
             <h2>अजय कुमार वेजिटेबल्स - पार्टनर ऐप</h2>
@@ -54,7 +56,7 @@
         </div>
         
         <div style="text-align: right; font-size: 12px; margin-top: 8px; margin-bottom: 10px;">
-            यूजर: <span id="userRoleDisplay"><b>দुकानदार</b></span> | प्लान स्थिति: <span id="planStatusDisplay" style="color:green; font-weight:bold;">सक्रिय (Active)</span>
+            यूजर: <span id="userRoleDisplay"><b>दुकानदार</b></span> | प्लान स्थिति: <span id="planStatusDisplay" style="color:green; font-weight:bold;">सक्रिय (Active)</span>
         </div>
 
         <!-- 30 दिन खत्म होने पर दिखने वाला लॉक और QR कोड बॉक्स -->
@@ -62,16 +64,19 @@
             <h3>⚠️ आपका सब्सक्रिप्शन समाप्त हो गया है!</h3>
             <p>ऐप का इस्तेमाल जारी रखने के लिए Master Owner को ₹30 का भुगतान करें।</p>
             <p><b>मास्टर ओनर का भुगतान QR कोड / UPI:</b></p>
-            <p style="background: #e0e0e0; padding: 10px; font-weight: bold; border-radius: 4px;">UPI ID: ajayvegetables@paytm<br>(या Master Owner से संपर्क करें)</p>
-            <p style="font-size: 13px; color: #555;">भुगतान करने के बाद ओनर को कॉल करें ताकि वे आपका प्लान अगले 30 दिन के लिए चालू कर सकें।</p>
+            <div style="background: white; padding: 10px; display: inline-block; border-radius: 4px; border: 1px solid #ddd;">
+                <img id="masterQrImg" src="" alt="Master QR" width="140" height="140">
+            </div>
+            <p style="font-weight: bold; margin-top: 5px;" id="masterUpiText">UPI ID: 8218231811@nyes</p>
+            <p style="font-size: 13px; color: #555;">भुगतान करने के बाद ओनर को कॉल करें ताकि वे आपका प्लान चालू कर सकें।</p>
         </div>
 
-        <!-- दुकान का असली काम (जो लॉक होने के बाद छिप जाएगा) -->
+        <!-- दुकान का काम -->
         <div id="appWorkingArea">
             <div class="section">
                 <h3>⚙️ दुकान की सेटिंग्स & QR कोड (आपके ग्राहक के लिए):</h3>
                 <label>आपकी दुकान की UPI ID:</label>
-                <input type="text" id="upiId" value="9876543210@paytm">
+                <input type="text" id="upiId" value="8218231811@nyes">
                 <label>आपका WhatsApp नंबर:</label>
                 <input type="text" id="whatsappNum" value="9997077062">
                 <button onclick="saveSettings()">सेटिंग्स सेव करें</button>
@@ -100,11 +105,19 @@
                 <div class="total-box">कुल योग: ₹<span id="grandTotal">0</span></div>
 
                 <button id="qrBtn" onclick="generateQR()" disabled style="background:#7b1fa2; margin-top:10px;">भुगतान QR कोड तैयार करें (लॉक्ड)</button>
+                
+                <!-- यहाँ असली QR कोड दिखेगा -->
+                <div id="qrDisplayArea">
+                    <h4 style="margin:0 0 5px 0; color:#7b1fa2;">📱 स्कैन करके भुगतान करें</h4>
+                    <img id="dynamicQrImg" src="" alt="Payment QR" width="160" height="160">
+                    <p id="qrDetailsText" style="font-size: 13px; font-weight: bold; margin: 5px 0 0 0;"></p>
+                </div>
+
                 <button id="whatsappBtn" onclick="sendWhatsApp()" disabled style="background:#00c853;">WhatsApp पर पर्ची भेजें (लॉक्ड)</button>
             </div>
         </div>
 
-        <!-- ओनर (Admin) पैनल - सिर्फ आपके लिए (मास्टर ओनर नंबर से लॉगिन करने पर दिखेगा) -->
+        <!-- ओनर (Admin) पैनल -->
         <div id="adminPanel" class="section" style="display:none; background: #e8f5e9; border: 2px dashed #2e7d32;">
             <h3>🛠️ मास्टर ओनर (Admin) पैनल</h3>
             <p style="font-size: 12px; color: #555;">किसी भी दुकानदार से ₹30 मिलने पर उसका मोबाइल नंबर यहाँ लिखकर 30 दिन का प्लान एक्टिव करें।</p>
@@ -120,7 +133,8 @@
         { name: "टमाटर (Tomato)", price: 80 }
     ];
 
-    const MASTER_PHONE = "9997077062"; // आपका मास्टर ओनर नंबर
+    const MASTER_PHONE = "9997077062"; 
+    const MASTER_UPI = "8218231811@nyes";
 
     function checkLogin() {
         let phone = document.getElementById("loginPhone").value.trim();
@@ -128,7 +142,6 @@
 
         localStorage.setItem("user_phone", phone);
         if(!localStorage.getItem("expiry_" + phone)) {
-            // नया यूजर है तो आज से 30 दिन की वैधता दें (या डेमो के लिए आप चाहें तो कंट्रोल कर सकते हैं)
             let expiryDate = new Date().getTime() + (30 * 24 * 60 * 60 * 1000);
             localStorage.setItem("expiry_" + phone, expiryDate);
         }
@@ -146,7 +159,10 @@
         let now = new Date().getTime();
         let expiry = localStorage.getItem("expiry_" + phone);
 
-        // अगर मास्टर ओनर है या दिन बाकी हैं
+        // मास्टर QR कोड सेट करें
+        let masterUpiLink = `upi://pay?pa=${MASTER_UPI}&pn=MasterOwner&am=30&cu=INR`;
+        document.getElementById("masterQrImg").src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(masterUpiLink)}`;
+
         if(phone === MASTER_PHONE) {
             document.getElementById("userRoleDisplay").innerHTML = "<b>Master Owner</b>";
             document.getElementById("planStatusDisplay").innerText = "लाइफटाइम (Owner)";
@@ -155,13 +171,11 @@
             document.getElementById("lockScreen").style.display = "none";
             document.getElementById("appWorkingArea").style.display = "block";
         } else if(now < expiry) {
-            // दिन बचे हैं
             let daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
             document.getElementById("planStatusDisplay").innerText = `सक्रिय (${daysLeft} दिन शेष)`;
             document.getElementById("lockScreen").style.display = "none";
             document.getElementById("appWorkingArea").style.display = "block";
         } else {
-            // 30 दिन खत्म - ऑटोमैटिक लॉक!
             document.getElementById("planStatusDisplay").innerText = "समाप्त (Expired)";
             document.getElementById("planStatusDisplay").style.color = "red";
             document.getElementById("lockScreen").style.display = "block";
@@ -280,13 +294,23 @@
             whatsappBtn.disabled = true;
             whatsappBtn.style.background = "#cccccc";
             whatsappBtn.innerText = "WhatsApp पर पर्ची भेजें (लॉक्ड)";
+            
+            // अगर बिल जीरो है तो QR छिपा दें
+            document.getElementById("qrDisplayArea").style.display = "none";
         }
     }
 
     function generateQR() {
         let total = document.getElementById("grandTotal").innerText;
         let upi = document.getElementById("upiId").value;
-        alert("UPI ID: " + upi + "\nकुल भुगतान राशि: ₹" + total + "\nकृपया इस राशि का भुगतान लें।");
+        if(total == 0) return;
+
+        let upiLink = `upi://pay?pa=${upi}&pn=VegetableShop&am=${total}&cu=INR`;
+        let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiLink)}`;
+        
+        document.getElementById("dynamicQrImg").src = qrUrl;
+        document.getElementById("qrDetailsText").innerText = `UPI: ${upi} | राशि: ₹${total}`;
+        document.getElementById("qrDisplayArea").style.display = "block";
     }
 
     function sendWhatsApp() {
@@ -296,7 +320,6 @@
         window.open(`https://wa.me/${num}?text=नमस्ते, आपका सब्जी का कुल बिल ₹${total} है। कृपया भुगतान करें।`);
     }
 
-    // ऑटोमैटिक चेक करें कि क्या यूजर पहले से लॉगइन है और क्या दिन बचे हैं
     window.onload = function() {
         if(localStorage.getItem("user_phone")) {
             loadAppSession();
