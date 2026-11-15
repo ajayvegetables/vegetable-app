@@ -3,131 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajay Kumar Vegetables - Shopkeeper Dashboard</title>
+    <title>अजय कुमार वेजिटेबल्स - ऑनलाइन आर्डर</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #fff3e0; margin: 0; padding: 15px; color: #333; }
+        body { font-family: Arial, sans-serif; background: #e8f5e9; margin: 0; padding: 15px; color: #333; }
         .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { color: #e65100; text-align: center; margin-bottom: 5px; }
-        .status-bar { text-align: center; background: #ffe0b2; padding: 8px; border-radius: 6px; font-weight: bold; margin-bottom: 15px; color: #bf360c; }
-        .order-card { background: #fafafa; border: 1px solid #ddd; border-left: 5px solid #e65100; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .order-card.pending { border-left-color: #d32f2f; background: #ffebee; }
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        .btn { flex: 1; padding: 10px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
-        .btn-accept { background: #2e7d32; }
-        .btn-reject { background: #c62828; }
-        .item-list { font-size: 14px; margin: 8px 0; padding-left: 20px; }
+        h2 { color: #2e7d32; text-align: center; margin-bottom: 5px; }
+        .sub-title { text-align: center; color: #666; font-size: 14px; margin-bottom: 20px; }
+        .product-card { display: flex; justify-content: space-between; align-items: center; background: #f1f8e9; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #c8e6c9; }
+        .product-info h4 { margin: 0 0 5px 0; color: #1b5e20; }
+        .product-info p { margin: 0; color: #555; font-size: 14px; }
+        .qty-box { display: flex; align-items: center; gap: 8px; }
+        .qty-box input { width: 50px; padding: 5px; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
+        .form-group { margin-top: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        .btn-submit { background: #2e7d32; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-submit:hover { background: #1b5e20; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🛎️ दुकानदार डैशबोर्ड: अजय कुमार वेजिटेबल्स</h2>
-    <div class="status-bar" id="connectionStatus">लाइव डेटाबेस से जुड़ रहा है...</div>
+    <h2>🥬 अजय कुमार वेजिटेबल्स</h2>
+    <div class="sub-title">ताज़ा सब्ज़ी सीधे आपके घर! अपना आर्डर चुनें</div>
 
-    <h3>नए ऑर्डर्स की सूची:</h3>
-    <div id="orders-container">
-        <p style="text-align: center; color: #777;">नया ऑर्डर आने का इंतज़ार है...</p>
+    <div id="products-list">
+        <!-- प्रोडक्ट लिस्ट यहाँ दिखेगी -->
+        <div class="product-card">
+            <div class="product-info">
+                <h4>टमाटर (Tomato)</h4>
+                <p>₹40 / kg</p>
+            </div>
+            <div class="qty-box">
+                <input type="number" id="qty_0" min="0" value="0" placeholder="Kg">
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-info">
+                <h4>आलू (Potato)</h4>
+                <p>₹30 / kg</p>
+            </div>
+            <div class="qty-box">
+                <input type="number" id="qty_1" min="0" value="0" placeholder="Kg">
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-info">
+                <h4>प्याज़ (Onion)</h4>
+                <p>₹50 / kg</p>
+            </div>
+            <div class="qty-box">
+                <input type="number" id="qty_2" min="0" value="0" placeholder="Kg">
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-info">
+                <h4>हरी मिर्च (Green Chilli)</h4>
+                <p>₹80 / kg</p>
+            </div>
+            <div class="qty-box">
+                <input type="number" id="qty_3" min="0" value="0" placeholder="Kg">
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- ऑडियो बीप / घंटी के लिए बीप सिंथेसाइज़र -->
-<script>
-    function playAlarm() {
-        try {
-            let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 1.5); // 1.5 सेकंड की घंटी
-        } catch(e) {
-            console.log("Audio play error", e);
-        }
-    }
-</script>
+    <div class="form-group">
+        <label>आपका नाम:</label>
+        <input type="text" id="customerName" placeholder="अपना नाम लिखें">
+    </div>
+
+    <div class="form-group">
+        <label>मोबाइल नंबर:</label>
+        <input type="tel" id="customerPhone" placeholder="10 अंकों का मोबाइल नंबर">
+    </div>
+
+    <div class="form-group">
+        <label>पूरी डिलीवरी का पता (Address):</label>
+        <textarea id="customerAddress" rows="3" placeholder="घर का नंबर, गली, मोहल्ला..."></textarea>
+    </div>
+
+    <button class="btn-submit" onclick="sendOrder()">🚀 आर्डर भेजें</button>
+</div>
 
 <!-- Firebase SDKs -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
-      authDomain: "ajayvegetables-e6201.firebaseapp.com",
-      databaseURL: "https://ajayvegetables-e6201-default-rtdb.firebaseio.com",
-      projectId: "ajayvegetables-e6201",
-      storageBucket: "ajayvegetables-e6201.firebasestorage.app",
-      messagingSenderId: "735482766488",
-      appId: "1:735482766488:web:a7121405cb15fffefd1ced",
-      measurementId: "G-KBGKZ36RY8"
+        apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
+        authDomain: "ajayvegetables-e6201.firebaseapp.com",
+        databaseURL: "https://ajayvegetables-e6201-default-rtdb.firebaseio.com",
+        projectId: "ajayvegetables-e6201",
+        storageBucket: "ajayvegetables-e6201.firebasestorage.app",
+        messagingSenderId: "735482766488",
+        appId: "1:735482766488:web:a7121405cb15fffefd1ced",
+        measurementId: "G-KBGKZ36RY8"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const statusEl = document.getElementById('connectionStatus');
-    const container = document.getElementById('orders-container');
+    window.sendOrder = function() {
+        const name = document.getElementById('customerName').value.trim();
+        const phone = document.getElementById('customerPhone').value.trim();
+        const address = document.getElementById('customerAddress').value.trim();
 
-    let previousOrdersCount = null;
-
-    const ordersRef = ref(db, 'orders');
-    onValue(ordersRef, (snapshot) => {
-        statusEl.innerText = "🟢 लाइव कनेक्टेड! नए ऑर्डर का इंतज़ार है...";
-        const data = snapshot.val();
-        
-        if (!data) {
-            container.innerHTML = '<p style="text-align: center; color: #777;">फिलहाल कोई नया ऑर्डर नहीं है।</p>';
-            previousOrdersCount = 0;
+        if (!name || !phone || !address) {
+            alert('कृपया अपना नाम, फोन नंबर और पता सही से भरें!');
             return;
         }
 
-        let ordersArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-        
-        // नए ऑर्डर की जाँच और घंटी बजाना
-        if (previousOrdersCount !== null && ordersArray.length > previousOrdersCount) {
-            playAlarm(); // असली घंटी बजेगी!
-        }
-        previousOrdersCount = ordersArray.length;
+        const products = [
+            { name: "टमाटर", price: 40, qtyId: "qty_0" },
+            { name: "आलू", price: 30, qtyId: "qty_1" },
+            { name: "प्याज़", price: 50, qtyId: "qty_2" },
+            { name: "हरी मिर्च", price: 80, qtyId: "qty_3" }
+        ];
 
-        container.innerHTML = "";
-        ordersArray.reverse().forEach(order => {
-            let itemsHtml = "";
-            if (order.items) {
-                order.items.forEach(i => {
-                    itemsHtml += `<li>${i.name} - ${i.qty} kg (₹${i.price}/kg)</li>`;
-                });
+        let orderedItems = [];
+        let totalAmount = 0;
+
+        products.forEach(p => {
+            let qty = parseFloat(document.getElementById(p.qtyId).value) || 0;
+            if (qty > 0) {
+                let itemTotal = qty * p.price;
+                orderedItems.push({ name: p.name, qty: qty, price: p.price });
+                totalAmount += itemTotal;
             }
-
-            let card = document.createElement('div');
-            card.className = "order-card pending";
-            card.innerHTML = `
-                <strong>ग्राहक: ${order.customerName}</strong><br>
-                📞 फोन: <a href="tel:${order.customerPhone}">${order.customerPhone}</a><br>
-                📍 पता: ${order.customerAddress}<br>
-                <strong>कुल राशि: ₹${order.totalAmount}</strong>
-                <div class="item-list"><ul>${itemsHtml}</ul></div>
-                <div class="btn-group">
-                    <button class="btn btn-accept" onclick="acceptOrder('${order.id}')">✅ स्वीकार करें</button>
-                    <button class="btn btn-reject" onclick="rejectOrder('${order.id}')">❌ रद्द करें</button>
-                </div>
-            `;
-            container.appendChild(card);
         });
-    });
 
-    window.acceptOrder = function(orderId) {
-        alert('ऑर्डर स्वीकार कर लिया गया है!');
-        remove(ref(db, 'orders/' + orderId));
-    };
-
-    window.rejectOrder = function(orderId) {
-        if(confirm('क्या आप वाकई इस ऑर्डर को रद्द करना चाहते हैं?')) {
-            remove(ref(db, 'orders/' + orderId));
+        if (orderedItems.length === 0) {
+            alert('कृपया कम से कम एक सब्ज़ी की मात्रा (Quantity) चुनें!');
+            return;
         }
+
+        const orderData = {
+            customerName: name,
+            customerPhone: phone,
+            customerAddress: address,
+            items: orderedItems,
+            totalAmount: totalAmount,
+            timestamp: Date.now()
+        };
+
+        push(ref(db, 'orders'), orderData)
+            .then(() => {
+                alert('🎉 आपका आर्डर सफलतापर्वक भेज दिया गया है!');
+                // फॉर्म खाली करें
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerPhone').value = '';
+                document.getElementById('customerAddress').value = '';
+                products.forEach(p => document.getElementById(p.qtyId).value = 0);
+            })
+            .catch((error) => {
+                alert('आर्डर भेजने में कुछ दिक्कत आई: ' + error.message);
+            });
     };
 </script>
 
