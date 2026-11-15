@@ -48,11 +48,14 @@
 
         .history-floating-btn { background: #37474f; color: white; border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); margin: 10px auto 4px auto; }
 
-        /* हिस्ट्री पॉप-अप व अंदर के बटन */
+        /* हिस्ट्री पॉप-अप व बटन स्पेसिंग फिक्स */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 5px; box-sizing: border-box; }
         .modal-content { background: white; padding: 10px; width: 92%; max-width: 360px; border-radius: 6px; max-height: 80vh; overflow-y: auto; box-sizing: border-box; position: relative; margin: auto; }
-        .close-modal { position: absolute; top: 5px; right: 6px; font-size: 12px; font-weight: bold; cursor: pointer; color: #fff; background: #c62828; padding: 1px 5px; border-radius: 50%; z-index: 10; }
         
+        /* ✅ 'सभी हटाएं' और '×' के बीच सुरक्षित स्पेसिंग */
+        .close-modal { position: absolute; top: 8px; right: 8px; font-size: 14px; font-weight: bold; cursor: pointer; color: #fff; background: #c62828; padding: 2px 7px; border-radius: 50%; z-index: 10; }
+        .clear-all-btn { background: #c62828; color: white; border: none; padding: 4px 8px; font-size: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 35px; }
+
         .history-item-box { background: #f1f8e9; border-left: 2px solid #2e7d32; padding: 6px; margin-bottom: 6px; font-size: 10px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; }
         .rejected-item-box { background: #fafafa; border-left: 2px solid #757575; padding: 6px; margin-bottom: 6px; font-size: 10px; border-radius: 3px; color: #555; display: flex; justify-content: space-between; align-items: center; }
         
@@ -73,9 +76,9 @@
 <div id="historyModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding-right: 30px;">
             <h3 style="color:#e65100; margin:0; font-size:13px;">📊 आर्डर का इतिहास (History)</h3>
-            <button onclick="clearAllHistory()" style="background:#c62828; color:white; border:none; padding:3px 6px; font-size:9px; border-radius:3px; cursor:pointer; font-weight:bold;">🗑️ सभी हटाएं</button>
+            <button class="clear-all-btn" onclick="clearAllHistory()">🗑️ सभी हटाएं</button>
         </div>
         <hr style="border:0; border-top:1px solid #ddd; margin-bottom:6px;">
         
@@ -343,13 +346,12 @@
         alert("सभी नए आर्डर्स देखे जा चुके हैं।");
     };
 
-    // जब तक आर्डर पेंडिंग है, तेज और अलग तरह की घंटी लगातार बजती रहेगी
     function startContinuousAlarm() {
         if (alarmInterval) return;
         playSpecialAlarm();
         alarmInterval = setInterval(() => {
             playSpecialAlarm();
-        }, 2500); // हर 2.5 सेकंड में तेज बीप
+        }, 2500);
     }
 
     function stopContinuousAlarm() {
@@ -364,7 +366,7 @@
             let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
-            osc.type = 'sawtooth'; // तेज और अलग आवाज
+            osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
             osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.2);
             gain.gain.setValueAtTime(1, audioCtx.currentTime);
@@ -437,7 +439,6 @@
         });
     }
 
-    // हिस्ट्री लोड करना (शेयर और डिलीट बटन के साथ)
     function loadHistoryData() {
         const acceptedContainer = document.getElementById('accepted-history-container');
         const rejectedContainer = document.getElementById('rejected-history-container');
@@ -496,20 +497,19 @@
         });
     }
 
-    // सिंगल हिस्ट्री आइटम डिलीट करना
     window.deleteHistoryItem = function(key) {
         if(confirm("क्या आप वाकई इस आर्डर को हिस्ट्री से हटाना चाहते हैं?")) {
             remove(ref(db, 'orderHistory/' + key));
         }
     };
 
-    // सभी हिस्ट्री एक साथ डिलीट करना
     window.clearAllHistory = function() {
         if(confirm("क्या आप वाकई सभी आर्डर हिस्ट्री को साफ़ करना चाहते हैं?")) {
             remove(ref(db, 'orderHistory'));
         }
     };
 
+    // ऑर्डर स्वीकार करना और ग्राहक को नोटिफिकेशन भेजना
     window.acceptOrder = function(orderId, name, amount, phone, address) {
         stopContinuousAlarm();
         let historyData = {
@@ -521,12 +521,20 @@
             timestamp: Date.now()
         };
 
-        push(ref(db, 'orderHistory'), historyData).then(() => {
-            alert('ऑर्डर स्वीकार कर लिया गया है!');
-            remove(ref(db, 'orders/' + orderId));
+        // ग्राहक के लिए लाइव स्टेटस डेटाबेस में सेव करें
+        set(ref(db, 'customerNotification/' + phone), {
+            status: 'accepted',
+            msg: `आपका ऑर्डर स्वीकार कर लिया गया है! (₹${amount})`,
+            timestamp: Date.now()
+        }).then(() => {
+            push(ref(db, 'orderHistory'), historyData).then(() => {
+                alert('ऑर्डर स्वीकार कर लिया गया है और ग्राहक को नोटिफिकेशन भेज दिया गया है!');
+                remove(ref(db, 'orders/' + orderId));
+            });
         });
     };
 
+    // ऑर्डर रद्द करना और ग्राहक को नोटिफिकेशन भेजना
     window.rejectOrder = function(orderId, name, phone) {
         if(confirm('क्या आप वाकई इस ऑर्डर को रद्द करना चाहते हैं?')) {
             stopContinuousAlarm();
@@ -537,9 +545,16 @@
                 timestamp: Date.now()
             };
 
-            push(ref(db, 'orderHistory'), historyData).then(() => {
-                alert('ऑर्डर रद्द कर दिया गया है।');
-                remove(ref(db, 'orders/' + orderId));
+            // ग्राहक के लिए लाइव स्टेटस डेटाबेस में सेव करें
+            set(ref(db, 'customerNotification/' + phone), {
+                status: 'rejected',
+                msg: `माफ़ कीजिए, आपका ऑर्डर रद्द कर दिया गया है।`,
+                timestamp: Date.now()
+            }).then(() => {
+                push(ref(db, 'orderHistory'), historyData).then(() => {
+                    alert('ऑर्डर रद्द कर दिया गया है और ग्राहक को सूचित कर दिया गया है।');
+                    remove(ref(db, 'orders/' + orderId));
+                });
             });
         }
     };
