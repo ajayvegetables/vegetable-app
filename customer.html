@@ -11,22 +11,25 @@
     
     <style>
         body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; color: #333; }
-        .top-header { background: #2e7d32; color: white; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* टॉप हेडर - टोकरी और नाम बिल्कुल बीच में */
+        .top-header { background: #2e7d32; color: white; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 15px; display: flex; justify-content: center; align-items: center; gap: 6px; }
+        
         .container { max-width: 500px; margin: auto; background: white; padding: 10px; min-height: 100vh; box-sizing: border-box; }
         
-        /* टॉप हेल्प बटन */
-        .help-btn { background: #c62828; color: white; padding: 4px 10px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        /* दुकान और हेल्प वाली लाइन (एक ही लाइन में, दुकान बाईं तरफ, हेल्प दाईं तरफ) */
+        .middle-action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        
+        .shop-card-left { display: flex; align-items: center; gap: 6px; background: #e8f5e9; border: 1px solid #c8e6c9; padding: 6px 12px; border-radius: 6px; text-decoration: none; color: #1b5e20; font-weight: bold; font-size: 12px; }
+        .shop-card-left span { font-size: 18px; }
 
-        /* दुकानदार का बड़ा आइकॉन बार */
-        .shop-header-card { display: flex; flex-direction: column; align-items: center; background: #e8f5e9; border: 1px solid #c8e6c9; padding: 10px; border-radius: 8px; margin-bottom: 12px; text-decoration: none; color: #1b5e20; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .shop-icon { font-size: 28px; margin-bottom: 2px; }
-        .shop-label { font-size: 13px; font-weight: bold; }
+        .help-btn-right { background: #c62828; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 4px; }
 
         .section-title { font-weight: bold; font-size: 13px; color: #2e7d32; margin: 10px 0 6px 0; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; }
 
-        /* कैटलॉग कार्ड */
+        /* कैटलॉग कार्ड (हर सब्जी का अलग फोटो/इमोजी) */
         .product-card { display: flex; align-items: center; background: #fff; border: 1px solid #e0e0e0; padding: 8px; border-radius: 6px; margin-bottom: 8px; gap: 10px; }
-        .product-img { width: 38px; height: 38px; background: #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .product-img { width: 38px; height: 38px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .product-info { flex: 1; }
         .product-name { font-size: 12px; font-weight: bold; color: #333; }
         .product-price { font-size: 11px; color: #d32f2f; font-weight: bold; }
@@ -55,22 +58,27 @@
 </head>
 <body>
 
+<!-- टॉप हेडर - टोकरी और नाम बिल्कुल बीच में -->
 <div class="top-header">
-    <span>🛒 अजय वेजिटेबल्स</span>
-    <a href="tel:9997077062" class="help-btn">📞 Help</a>
+    <span>🛒</span>
+    <span>अजय वेजिटेबल्स</span>
 </div>
 
 <div class="container">
     
-    <!-- दुकानदार का बड़ा आइकॉन जिसपर क्लिक करने से कॉल लगेगा -->
-    <a href="tel:9997077062" class="shop-header-card">
-        <div class="shop-icon">🏪</div>
-        <div class="shop-label">दुकान</div>
-    </a>
+    <!-- दुकान (बाईं तरफ) और Help बटन (दाईं तरफ) एक ही लाइन में -->
+    <div class="middle-action-bar">
+        <a href="tel:9997077062" class="shop-card-left">
+            <span>🏪</span> दुकान
+        </a>
+        <a href="tel:9997077062" class="help-btn-right">
+            📞 Help
+        </a>
+    </div>
 
     <div class="section-title">सब्जी कैटलॉग (अपनी पसंद चुनें)</div>
     
-    <!-- ओरिजिनल लाइव कैटलॉग (Firebase डेटाबेस से जुड़ी हुई) -->
+    <!-- ओरिजिनल लाइव कैटलॉग (हर सब्जी के सामने उसका सही फोटो/इमोजी) -->
     <div id="catalogContainer">
         <p style="text-align: center; color: #777; font-size: 12px;">कैटलॉग लोड हो रही है...</p>
     </div>
@@ -121,7 +129,7 @@
 <!-- Firebase और लाइव कैटलॉग लॉजिक -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
@@ -156,6 +164,22 @@
         { label: "10 किलो", value: 10.0 }
     ];
 
+    // सब्जी के नाम के अनुसार सही फोटो/इमोजी चुनने का फंक्शन
+    function getVegEmoji(name) {
+        let n = name.trim().toLowerCase();
+        if (n.includes('टमाटर')) return '🍅';
+        if (n.includes('आलू')) return '🥔';
+        if (n.includes('प्याज') || n.includes('प्याज़')) return '🧅';
+        if (n.includes('कद्दू')) return '🎃';
+        if (n.includes('मटर')) return '🟢';
+        if (n.includes('मिर्च')) return '🌶️';
+        if (n.includes('गोभी')) return '🥦';
+        if (n.includes('नींबू')) return '🍋';
+        if (n.includes('धनिया')) return '🌿';
+        if (n.includes('गाजर')) return '🥕';
+        return '🥗'; // डिफ़ॉल्ट सब्जी आइकन
+    }
+
     window.onload = function() {
         if(localStorage.getItem("savedName")) document.getElementById('custName').value = localStorage.getItem("savedName");
         if(localStorage.getItem("savedPhone")) document.getElementById('custPhone').value = localStorage.getItem("savedPhone");
@@ -166,7 +190,7 @@
 
     function loadLiveCatalog() {
         const container = document.getElementById('catalogContainer');
-        // चूंकि दुकानदार वाले ऐप में कैटलॉग फिक्स या लोकल है, हम यहाँ ओरिजिनल डिफॉल्ट सब्जियां लोड कर रहे हैं जो शॉपकीपर ऐप से मैच करें
+        // ओरिजिनल कैटलॉग (टमाटर, आलू, प्याज)
         liveCatalog = [
             { name: "टमाटर", price: 40 },
             { name: "आलू", price: 30 },
@@ -181,10 +205,12 @@
                 optionsHtml += `<option value="${w.value}" ${sel}>${w.label}</option>`;
             });
 
+            let emoji = getVegEmoji(item.name);
+
             let div = document.createElement('div');
             div.className = "product-card";
             div.innerHTML = `
-                <div class="product-img">🥗</div>
+                <div class="product-img">${emoji}</div>
                 <div class="product-info">
                     <div class="product-name">${item.name}</div>
                     <div class="product-price">₹${item.price} / किलो</div>
