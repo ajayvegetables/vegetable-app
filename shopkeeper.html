@@ -20,7 +20,7 @@
         .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 13px; }
         .btn-main { background: #e65100; color: white; border: none; width: 100%; padding: 10px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
         
-        /* ✅ टॉप फिक्सड बटन - अब कभी नहीं कटेंगे */
+        /* टॉप फिक्सड बटन */
         .top-bar-fixed { position: fixed; top: 8px; right: 10px; display: flex; gap: 6px; z-index: 999; }
         .help-btn { background: #2e7d32; color: white; padding: 5px 10px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .notif-badge-btn { background: #c62828; color: white; padding: 5px 10px; border-radius: 12px; font-weight: bold; font-size: 12px; cursor: pointer; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
@@ -40,7 +40,7 @@
         .item-list { font-size: 12px; margin: 4px 0; padding-left: 15px; }
         .error-msg { color: red; font-size: 12px; text-align: center; margin-top: 6px; }
 
-        /* ✅ बिना बॉक्स वाली साफ-सुथरी कैटलॉग लिस्ट और "हटाएं" बटन */
+        /* साफ़ कैटलॉग लिस्ट और "हटाएं" बटन */
         .item-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; width: 100%; box-sizing: border-box; border-bottom: 1px solid #eee; padding-bottom: 6px; }
         .item-row input.item-name { flex: 1.8; border: none; background: transparent; font-size: 14px; font-weight: bold; color: #333; outline: none; }
         .item-row input.item-price { flex: 0.9; border: 1px solid #ddd; background: #fff; padding: 5px; font-size: 13px; border-radius: 4px; text-align: center; }
@@ -59,13 +59,11 @@
 </head>
 <body>
 
-<!-- टॉप फिक्सड बटन (अब बिल्कुल सही जगह पर) -->
 <div class="top-bar-fixed">
     <button class="notif-badge-btn" onclick="openNotifications()">🔔 <span id="notifCount">0</span></button>
     <a href="tel:9997077062" class="help-btn">📞 Help</a>
 </div>
 
-<!-- हिस्ट्री पॉप-अप विंडो -->
 <div id="historyModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
@@ -86,7 +84,6 @@
 
 <div class="container">
     
-    <!-- 1. लॉगिन स्क्रीन -->
     <div id="loginScreen" class="screen active">
         <h2>🔐 वेजिटेबल पार्टनर - लॉगिन</h2>
         <p style="text-align: center; color: #666; font-size: 12px;">लॉगिन करने के लिए मोबाइल नंबर दर्ज करें</p>
@@ -104,7 +101,6 @@
         <div id="loginError" class="error-msg"></div>
     </div>
 
-    <!-- 2. सब्सक्रिप्शन पेमेंट स्क्रीन (₹30) -->
     <div id="subScreen" class="screen">
         <h2>💳 सब्सक्रिप्शन भुगतान</h2>
         <p style="text-align: center; color: #d32f2f; font-weight: bold; font-size:13px;">आपका सब्सक्रिप्शन सक्रिय नहीं है!</p>
@@ -120,12 +116,10 @@
         <button class="btn-main" onclick="confirmSubscription()">भुगतान कर दिया है (Activate)</button>
     </div>
 
-    <!-- 3. मुख्य दुकानदार डैशबोर्ड व कैटलॉग मैनेजर -->
     <div id="dashboardScreen" class="screen">
         <h2>🔔 वेजिटेबल पार्टनर डैशबोर्ड</h2>
         <div class="status-bar" id="connectionStatus">लाइव डेटाबेस से जुड़ रहा है...</div>
 
-        <!-- दुकान की सेटिंग्स व कैटलॉग -->
         <div class="section-box">
             <h3>⚙️ दुकान की सेटिंग्स व कैटलॉग</h3>
             <div class="form-group">
@@ -168,7 +162,6 @@
             <p style="text-align: center; color: #777; font-size:12px;">नया ऑर्डर आने का इंतज़ार है...</p>
         </div>
 
-        <!-- हिस्ट्री खोलने वाला बटन -->
         <button class="history-section-btn" onclick="openHistoryModal()">
             📜 आर्डर का इतिहास (History देखें)
         </button>
@@ -178,7 +171,6 @@
 
 </div>
 
-<!-- Firebase और लॉजिक स्क्रिप्ट -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -274,7 +266,7 @@
     };
 
     window.saveCatalogSettings = function() {
-        alert("कैटलॉग और दुकान की सेटिंग्स सफलताપर्वक सेव कर दी गईं हैं!");
+        alert("कैटलॉग और दुकान की सेटिंग्स सफलतापर्वक सेव कर दी गईं हैं!");
     };
 
     window.openHistoryModal = function() {
