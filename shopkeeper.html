@@ -44,13 +44,17 @@
         .btn-reject { background: #c62828; }
         .btn-call { background: #0288d1; text-decoration: none; text-align: center; display: inline-block; padding: 5px 8px; border-radius: 3px; color: white; font-weight: bold; margin-top: 5px; font-size: 11px; width: 100%; box-sizing: border-box; }
 
+        /* कैटलॉग आइटम रो और स्टॉक टॉगल बटन */
         .item-row { display: flex; flex-direction: column; background: #fff; border: 1px solid #eee; padding: 6px; border-radius: 5px; margin-bottom: 6px; box-sizing: border-box; }
         .item-top { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 4px; }
-        .item-row input.item-name { width: 65%; border: none; background: transparent; font-size: 12px; font-weight: bold; color: #333; outline: none; }
-        .item-bottom { display: flex; align-items: center; gap: 6px; width: 100%; border-top: 1px dashed #f0f0f0; padding-top: 4px; }
-        .item-row input.item-price { width: 45px; border: 1px solid #ccc; background: #fff; padding: 2px; font-size: 11px; text-align: center; border-radius: 3px; outline: none; font-weight: bold; color: #e65100; }
+        .item-row input.item-name { width: 50%; border: none; background: transparent; font-size: 12px; font-weight: bold; color: #333; outline: none; }
+        .item-bottom { display: flex; align-items: center; gap: 4px; width: 100%; border-top: 1px dashed #f0f0f0; padding-top: 4px; }
+        .item-row input.item-price { width: 40px; border: 1px solid #ccc; background: #fff; padding: 2px; font-size: 11px; text-align: center; border-radius: 3px; outline: none; font-weight: bold; color: #e65100; }
         .item-row span { font-size: 10px; color: #666; }
-        .item-row button.remove-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 10px; margin-left: auto; }
+        
+        .stock-toggle-btn { background: #2e7d32; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 9px; font-weight: bold; cursor: pointer; }
+        .stock-toggle-btn.out-of-stock { background: #c62828; }
+        .remove-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 3px 6px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 9px; margin-left: auto; }
 
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 5px; box-sizing: border-box; }
         .modal-content { background: white; padding: 10px; width: 92%; max-width: 360px; border-radius: 6px; max-height: 80vh; overflow-y: auto; box-sizing: border-box; position: relative; margin: auto; }
@@ -162,7 +166,6 @@
         <h2>🔔 वेजिटेबल पार्टनर डैशबोर्ड</h2>
         <div class="status-bar" id="connectionStatus">लाइव डेटाबेस से जुड़ रहा है...</div>
 
-        <!-- ✅ नए ऑर्डर्स की सूची को सबसे ऊपर रख दिया गया है ताकि स्क्रॉल न करना पड़े -->
         <h3 style="font-size:12px; margin-top:0; color:#d32f2f;">🚨 नए आर्डर्स की सूची:</h3>
         <div id="orders-container">
             <p style="text-align: center; color: #777; font-size:10px;">नया ऑर्डर आने का इंतज़ार है...</p>
@@ -215,7 +218,7 @@
     let alarmInterval = null;
     let lastDeletedHistory = {};
     let activeOrdersData = {};
-    let removedItemsTracker = {}; // कौन सा आइटम काटा गया है उसे ट्रैक करने के लिए
+    let removedItemsTracker = {};
 
     window.onload = function() {
         let savedPhone = localStorage.getItem("partnerPhone");
@@ -288,25 +291,29 @@
                     renderCatalog(data.catalog);
                 } else {
                     renderCatalog([
-                        {name: "टमाटर", price: 40},
-                        {name: "आलू", price: 30},
-                        {name: "प्याज़", price: 50}
+                        {name: "टमाटर", price: 40, outOfStock: false},
+                        {name: "आलू", price: 30, outOfStock: false},
+                        {name: "प्याज़", price: 50, outOfStock: false}
                     ]);
                 }
             } else {
                 renderCatalog([
-                    {name: "टमाटर", price: 40},
-                    {name: "आलू", price: 30},
-                    {name: "प्याज़", price: 50}
+                    {name: "टमाटर", price: 40, outOfStock: false},
+                    {name: "आलू", price: 30, outOfStock: false},
+                    {name: "प्याज़", price: 50, outOfStock: false}
                 ]);
             }
         });
     }
 
+    // ✅ कैटलॉग रेंडर करते समय 'स्टॉक नहीं है' बटन जोड़ना
     function renderCatalog(items) {
         let container = document.getElementById('catalog-items-container');
         container.innerHTML = "";
-        items.forEach((item) => {
+        items.forEach((item, index) => {
+            let isOut = item.outOfStock ? "out-of-stock" : "";
+            let btnText = item.outOfStock ? "स्टॉक में है" : "स्टॉक नहीं है";
+
             let div = document.createElement('div');
             div.className = "item-row";
             div.innerHTML = `
@@ -316,12 +323,35 @@
                 <div class="item-bottom">
                     <input type="number" class="item-price" value="${item.price}" placeholder="रेट">
                     <span>₹/kg</span>
+                    <button class="stock-toggle-btn ${isOut}" onclick="toggleStock(${index})">${btnText}</button>
                     <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
                 </div>
             `;
             container.appendChild(div);
         });
     }
+
+    // ✅ स्टॉक टॉगल करने का फंक्शन (जैसे ही क्लिक हो, स्थिति बदलकर तुरंत सेव हो जाएगी)
+    window.toggleStock = function(index) {
+        let rows = document.querySelectorAll('.item-row');
+        let catalog = [];
+        rows.forEach((row, idx) => {
+            let name = row.querySelector('.item-name').value.trim();
+            let price = parseFloat(row.querySelector('.item-price').value) || 0;
+            let stockBtn = row.querySelector('.stock-toggle-btn');
+            let isOut = idx === index ? !stockBtn.classList.contains('out-of-stock') : stockBtn.classList.contains('out-of-stock');
+            
+            if(name) {
+                catalog.push({ name: name, price: price, outOfStock: isOut });
+            }
+        });
+
+        let upi = document.getElementById('shopUpi').value.trim();
+        let whatsapp = document.getElementById('shopWhatsapp').value.trim();
+        let offerText = document.getElementById('shopOfferText').value.trim();
+
+        set(ref(db, 'shopSettings'), { upi, whatsapp, offerText, catalog });
+    };
 
     window.addNewItemRow = function() {
         let container = document.getElementById('catalog-items-container');
@@ -334,6 +364,7 @@
             <div class="item-bottom">
                 <input type="number" class="item-price" placeholder="रेट">
                 <span>₹/kg</span>
+                <button class="stock-toggle-btn" onclick="this.classList.toggle('out-of-stock'); this.innerText = this.classList.contains('out-of-stock') ? 'स्टॉक में है' : 'स्टॉक नहीं है';">स्टॉक नहीं है</button>
                 <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
             </div>
         `;
@@ -350,8 +381,11 @@
         rows.forEach(row => {
             let name = row.querySelector('.item-name').value.trim();
             let price = parseFloat(row.querySelector('.item-price').value) || 0;
+            let stockBtn = row.querySelector('.stock-toggle-btn');
+            let isOut = stockBtn ? stockBtn.classList.contains('out-of-stock') : false;
+
             if(name) {
-                catalog.push({ name: name, price: price });
+                catalog.push({ name: name, price: price, outOfStock: isOut });
             }
         });
 
@@ -493,7 +527,6 @@
         });
     }
 
-    // ✅ सब्जी हटाने पर नाम सेव करना ताकि स्वीकार करने पर ग्राहक को साफ़ पता चले
     window.removeOrderItemItem = function(orderId, index) {
         if (activeOrdersData[orderId] && activeOrdersData[orderId].items) {
             let removedItem = activeOrdersData[orderId].items.splice(index, 1)[0];
@@ -529,7 +562,6 @@
                 let waShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
 
                 if(h.status === 'accepted') {
-                    // ✅ स्वीकृत आर्डर्स के सामने शेयर और डिलीट दोनों बटन
                     acceptedHtml += `
                         <div class="history-item-box" onclick="showOrderDetails(event, '${key}')">
                             <div>
@@ -654,7 +686,6 @@
         });
     };
 
-    // ✅ आर्डर स्वीकार करने पर ग्राहक को हटाए गए आइटम (जैसे प्याज) के नाम के साथ नोटिफिकेशन भेजना
     window.acceptOrder = function(orderId, event) {
         event.stopPropagation();
         stopContinuousAlarm();
@@ -677,7 +708,7 @@
                 let removedNames = removedItemsTracker[orderId];
                 let msgText = `✅ आपका ऑर्डर स्वीकार कर लिया गया है! (₹${order.totalAmount})`;
                 if (removedNames && removedNames.length > 0) {
-                    msgText = `✅ आपका ऑर्डर स्वीकार कर लिया गया है! (स्टॉक न होने के कारण '${removedNames.join(', ')}' को हटा दिया गया है)।`;
+                    msgText = `✅ आपका ऑर्डर स्वीकार कर लिया गया है! लेकिन स्टॉक न होने के कारण '${removedNames.join(', ')}' को हटा दिया गया है।`;
                 }
 
                 set(ref(db, 'customerNotification/' + order.customerPhone), {
