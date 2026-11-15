@@ -31,25 +31,19 @@
         .section-box { background: #fafafa; border: 1px solid #ddd; padding: 8px; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box; }
         .section-box h3 { margin-top: 0; color: #e65100; font-size: 12px; border-bottom: 2px solid #ffe0b2; padding-bottom: 2px; }
         
-        .order-card { background: #ffebee; border: 1px solid #ffcdd2; border-left: 4px solid #d32f2f; padding: 8px; border-radius: 5px; margin-bottom: 8px; font-size: 11px; box-sizing: border-box; }
-        .location-info { font-size: 10px; color: #d32f2f; font-weight: bold; margin: 2px 0; background: #fff; padding: 2px 4px; border-radius: 3px; display: inline-block; border: 1px solid #ffcdd2; }
-        .map-link-btn { background: #1976d2; color: white; padding: 2px 6px; border-radius: 3px; text-decoration: none; font-size: 9px; font-weight: bold; display: inline-block; margin-top: 2px; }
+        /* बड़े अक्षरों में आकर्षक आर्डर कार्ड */
+        .order-card { background: #ffebee; border: 2px solid #d32f2f; border-left: 6px solid #d32f2f; padding: 12px; border-radius: 6px; margin-bottom: 10px; font-size: 12px; box-sizing: border-box; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .location-info { font-size: 11px; color: #d32f2f; font-weight: bold; margin: 3px 0; background: #fff; padding: 3px 6px; border-radius: 3px; display: inline-block; border: 1px solid #ffcdd2; }
+        .map-link-btn { background: #1976d2; color: white; padding: 3px 8px; border-radius: 3px; text-decoration: none; font-size: 10px; font-weight: bold; display: inline-block; margin-top: 3px; }
         
-        .btn-group { display: flex; gap: 4px; margin-top: 5px; }
-        .btn { flex: 1; padding: 5px; border: none; border-radius: 3px; font-weight: bold; cursor: pointer; color: white; font-size: 10px; }
+        .editable-item-row { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 4px 6px; border: 1px solid #ffcdd2; border-radius: 3px; margin-bottom: 3px; font-size: 11px; }
+        .remove-item-btn { background: #c62828; color: white; border: none; padding: 2px 6px; font-size: 10px; border-radius: 3px; cursor: pointer; font-weight: bold; }
+
+        .btn-group { display: flex; gap: 6px; margin-top: 8px; }
+        .btn { flex: 1; padding: 7px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 11px; }
         .btn-accept { background: #2e7d32; }
         .btn-reject { background: #c62828; }
-        .btn-call { background: #0288d1; text-decoration: none; text-align: center; display: inline-block; padding: 4px 6px; border-radius: 3px; color: white; font-weight: bold; margin-top: 3px; font-size: 10px; }
-        .item-list { font-size: 10px; margin: 2px 0; padding-left: 10px; }
-        .error-msg { color: red; font-size: 10px; text-align: center; margin-top: 4px; }
-
-        .item-row { display: flex; flex-direction: column; background: #fff; border: 1px solid #eee; padding: 6px; border-radius: 5px; margin-bottom: 6px; box-sizing: border-box; }
-        .item-top { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 4px; }
-        .item-row input.item-name { width: 65%; border: none; background: transparent; font-size: 12px; font-weight: bold; color: #333; outline: none; }
-        .item-bottom { display: flex; align-items: center; gap: 6px; width: 100%; border-top: 1px dashed #f0f0f0; padding-top: 4px; }
-        .item-row input.item-price { width: 45px; border: 1px solid #ccc; background: #fff; padding: 2px; font-size: 11px; text-align: center; border-radius: 3px; outline: none; font-weight: bold; color: #e65100; }
-        .item-row span { font-size: 10px; color: #666; }
-        .item-row button.remove-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 10px; margin-left: auto; }
+        .btn-call { background: #0288d1; text-decoration: none; text-align: center; display: inline-block; padding: 5px 8px; border-radius: 3px; color: white; font-weight: bold; margin-top: 5px; font-size: 11px; width: 100%; box-sizing: border-box; }
 
         /* मॉडल पॉप-अप */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 5px; box-sizing: border-box; }
@@ -91,7 +85,6 @@
     </div>
 </div>
 
-<!-- आर्डर की पूरी डिटेल देखने के लिए पॉप-अप -->
 <div id="detailModal" class="modal" onclick="closeDetailModalOutside(event)">
     <div class="modal-content" id="detailModalContent">
         <span class="close-modal" onclick="closeDetailModal()">&times;</span>
@@ -101,7 +94,6 @@
     </div>
 </div>
 
-<!-- हिस्ट्री पॉप-अप विंडो -->
 <div id="historyModal" class="modal" onclick="checkOutsideClick(event)">
     <div class="modal-content" id="historyModalContent">
         <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
@@ -186,10 +178,8 @@
             <button class="btn-main" style="font-size:11px; padding:7px; margin-top:6px;" onclick="saveCatalogSettings()">कैटलॉग व सेटिंग्स सेव करें</button>
         </div>
 
-        <h3 style="font-size:12px;">🛍️ नए ऑर्डर्स की सूची:</h3>
-        <div id="orders-container">
-            <p style="text-align: center; color: #777; font-size:10px;">नया ऑर्डर आने का इंतज़ार है...</p>
-        </div>
+        <!-- नए ऑर्डर्स की सूची (फालतू टेक्स्ट हटाए गए) -->
+        <div id="orders-container"></div>
     </div>
 
 </div>
@@ -215,11 +205,10 @@
     let customerNotifications = [];
     let alarmInterval = null;
     let lastDeletedHistory = {};
+    let activeOrdersData = {}; // पेंडिंग ऑर्डर्स का डेटा स्टोर करने के लिए
 
     window.onload = function() {
         let savedPhone = localStorage.getItem("partnerPhone");
-        let isSubscribed = localStorage.getItem("isSubscribed");
-
         if (savedPhone) {
             showDashboard();
         }
@@ -304,67 +293,6 @@
         });
     }
 
-    function renderCatalog(items) {
-        let container = document.getElementById('catalog-items-container');
-        container.innerHTML = "";
-        items.forEach((item) => {
-            let div = document.createElement('div');
-            div.className = "item-row";
-            div.innerHTML = `
-                <div class="item-top">
-                    <input type="text" class="item-name" value="${item.name}" placeholder="आइटम नाम">
-                </div>
-                <div class="item-bottom">
-                    <input type="number" class="item-price" value="${item.price}" placeholder="रेट">
-                    <span>₹/kg</span>
-                    <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
-                </div>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    window.addNewItemRow = function() {
-        let container = document.getElementById('catalog-items-container');
-        let div = document.createElement('div');
-        div.className = "item-row";
-        div.innerHTML = `
-            <div class="item-top">
-                <input type="text" class="item-name" placeholder="आइटम नाम">
-            </div>
-            <div class="item-bottom">
-                <input type="number" class="item-price" placeholder="रेट">
-                <span>₹/kg</span>
-                <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
-            </div>
-        `;
-        container.appendChild(div);
-    };
-
-    window.saveCatalogSettings = function() {
-        let upi = document.getElementById('shopUpi').value.trim();
-        let whatsapp = document.getElementById('shopWhatsapp').value.trim();
-        let offerText = document.getElementById('shopOfferText').value.trim();
-        
-        let rows = document.querySelectorAll('.item-row');
-        let catalog = [];
-        rows.forEach(row => {
-            let name = row.querySelector('.item-name').value.trim();
-            let price = parseFloat(row.querySelector('.item-price').value) || 0;
-            if(name) {
-                catalog.push({ name: name, price: price });
-            }
-        });
-
-        let settingsData = { upi: upi, whatsapp: whatsapp, offerText: offerText, catalog: catalog };
-        
-        set(ref(db, 'shopSettings'), settingsData).then(() => {
-            alert("कैटलॉग, UPI और ऑफर लाइव सेव कर दिए गए हैं!");
-        }).catch((err) => {
-            alert("त्रुटि: " + err.message);
-        });
-    };
-
     window.openNotifications = function() {
         customerNotifications = [];
         document.getElementById('notifCount').innerText = "0";
@@ -378,13 +306,6 @@
 
     window.closeCustomAlert = function() {
         document.getElementById('customAlertModal').style.display = 'none';
-    };
-
-    window.closeCustomAlertOutside = function(event) {
-        let box = document.getElementById('customAlertBox');
-        if (!box.contains(event.target)) {
-            closeCustomAlert();
-        }
     };
 
     function startContinuousAlarm() {
@@ -420,6 +341,7 @@
         }
     }
 
+    // ✅ लाइव ऑर्डर और बेल आइकॉन पर पेंडिंग काउंट
     function startLiveOrders() {
         const statusEl = document.getElementById('connectionStatus');
         const container = document.getElementById('orders-container');
@@ -431,17 +353,22 @@
             const data = snapshot.val();
 
             if (!data) {
-                container.innerHTML = '<p style="text-align: center; color: #777; font-size:10px;">फिलहाल कोई नया ऑर्डर नहीं है।</p>';
+                container.innerHTML = '';
+                document.getElementById('notifCount').innerText = "0";
                 previousCount = 0;
                 stopContinuousAlarm();
+                activeOrdersData = {};
                 return;
             }
 
+            activeOrdersData = data;
             let ordersArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+
+            // बेल आइकॉन पर पेंडिंग ऑर्डर्स की सटीक संख्या दिखाना
+            document.getElementById('notifCount').innerText = ordersArray.length;
 
             if (previousCount !== null && ordersArray.length > previousCount) {
                 customerNotifications.push("नया आर्डर प्राप्त हुआ है!");
-                document.getElementById('notifCount').innerText = customerNotifications.length;
             }
             previousCount = ordersArray.length;
 
@@ -454,9 +381,15 @@
             container.innerHTML = "";
             ordersArray.reverse().forEach(order => {
                 let itemsHtml = "";
-                if (order.items) {
-                    order.items.forEach(i => {
-                        itemsHtml += `<li>${i.name} - ${i.qtyText || i.qty + ' kg'} (₹${i.price}/kg)</li>`;
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach((i, idx) => {
+                        let qtyDisplay = i.qtyText || `${i.qty} kg`;
+                        itemsHtml += `
+                            <div class="editable-item-row" id="item_row_${order.id}_${idx}">
+                                <span><b>${i.name}</b> (${qtyDisplay}) - ₹${i.price}/kg</span>
+                                <button class="remove-item-btn" onclick="removeOrderItemItem('${order.id}', ${idx})">❌ हटाएं</button>
+                            </div>
+                        `;
                     });
                 }
 
@@ -465,12 +398,14 @@
                 let card = document.createElement('div');
                 card.className = "order-card";
                 card.innerHTML = `
+                    <div style="font-size:13px; font-weight:bold; color:#d32f2f; margin-bottom:4px;">🚨 नया आर्डर प्राप्त हुआ है!</div>
                     <strong>ग्राहक: ${order.customerName}</strong><br>
                     📞 फोन: <a href="tel:${order.customerPhone}">${order.customerPhone}</a><br>
                     📍 पता: ${order.customerAddress}<br>
                     <div class="location-info">📍 जीपीएस दूरी: ${order.distance || '0 मीटर'}</div> ${mapButtonHtml}<br>
                     <strong>कुल राशि: ₹${order.totalAmount}</strong>
-                    <div class="item-list"><ul>${itemsHtml}</ul></div>
+                    <div style="margin: 4px 0; font-size:11px; font-weight:bold;">सब्जी सूची (जो उपलब्ध न हो उसे हटाएं):</div>
+                    <div class="item-list" id="items_container_${order.id}">${itemsHtml}</div>
                     <a href="tel:${order.customerPhone}" class="btn-call">📞 ग्राहक को कॉल करें</a>
                     <div class="btn-group">
                         <button class="btn btn-accept" onclick="acceptOrder('${order.id}', event)">✅ स्वीकार करें</button>
@@ -482,7 +417,27 @@
         });
     }
 
-    function loadHistoryData() {
+    // ✅ दुकानदार द्वारा आर्डर की लिस्ट से कोई सब्जी कम/हटाने का फंक्शन
+    window.removeOrderItemItem = function(orderId, index) {
+        if (activeOrdersData[orderId] && activeOrdersData[orderId].items) {
+            let removedItem = activeOrdersData[orderId].items.splice(index, 1)[0];
+            
+            // संशोधित लिस्ट को डेटाबेस में अपडेट करें
+            set(ref(db, `orders/${orderId}/items`), activeOrdersData[orderId].items);
+
+            // ग्राहक के पास नोटिफिकेशन भेजें कि कौन सी सब्जी हटाई गई है
+            let phone = activeOrdersData[orderId].customerPhone;
+            set(ref(db, 'customerNotification/' + phone), {
+                status: 'updated',
+                msg: `⚠️ दुकानदार ने आपके आर्डर से '${removedItem.name}' हटा दिया है (स्टॉक में नहीं है)।`,
+                timestamp: Date.now()
+            });
+
+            alert(`'${removedItem.name}' को आर्डर से हटा दिया गया है और ग्राहक को सूचित कर दिया गया है।`);
+        }
+    };
+
+    window.loadHistoryData = function() {
         const acceptedContainer = document.getElementById('accepted-history-container');
         const rejectedContainer = document.getElementById('rejected-history-container');
 
@@ -537,9 +492,8 @@
             acceptedContainer.innerHTML = acceptedHtml || '<p style="font-size: 10px; color: #777;">कोई स्वीकृत आर्डर नहीं है।</p>';
             rejectedContainer.innerHTML = rejectedHtml || '<p style="font-size: 10px; color: #777;">कोई रद्द किया गया आर्डर नहीं है।</p>';
         });
-    }
+    };
 
-    // ✅ आर्डर की पूरी जानकारी (सब्जियों की लिस्ट और वजन सहित) दिखने वाला फिक्स फंक्शन
     window.showOrderDetails = function(event, key) {
         closeHistoryModal();
         const historyRef = ref(db, 'orderHistory/' + key);
@@ -549,10 +503,9 @@
                 let timeStr = new Date(h.timestamp).toLocaleString('hi-IN');
                 let itemsListHtml = "";
                 
-                // आर्डर में मौजूद सभी सब्जियों और उनके वजन को छोटे अक्षरों में साफ़ दिखाना
                 if (h.items && Array.isArray(h.items)) {
                     h.items.forEach(i => {
-                        let qtyDisplay = i.qtyText || `${i.qty} कि.मी./kg`;
+                        let qtyDisplay = i.qtyText || `${i.qty} kg`;
                         itemsListHtml += `<li><b>${i.name}</b> - ${qtyDisplay} (₹${i.price}/kg)</li>`;
                     });
                 } else {
@@ -644,7 +597,7 @@
                     phone: order.customerPhone,
                     address: order.customerAddress,
                     distance: order.distance || '',
-                    items: order.items || [], // सब्जियों की लिस्ट सेव की जा रही है
+                    items: order.items || [],
                     status: 'accepted',
                     timestamp: Date.now()
                 };
@@ -678,7 +631,7 @@
                         phone: order.customerPhone,
                         address: order.customerAddress,
                         distance: order.distance || '',
-                        items: order.items || [], // सब्जियों की लिस्ट सेव की जा रही है
+                        items: order.items || [],
                         status: 'rejected',
                         timestamp: Date.now()
                     };
