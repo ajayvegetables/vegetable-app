@@ -143,7 +143,7 @@
     const shopLat = 27.1767; 
     const shopLng = 78.0081;
     let paymentDone = false;
-    let currentOfferText = ""; // दुकानदार द्वारा लिखा गया ऑफर
+    let currentOfferText = ""; // दुकानदार द्वारा लिखा गया असली टेक्स्ट
 
     const weightOptions = [
         { label: "50 ग्राम", value: 0.05 },
@@ -324,7 +324,7 @@
             html += `
                 <div class="cart-row">
                     <span><b>${item.name}</b> (${item.qtyText}) - ₹${itemTotal.toFixed(1)}</span>
-                    <button class="remove-cart" onclick="removeFromCart(${index})">हटाएं</button>
+                    <button class="remove-btn" onclick="removeFromCart(${index})">हटाएं</button>
                 </div>
             `;
         });
@@ -332,34 +332,65 @@
         document.getElementById('subTotalDisplay').innerText = `सब्जी का कुल मूल्य: ₹${subTotal.toFixed(1)}`;
     }
 
-    // ✅ ऑटोमैटिक ऑफर कैलकुलेटर (दुकानदार के लिखे टेक्स्ट को पढ़कर डिस्काउंट कैलकुलेट करना)
+    // ✅ बिल्कुल सटीक नियम पढ़ने वाला कैलकुलेटर (दुकानदार के लिखे टेक्स्ट के अनुसार)
     window.calculateFinalBill = function() {
         let subTotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-        let deliveryCharge = (subTotal < 200 && subTotal > 0) ? 50 : 0;
-        let baseTotal = subTotal + deliveryCharge;
-        
+        let deliveryCharge = 0;
         let discountAmount = 0;
-        let discountText = "";
+        let ruleMessage = "";
 
-        // ऑफर टेक्स्ट को एनालाइज करना (जैसे: "200 से अधिक" और "10% या 20%")
-        let text = currentOfferText;
-        let minAmountMatch = text.match(/(\d+)\s*(से अधिक|पर)/);
-        let percentMatch = text.match(/(\d+)\s*%/);
+        let text = currentOfferText.trim();
 
-        let minLimit = minAmountMatch ? parseInt(minAmountMatch[1]) : 200;
-        let discountPercent = percentMatch ? parseInt(percentMatch[1]) : 0;
+        // 1. यदि टेक्स्ट में डिलीवरी चार्ज से जुड़ा नियम है (जैसे: "₹200 से कम के ऑर्डर पर ₹50 डिलीवरी चार्ज")
+        let deliveryLimitMatch = text.match(/(\d+)\s*(से कम|से अधिक)/);
+        let deliveryChargeMatch = text.match(/(\d+)\s*(रुपये|रु|₹)?\s*डिलीवरी/i);
 
-        if (discountPercent > 0 && subTotal >= minLimit) {
-            discountAmount = Math.round((baseTotal * discountPercent) / 100);
-            discountText = `🎉 ${discountPercent}% ऑफर लागू (-₹${discountAmount})`;
+        if (text.includes("डिलीवरी चार्ज") || text.includes("डिलीवरी")) {
+            let limit = deliveryLimitMatch ? parseInt(deliveryLimitMatch[1]) : 200;
+            let charge = deliveryChargeMatch ? parseInt(deliveryChargeMatch[1]) : 50;
+
+            if (text.includes("से कम") && subTotal < limit && subTotal > 0) {
+                deliveryCharge = charge;
+                ruleMessage = `₹${limit} से कम का ऑर्डर है, इसलिए ₹${charge} डिलीवरी चार्ज जुड़ा है।`;
+            } else if (text.includes("से अधिक") && subTotal >= limit) {
+                deliveryCharge = charge;
+                ruleMessage = `₹${limit} या अधिक का ऑर्डर है, नियम के अनुसार ₹${charge} डिलीवरी चार्ज जुड़ा है।`;
+            } else {
+                ruleMessage = "ऑर्डर पर फ्री डिलीवरी है।";
+            }
         } else {
-            discountText = "कोई ऑफर लागू नहीं।";
+            // डिफ़ॉल्ट नियम यदि ऑफर में डिलीवरी की बात न हो
+            if (subTotal < 200 && subTotal > 0) {
+                deliveryCharge = 50;
+                ruleMessage = "₹200 से कम का ऑर्डर है, इसलिए ₹50 फिक्स डिलीवरी चार्ज है।";
+            } else {
+                ruleMessage = "फ्री डिलीवरी लागू है।";
+            }
+        }
+
+        let baseTotal = subTotal + deliveryCharge;
+
+        // 2. यदि टेक्स्ट में प्रतिशत छूट (Discount / % off) से जुड़ा नियम है
+        let percentMatch = text.match(/(\d+)\s*%/);
+        let offerLimitMatch = text.match(/(\d+)\s*(से अधिक|पर)/);
+
+        if (percentMatch) {
+            let percent = parseInt(percentMatch[1]);
+            let offerLimit = offerLimitMatch ? parseInt(offerLimitMatch[1]) : 200;
+
+            if (subTotal >= offerLimit) {
+                discountAmount = Math.round((baseTotal * percent) / 100);
+                ruleMessage += `<br>🎯 ऑफर लागू: "${text}" (${percent}% छूट -₹${discountAmount})`;
+            } else {
+                ruleMessage += `<br>ℹ️ छूट के लिए कम से कम ₹${offerLimit} की खरीदी आवश्यक है।`;
+            }
+        } else if (text !== "" && !text.includes("डिलीवरी")) {
+            // यदि कोई साधारण टेक्स्ट या नियम लिखा हो
+            ruleMessage += `<br>📜 दुकान की शर्त: "${text}"`;
         }
 
         let grandTotal = Math.max(0, baseTotal - discountAmount);
-        let ruleText = (subTotal < 200 && subTotal > 0) ? "₹200 से कम का ऑर्डर है, इसलिए ₹50 फिक्स डिलीवरी चार्ज है।" : "₹200 से अधिक का ऑर्डर है (फ्री डिलीवरी)।";
-
-        return { subTotal, deliveryCharge, baseTotal, discountAmount, discountText, grandTotal, ruleText };
+        return { subTotal, deliveryCharge, discountAmount, grandTotal, ruleMessage };
     };
 
     window.proceedToPayment = function() {
@@ -382,9 +413,9 @@
         let breakdownHtml = `
             सब्जी का कुल मूल्य: ₹${bill.subTotal.toFixed(1)}<br>
             डिलीवरी चार्ज: ₹${bill.deliveryCharge}<br>
-            <span style="color:#2e7d32;">${bill.discountText}</span><br>
+            ${bill.discountAmount > 0 ? `छूट (Discount): -₹${bill.discountAmount}<br>` : ''}
             <b>कुल भुगतान योग्य राशि: ₹${bill.grandTotal}</b><br>
-            <span style="color:#d32f2f; font-size:10px;">${bill.ruleText}</span>
+            <span style="color:#d32f2f; font-size:10px;">${bill.ruleMessage}</span>
         `;
         document.getElementById('billBreakdown').innerHTML = breakdownHtml;
         document.getElementById('finalPayableText').innerText = `कुल भुगतान योग्य राशि: ₹${bill.grandTotal}`;
