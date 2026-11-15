@@ -15,8 +15,11 @@
         .btn:hover { background-color: #1b5e20; }
         .help-btn { background-color: #0288d1; margin-top: 10px; text-decoration: none; display: block; text-align: center; color: white; padding: 12px; border-radius: 4px; font-size: 16px; font-weight: bold; }
         .help-btn:hover { background-color: #01579b; }
+        .sound-btn { background-color: #ff9800; margin-top: 10px; }
+        .sound-btn:hover { background-color: #f57c00; }
         .hidden { display: none; }
-        .veg-item { background: #f9f9f9; padding: 10px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        .veg-item, .order-item { background: #f9f9f9; padding: 12px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        .order-item { background: #fff3e0; border-left: 5px solid #ff9800; display: block; }
         .otp-msg { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 10px; margin-top: 10px; border-radius: 4px; color: #2e7d32; font-weight: bold; text-align: center; }
     </style>
 </head>
@@ -50,6 +53,17 @@
                 <button onclick="logout()" style="background: #d32f2f; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">लॉग आउट</button>
             </div>
 
+            <!-- नए ऑर्डर्स और रिंगटोन सेक्शन -->
+            <div class="section-title">🚨 नए कस्टमर ऑर्डर्स (लाइव)</div>
+            <button class="btn sound-btn" onclick="playOrderRingtone()">🔔 रिंगटोन टेस्ट करें (ऑर्डर साउंड)</button>
+            <div id="orderListContainer">
+                <div class="order-item">
+                    <b>नया आर्डर #101</b><br>
+                    <span>ग्राहक: राहुल (आलू 2kg, टमाटर 1kg)</span><br>
+                    <small style="color: #d32f2f; font-weight: bold;">कुल: ₹90 | UPI भुगतान हो चुका है</small>
+                </div>
+            </div>
+
             <!-- दुकान की सेटिंग्स -->
             <div class="section-title">⚙️ दुकान की सेटिंग्स & UPI</div>
             <label>आपकी दुकान की UPI ID:</label>
@@ -60,9 +74,8 @@
 
             <button class="btn" onclick="saveSettings()">सेटिंग्स सेव करें</button>
 
-            <!-- डिलीवरी नियम और शर्तें (वेंडर द्वारा बदलने योग्य) -->
+            <!-- डिलीवरी नियम और शर्तें -->
             <div class="section-title">📜 डिलीवरी नियम और शर्तें सेट करें</div>
-            
             <label>न्यूनतम ऑर्डर राशि (₹):</label>
             <input type="number" id="minOrderAmt" value="200">
 
@@ -91,11 +104,11 @@
             <div id="vegListContainer">
                 <div class="veg-item">
                     <span><b>आलू</b> - ₹30/किग्रा (उपलब्ध: हाँ)</span>
-                    <button onclick="toggleStock(this)" style="background: green; color: white; border: none; padding: 5px; border-radius: 3px;">चालू</button>
+                    <button onclick="toggleStock(this)" style="background: green; color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer;">चालू</button>
                 </div>
             </div>
 
-            <!-- हेल्प बटन (सीधे कॉल लगाने के लिए) -->
+            <!-- हेल्प बटन -->
             <a href="tel:9997077062" class="help-btn">📞 Help (तकनीकी सहायता कॉल करें)</a>
         </div>
     </div>
@@ -103,16 +116,23 @@
     <script>
         let generatedOTP = "";
 
+        // पेज लोड होते ही चेक करें कि क्या यूजर पहले से लॉग इन है (Persistent Login)
+        window.onload = function() {
+            let savedMobile = localStorage.getItem('vendor_mobile');
+            if(savedMobile) {
+                document.getElementById('userMobileDisplay').innerText = savedMobile;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+            }
+        };
+
         function sendOTP() {
             var mobile = document.getElementById('loginMobile').value;
             if(mobile.length === 10) {
-                // हर बार नया रैंडम 4 अंकों का ओटीपी जेनरेट होगा
                 generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-                
                 var otpMsgBox = document.getElementById('otpDisplayBox');
-                otpMsgBox.innerText = `📩 नया संदेश (OTP): आपका वन-टाइम पासवर्ड है -> ${generatedOTP} (इसे याद रखें या कॉपी करें)`;
+                otpMsgBox.innerText = `📩 नया संदेश (OTP): आपका वन-टाइम पासवर्ड है -> ${generatedOTP}`;
                 otpMsgBox.classList.remove('hidden');
-                
                 document.getElementById('otpBox').classList.remove('hidden');
                 alert('ओटीपी जनरेट हो गया है! नीचे बॉक्स में देखें।');
             } else {
@@ -124,22 +144,54 @@
             var otp = document.getElementById('otpInput').value;
             if(otp === generatedOTP && otp !== "") {
                 var mobile = document.getElementById('loginMobile').value;
+                // मोबाइल नंबर को ब्राउज़र में सेव करें ताकि दोबारा लॉगिन न मांगें
+                localStorage.setItem('vendor_mobile', mobile);
+                
                 document.getElementById('userMobileDisplay').innerText = mobile;
                 alert('लॉगिन सफल रहा!');
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('dashboardSection').classList.remove('hidden');
             } else {
-                alert('गलत OTP! कृपया ऊपर संदेश में दिया गया सही ओटीपी दर्ज करें।');
+                alert('गलत OTP! कृपया सही ओटीपी दर्ज करें।');
             }
         }
 
         function logout() {
+            // लॉग आउट पर सेव किया हुआ मोबाइल हटा दें
+            localStorage.removeItem('vendor_mobile');
             document.getElementById('dashboardSection').classList.add('hidden');
             document.getElementById('loginSection').classList.remove('hidden');
             document.getElementById('loginMobile').value = '';
             document.getElementById('otpInput').value = '';
             document.getElementById('otpBox').classList.add('hidden');
             document.getElementById('otpDisplayBox').classList.add('hidden');
+        }
+
+        // Swiggy/Zomato जैसी तेज ऑर्डर रिंगटोन (Web Audio API का उपयोग)
+        function playOrderRingtone() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // तीन बार लगातार बीप बजेगी (जैसे आर्डर आने पर बजती है)
+                let playBeep = (time, freq) => {
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + time);
+                    osc.stop(audioCtx.currentTime + time + 0.25);
+                };
+
+                playBeep(0.0, 587.33); // D5
+                playBeep(0.3, 880.00); // A5
+                playBeep(0.6, 1174.66); // D6
+                
+                alert('🔔 नया आर्डर रिंगटोन बज रही है!');
+            } catch (e) {
+                alert('रिंगटोन बजने में त्रुटि: ' + e);
+            }
         }
 
         function saveSettings() {
@@ -161,7 +213,7 @@
                 var container = document.getElementById('vegListContainer');
                 var newItem = document.createElement('div');
                 newItem.className = 'veg-item';
-                newItem.innerHTML = `<span><b>${name}</b> - ₹${price}/किग्रा (उपलब्ध: हाँ)</span> <button onclick="toggleStock(this)" style="background: green; color: white; border: none; padding: 5px; border-radius: 3px;">चालू</button>`;
+                newItem.innerHTML = `<span><b>${name}</b> - ₹${price}/किग्रा (उपलब्ध: हाँ)</span> <button onclick="toggleStock(this)" style="background: green; color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer;">चालू</button>`;
                 container.appendChild(newItem);
                 document.getElementById('vegName').value = '';
                 document.getElementById('vegPrice').value = '';
