@@ -67,7 +67,6 @@
         <a href="tel:9997077062" class="help-btn-right">📞 Help</a>
     </div>
 
-    <!-- ✅ ग्राहक के लिए लाइव स्टेटस पॉप-अप (गुणा बटन के साथ) -->
     <div id="customerStatusBanner" class="status-popup-banner">
         <span id="statusMsgText">आर्डर स्थिति की जाँच हो रही है...</span>
         <button class="close-popup-btn" onclick="dismissStatusBanner()">×</button>
@@ -144,6 +143,7 @@
     const shopLat = 27.1767; 
     const shopLng = 78.0081;
     let paymentDone = false;
+    let currentOfferText = ""; // दुकानदार द्वारा लिखा गया ऑफर
 
     const weightOptions = [
         { label: "50 ग्राम", value: 0.05 },
@@ -186,28 +186,24 @@
         fetchLiveShopData();
     };
 
-    // ✅ दुकानदार द्वारा स्वीकार या रद्द किए जाने पर लाइव नोटिफिकेशन चेक करना (यदि हटाया न गया हो)
     function checkCustomerOrderStatus(phone) {
         let dismissedKey = localStorage.getItem("dismissedNotifTime");
         const notifRef = ref(db, 'customerNotification/' + phone);
         onValue(notifRef, (snapshot) => {
             const data = snapshot.val();
             if(data) {
-                // अगर इस नोटिफिकेशन को पहले ही हटाया जा चुका है, तो दोबारा न दिखाएं
                 if (dismissedKey && parseInt(dismissedKey) === data.timestamp) {
                     return;
                 }
-
                 let banner = document.getElementById('customerStatusBanner');
                 let textEl = document.getElementById('statusMsgText');
                 textEl.innerText = data.msg;
                 banner.style.display = 'block';
-                banner.dataset.timestamp = data.timestamp; // टाइमस्टैम्प सेव करें
+                banner.dataset.timestamp = data.timestamp;
             }
         });
     }
 
-    // ✅ गुणा (×) बटन दबाने पर नोटिफिकेशन हमेशा के लिए हटाना (डेटाबेस से भी डिलीट)
     window.dismissStatusBanner = function() {
         let banner = document.getElementById('customerStatusBanner');
         let timestamp = banner.dataset.timestamp;
@@ -215,7 +211,7 @@
             localStorage.setItem("dismissedNotifTime", timestamp);
             let phone = document.getElementById('custPhone').value.trim();
             if(phone) {
-                remove(ref(db, 'customerNotification/' + phone)); // डेटाबेस से भी साफ करें
+                remove(ref(db, 'customerNotification/' + phone));
             }
         }
         banner.style.display = 'none';
@@ -228,9 +224,11 @@
             if (data) {
                 if (data.upi) dynamicUpi = data.upi;
                 if (data.offerText && data.offerText.trim() !== "") {
+                    currentOfferText = data.offerText;
                     document.getElementById('liveOfferBanner').innerHTML = `<b>विशेष ऑफर / शर्तें:</b><br>${data.offerText}`;
                     document.getElementById('liveOfferBanner').style.display = 'block';
                 } else {
+                    currentOfferText = "";
                     document.getElementById('liveOfferBanner').style.display = 'none';
                 }
                 if (data.catalog && Array.isArray(data.catalog)) {
@@ -334,12 +332,34 @@
         document.getElementById('subTotalDisplay').innerText = `सब्जी का कुल मूल्य: ₹${subTotal.toFixed(1)}`;
     }
 
+    // ✅ ऑटोमैटिक ऑफर कैलकुलेटर (दुकानदार के लिखे टेक्स्ट को पढ़कर डिस्काउंट कैलकुलेट करना)
     window.calculateFinalBill = function() {
         let subTotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
         let deliveryCharge = (subTotal < 200 && subTotal > 0) ? 50 : 0;
-        let grandTotal = Math.round(subTotal + deliveryCharge);
+        let baseTotal = subTotal + deliveryCharge;
+        
+        let discountAmount = 0;
+        let discountText = "";
+
+        // ऑफर टेक्स्ट को एनालाइज करना (जैसे: "200 से अधिक" और "10% या 20%")
+        let text = currentOfferText;
+        let minAmountMatch = text.match(/(\d+)\s*(से अधिक|पर)/);
+        let percentMatch = text.match(/(\d+)\s*%/);
+
+        let minLimit = minAmountMatch ? parseInt(minAmountMatch[1]) : 200;
+        let discountPercent = percentMatch ? parseInt(percentMatch[1]) : 0;
+
+        if (discountPercent > 0 && subTotal >= minLimit) {
+            discountAmount = Math.round((baseTotal * discountPercent) / 100);
+            discountText = `🎉 ${discountPercent}% ऑफर लागू (-₹${discountAmount})`;
+        } else {
+            discountText = "कोई ऑफर लागू नहीं।";
+        }
+
+        let grandTotal = Math.max(0, baseTotal - discountAmount);
         let ruleText = (subTotal < 200 && subTotal > 0) ? "₹200 से कम का ऑर्डर है, इसलिए ₹50 फिक्स डिलीवरी चार्ज है।" : "₹200 से अधिक का ऑर्डर है (फ्री डिलीवरी)।";
-        return { subTotal, deliveryCharge, grandTotal, ruleText };
+
+        return { subTotal, deliveryCharge, baseTotal, discountAmount, discountText, grandTotal, ruleText };
     };
 
     window.proceedToPayment = function() {
@@ -362,6 +382,7 @@
         let breakdownHtml = `
             सब्जी का कुल मूल्य: ₹${bill.subTotal.toFixed(1)}<br>
             डिलीवरी चार्ज: ₹${bill.deliveryCharge}<br>
+            <span style="color:#2e7d32;">${bill.discountText}</span><br>
             <b>कुल भुगतान योग्य राशि: ₹${bill.grandTotal}</b><br>
             <span style="color:#d32f2f; font-size:10px;">${bill.ruleText}</span>
         `;
@@ -395,7 +416,6 @@
         window.location.href = upiLink;
     };
 
-    // ✅ ऑर्डर भेजने पर अपडेटेड पॉप-अप मैसेज
     window.sendOrderToShop = function() {
         if (!paymentDone) {
             alert("कृपया पहले ऊपर दिए गए बटन से भुगतान करें, तभी आर्डर भेजा जा सकेगा!");
@@ -451,6 +471,7 @@
             items: cart,
             subTotal: bill.subTotal,
             deliveryCharge: bill.deliveryCharge,
+            discountAmount: bill.discountAmount,
             totalAmount: bill.grandTotal,
             shopPhone: shopPhone,
             timestamp: Date.now()
@@ -458,7 +479,6 @@
 
         const ordersRef = ref(db, 'orders');
         push(ordersRef, orderData).then(() => {
-            // ✅ माँगा गया नया पॉप-अप मैसेज
             alert("ऑर्डर भेज दिया गया है, कृपया आर्डर स्वीकार हुआ है या नहीं ऊपर चेक कर लें।");
             location.reload();
         }).catch((error) => {
