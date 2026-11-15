@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>वेजिटेबल पार्टनर - दुकानदार डैशबोर्ड</title>
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%B5%E0%A5%87%E0%A4%9C%E0%A4%BF%E0%A4%AB%E0%A4%9F%E0%A4%AC%E0%A4%B2%20%E0%A4%AA%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%9A%E0%A4%A8%22%2C%22short_name%22%3A%22VegPartner%22%2C%22start_url%22%3A%22.%2Fshopkeeper.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fff3e0%22%2C%22theme_color%22%3A%22%23e65100%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3081%2F3081559.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any maskable%22%7D%5D%7D">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%B5%E0%A5%87%E0%A4%9C%E0%A4%BF%E0%A4%AB%E0%A4%9F%E0%A4%AC%E0%A4%B2%20%E0%A4%AA%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%9F%E0%A4%A8%22%2C%22short_name%22%3A%22VegPartner%22%2C%22start_url%22%3A%22.%2Fshopkeeper.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fff3e0%22%2C%22theme_color%22%3A%22%23e65100%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3081%2F3081559.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any maskable%22%7D%5D%7D">
     <meta name="theme-color" content="#e65100">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3081/3081559.png">
     
@@ -27,9 +27,7 @@
         .section-box { background: #fafafa; border: 1px solid #ddd; padding: 8px; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box; }
         .section-box h3 { margin-top: 0; color: #e65100; font-size: 12px; border-bottom: 2px solid #ffe0b2; padding-bottom: 2px; }
         
-        .order-card { background: #ffebee; border: 1px solid #ffcdd2; border-left: 4px solid #d32f2f; padding: 8px; border-radius: 5px; margin-bottom: 8px; font-size: 11px; box-sizing: border-box; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
-
+        .order-card { background: #ffebee; border: 1px solid #ffcdd2; border-left: 4px solid #d32f2f; padding: 8px; border-radius: 5px; margin-bottom: 8px; font-size: 11px; box-sizing: border-box; }
         .location-info { font-size: 10px; color: #d32f2f; font-weight: bold; margin: 2px 0; background: #fff; padding: 2px 4px; border-radius: 3px; display: inline-block; border: 1px solid #ffcdd2; }
         
         .btn-group { display: flex; gap: 4px; margin-top: 5px; }
@@ -50,11 +48,18 @@
 
         .history-floating-btn { background: #37474f; color: white; border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); margin: 10px auto 4px auto; }
 
+        /* हिस्ट्री पॉप-अप व अंदर के बटन */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 5px; box-sizing: border-box; }
-        .modal-content { background: white; padding: 10px; width: 85%; max-width: 320px; border-radius: 6px; max-height: 75vh; overflow-y: auto; box-sizing: border-box; position: relative; margin: auto; }
+        .modal-content { background: white; padding: 10px; width: 92%; max-width: 360px; border-radius: 6px; max-height: 80vh; overflow-y: auto; box-sizing: border-box; position: relative; margin: auto; }
         .close-modal { position: absolute; top: 5px; right: 6px; font-size: 12px; font-weight: bold; cursor: pointer; color: #fff; background: #c62828; padding: 1px 5px; border-radius: 50%; z-index: 10; }
-        .history-item-box { background: #f1f8e9; border-left: 2px solid #2e7d32; padding: 5px; margin-bottom: 4px; font-size: 10px; border-radius: 2px; }
-        .rejected-item-box { background: #fafafa; border-left: 2px solid #757575; padding: 5px; margin-bottom: 4px; font-size: 10px; border-radius: 2px; color: #555; }
+        
+        .history-item-box { background: #f1f8e9; border-left: 2px solid #2e7d32; padding: 6px; margin-bottom: 6px; font-size: 10px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; }
+        .rejected-item-box { background: #fafafa; border-left: 2px solid #757575; padding: 6px; margin-bottom: 6px; font-size: 10px; border-radius: 3px; color: #555; display: flex; justify-content: space-between; align-items: center; }
+        
+        .history-actions { display: flex; gap: 4px; align-items: center; }
+        .action-icon-btn { background: #ddd; border: none; padding: 4px 6px; border-radius: 3px; font-size: 11px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .share-btn { background: #25D366; color: white; }
+        .delete-btn { background: #c62828; color: white; }
     </style>
 </head>
 <body>
@@ -64,10 +69,14 @@
     <a href="tel:9997077062" class="help-btn">📞 Help</a>
 </div>
 
+<!-- हिस्ट्री पॉप-अप विंडो -->
 <div id="historyModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
-        <h3 style="color:#e65100; margin-top:0; font-size:13px;">📊 आर्डर का इतिहास (History)</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <h3 style="color:#e65100; margin:0; font-size:13px;">📊 आर्डर का इतिहास (History)</h3>
+            <button onclick="clearAllHistory()" style="background:#c62828; color:white; border:none; padding:3px 6px; font-size:9px; border-radius:3px; cursor:pointer; font-weight:bold;">🗑️ सभी हटाएं</button>
+        </div>
         <hr style="border:0; border-top:1px solid #ddd; margin-bottom:6px;">
         
         <h4 style="color:#2e7d32; margin:3px 0; font-size:11px;">✅ स्वीकृत आर्डर्स:</h4>
@@ -173,7 +182,7 @@
     const db = getDatabase(app);
 
     let customerNotifications = [];
-    let alarmInterval = null; // लगातार घंटी बजने के लिए
+    let alarmInterval = null;
 
     window.onload = function() {
         let savedPhone = localStorage.getItem("partnerPhone");
@@ -334,13 +343,13 @@
         alert("सभी नए आर्डर्स देखे जा चुके हैं।");
     };
 
-    // लगातार बजने वाली घंटी (जब तक ऑर्डर पेंडिंग है)
+    // जब तक आर्डर पेंडिंग है, तेज और अलग तरह की घंटी लगातार बजती रहेगी
     function startContinuousAlarm() {
-        if (alarmInterval) return; // अगर पहले से बज रही है तो दोबारा चालू न करें
-        playBeep();
+        if (alarmInterval) return;
+        playSpecialAlarm();
         alarmInterval = setInterval(() => {
-            playBeep();
-        }, 3000); // हर 3 सेकंड में घंटी बजेगी
+            playSpecialAlarm();
+        }, 2500); // हर 2.5 सेकंड में तेज बीप
     }
 
     function stopContinuousAlarm() {
@@ -350,18 +359,19 @@
         }
     }
 
-    function playBeep() {
+    function playSpecialAlarm() {
         try {
             let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+            osc.type = 'sawtooth'; // तेज और अलग आवाज
+            osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.2);
             gain.gain.setValueAtTime(1, audioCtx.currentTime);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start();
-            osc.stop(audioCtx.currentTime + 1.5);
+            osc.stop(audioCtx.currentTime + 0.5);
         } catch(e) {
             console.log("Audio error", e);
         }
@@ -380,7 +390,7 @@
             if (!data) {
                 container.innerHTML = '<p style="text-align: center; color: #777; font-size:10px;">फिलहाल कोई नया ऑर्डर नहीं है।</p>';
                 previousCount = 0;
-                stopContinuousAlarm(); // कोई आर्डर नहीं है तो घंटी बंद
+                stopContinuousAlarm();
                 return;
             }
 
@@ -392,7 +402,6 @@
             }
             previousCount = ordersArray.length;
 
-            // अगर नए आर्डर्स मौजूद हैं, तो लगातार घंटी बजाएं
             if (ordersArray.length > 0) {
                 startContinuousAlarm();
             } else {
@@ -414,7 +423,7 @@
                     <strong>ग्राहक: ${order.customerName}</strong><br>
                     📞 फोन: <a href="tel:${order.customerPhone}">${order.customerPhone}</a><br>
                     📍 पता: ${order.customerAddress}<br>
-                    <div class="location-info">📍 लाइव दूरी: ${order.distance || '0 मीटर'}</div><br>
+                    <div class="location-info">📍 जीपीएस दूरी: ${order.distance || '0 मीटर'}</div><br>
                     <strong>कुल राशि: ₹${order.totalAmount}</strong>
                     <div class="item-list"><ul>${itemsHtml}</ul></div>
                     <a href="tel:${order.customerPhone}" class="btn-call">📞 ग्राहक को कॉल करें</a>
@@ -428,6 +437,7 @@
         });
     }
 
+    // हिस्ट्री लोड करना (शेयर और डिलीट बटन के साथ)
     function loadHistoryData() {
         const acceptedContainer = document.getElementById('accepted-history-container');
         const rejectedContainer = document.getElementById('rejected-history-container');
@@ -435,39 +445,73 @@
         const historyRef = ref(db, 'orderHistory');
         onValue(historyRef, (snapshot) => {
             const data = snapshot.val();
-            if(!data) return;
+            if(!data) {
+                acceptedContainer.innerHTML = '<p style="font-size: 10px; color: #777;">कोई स्वीकृत आर्डर नहीं है।</p>';
+                rejectedContainer.innerHTML = '<p style="font-size: 10px; color: #777;">कोई रद्द किया गया आर्डर नहीं है।</p>';
+                return;
+            }
 
             let acceptedHtml = "";
             let rejectedHtml = "";
 
-            Object.values(data).forEach(h => {
+            Object.keys(data).forEach(key => {
+                let h = data[key];
                 let timeStr = new Date(h.timestamp).toLocaleString('hi-IN');
+                let shareText = `ऑर्डर विवरण:\nनाम: ${h.name}\nफोन: ${h.phone}\nपता: ${h.address || 'लागू नहीं'}\nराशि: ₹${h.amount || '0'}\nस्थिति: ${h.status === 'accepted' ? 'स्वीकृत' : 'रद्द'}`;
+                let waShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+
                 if(h.status === 'accepted') {
                     acceptedHtml += `
                         <div class="history-item-box">
-                            <b>👤 ${h.name}</b> (₹${h.amount})<br>
-                            📞 ${h.phone} | 📍 ${h.address}<br>
-                            <span style="color:#555; font-size:8px;">⏰ समय: ${timeStr}</span>
+                            <div>
+                                <b>👤 ${h.name}</b> (₹${h.amount})<br>
+                                📞 ${h.phone} | 📍 ${h.address}<br>
+                                <span style="color:#555; font-size:8px;">⏰ समय: ${timeStr}</span>
+                            </div>
+                            <div class="history-actions">
+                                <a href="${waShareUrl}" target="_blank" class="action-icon-btn share-btn" title="WhatsApp पर शेयर करें">📤</a>
+                                <button class="action-icon-btn delete-btn" onclick="deleteHistoryItem('${key}')" title="डिलीट करें">🗑️</button>
+                            </div>
                         </div>
                     `;
                 } else if(h.status === 'rejected') {
                     rejectedHtml += `
                         <div class="rejected-item-box">
-                            <b>👤 ${h.name}</b><br>
-                            📞 ${h.phone}<br>
-                            <span style="color:#555; font-size:8px;">⏰ रद्द समय: ${timeStr}</span>
+                            <div>
+                                <b>👤 ${h.name}</b> (रद्द)<br>
+                                📞 ${h.phone}<br>
+                                <span style="color:#555; font-size:8px;">⏰ समय: ${timeStr}</span>
+                            </div>
+                            <div class="history-actions">
+                                <a href="${waShareUrl}" target="_blank" class="action-icon-btn share-btn" title="WhatsApp पर शेयर करें">📤</a>
+                                <button class="action-icon-btn delete-btn" onclick="deleteHistoryItem('${key}')" title="डिलीट करें">🗑️</button>
+                            </div>
                         </div>
                     `;
                 }
             });
 
-            if(acceptedHtml) acceptedContainer.innerHTML = acceptedHtml;
-            if(rejectedHtml) rejectedContainer.innerHTML = rejectedHtml;
+            acceptedContainer.innerHTML = acceptedHtml || '<p style="font-size: 10px; color: #777;">कोई स्वीकृत आर्डर नहीं है।</p>';
+            rejectedContainer.innerHTML = rejectedHtml || '<p style="font-size: 10px; color: #777;">कोई रद्द किया गया आर्डर नहीं है।</p>';
         });
     }
 
+    // सिंगल हिस्ट्री आइटम डिलीट करना
+    window.deleteHistoryItem = function(key) {
+        if(confirm("क्या आप वाकई इस आर्डर को हिस्ट्री से हटाना चाहते हैं?")) {
+            remove(ref(db, 'orderHistory/' + key));
+        }
+    };
+
+    // सभी हिस्ट्री एक साथ डिलीट करना
+    window.clearAllHistory = function() {
+        if(confirm("क्या आप वाकई सभी आर्डर हिस्ट्री को साफ़ करना चाहते हैं?")) {
+            remove(ref(db, 'orderHistory'));
+        }
+    };
+
     window.acceptOrder = function(orderId, name, amount, phone, address) {
-        stopContinuousAlarm(); // आर्डर स्वीकार करते ही घंटी बंद हो जाएगी
+        stopContinuousAlarm();
         let historyData = {
             name: name,
             amount: amount,
@@ -485,7 +529,7 @@
 
     window.rejectOrder = function(orderId, name, phone) {
         if(confirm('क्या आप वाकई इस ऑर्डर को रद्द करना चाहते हैं?')) {
-            stopContinuousAlarm(); // आर्डर रद्द करते ही घंटी बंद हो जाएगी
+            stopContinuousAlarm();
             let historyData = {
                 name: name,
                 phone: phone,
