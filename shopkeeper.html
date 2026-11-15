@@ -162,7 +162,13 @@
         <h2>🔔 वेजिटेबल पार्टनर डैशबोर्ड</h2>
         <div class="status-bar" id="connectionStatus">लाइव डेटाबेस से जुड़ रहा है...</div>
 
-        <div class="section-box">
+        <!-- ✅ नए ऑर्डर्स की सूची को सबसे ऊपर रख दिया गया है ताकि स्क्रॉल न करना पड़े -->
+        <h3 style="font-size:12px; margin-top:0; color:#d32f2f;">🚨 नए आर्डर्स की सूची:</h3>
+        <div id="orders-container">
+            <p style="text-align: center; color: #777; font-size:10px;">नया ऑर्डर आने का इंतज़ार है...</p>
+        </div>
+
+        <div class="section-box" style="margin-top: 10px;">
             <h3>⚙️ दुकान की सेटिंग्स, UPI व ऑफर</h3>
             <div class="form-group">
                 <label>आपका UPI ID:</label>
@@ -177,15 +183,12 @@
                 <textarea id="shopOfferText" rows="2" placeholder="जैसे: ₹200 से अधिक के ऑर्डर पर फ्री डिलीवरी!"></textarea>
             </div>
 
-            <!-- ✅ कैटलॉग, सब्जी जोड़ने और हटाने वाला सेक्शन वापस ला दिया गया है -->
             <h4 style="margin: 6px 0 3px 0; color:#e65100; font-size:11px;">सब्जी / फल और रेट (क्लिक करके बदलें):</h4>
             <div id="catalog-items-container"></div>
             
             <button class="btn-main" style="background:#2e7d32; font-size:10px; padding:5px; margin-top:4px;" onclick="addNewItemRow()">+ नया आइटम जोड़ें</button>
             <button class="btn-main" style="font-size:11px; padding:7px; margin-top:6px;" onclick="saveCatalogSettings()">कैटलॉग व सेटिंग्स सेव करें</button>
         </div>
-
-        <div id="orders-container"></div>
     </div>
 
 </div>
@@ -212,6 +215,7 @@
     let alarmInterval = null;
     let lastDeletedHistory = {};
     let activeOrdersData = {};
+    let removedItemsTracker = {}; // कौन सा आइटम काटा गया है उसे ट्रैक करने के लिए
 
     window.onload = function() {
         let savedPhone = localStorage.getItem("partnerPhone");
@@ -426,7 +430,7 @@
             const data = snapshot.val();
 
             if (!data) {
-                container.innerHTML = '';
+                container.innerHTML = '<p style="text-align: center; color: #777; font-size:10px;">नया ऑर्डर आने का इंतज़ार है...</p>';
                 document.getElementById('notifCount').innerText = "0";
                 previousCount = 0;
                 stopContinuousAlarm();
@@ -489,25 +493,20 @@
         });
     }
 
-    // ✅ सब्जी काटने (हटाने) पर ग्राहक को उसका नाम लेकर नोटिफिकेशन भेजना
+    // ✅ सब्जी हटाने पर नाम सेव करना ताकि स्वीकार करने पर ग्राहक को साफ़ पता चले
     window.removeOrderItemItem = function(orderId, index) {
         if (activeOrdersData[orderId] && activeOrdersData[orderId].items) {
             let removedItem = activeOrdersData[orderId].items.splice(index, 1)[0];
             
+            if(!removedItemsTracker[orderId]) removedItemsTracker[orderId] = [];
+            removedItemsTracker[orderId].push(removedItem.name);
+
             set(ref(db, `orders/${orderId}/items`), activeOrdersData[orderId].items);
-
-            let phone = activeOrdersData[orderId].customerPhone;
-            set(ref(db, 'customerNotification/' + phone), {
-                status: 'updated',
-                msg: `⚠️ दुकानदार ने आपके आर्डर से '${removedItem.name}' हटा दिया है (क्योंकि स्टॉक में नहीं है)। बाकी आर्डर स्वीकार कर लिया गया है।`,
-                timestamp: Date.now()
-            });
-
-            alert(`'${removedItem.name}' को आर्डर से हटा दिया गया है और ग्राहक को सूचित कर दिया गया है।`);
+            alert(`'${removedItem.name}' को आर्डर से हटा दिया गया है।`);
         }
     };
 
-    window.loadHistoryData = function() {
+    function loadHistoryData() {
         const acceptedContainer = document.getElementById('accepted-history-container');
         const rejectedContainer = document.getElementById('rejected-history-container');
 
@@ -530,6 +529,7 @@
                 let waShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
 
                 if(h.status === 'accepted') {
+                    // ✅ स्वीकृत आर्डर्स के सामने शेयर और डिलीट दोनों बटन
                     acceptedHtml += `
                         <div class="history-item-box" onclick="showOrderDetails(event, '${key}')">
                             <div>
@@ -539,6 +539,7 @@
                             </div>
                             <div class="history-actions" onclick="event.stopPropagation()">
                                 <a href="${waShareUrl}" target="_blank" class="action-icon-btn share-btn" title="WhatsApp पर शेयर करें">📤</a>
+                                <button class="action-icon-btn delete-btn" onclick="deleteHistoryItem('${key}')" title="डिलीट करें">🗑️</button>
                             </div>
                         </div>
                     `;
@@ -562,7 +563,7 @@
             acceptedContainer.innerHTML = acceptedHtml || '<p style="font-size: 10px; color: #777;">कोई स्वीकृत आर्डर नहीं है।</p>';
             rejectedContainer.innerHTML = rejectedHtml || '<p style="font-size: 10px; color: #777;">कोई रद्द किया गया आर्डर नहीं है।</p>';
         });
-    };
+    }
 
     window.showOrderDetails = function(event, key) {
         closeHistoryModal();
@@ -653,6 +654,7 @@
         });
     };
 
+    // ✅ आर्डर स्वीकार करने पर ग्राहक को हटाए गए आइटम (जैसे प्याज) के नाम के साथ नोटिफिकेशन भेजना
     window.acceptOrder = function(orderId, event) {
         event.stopPropagation();
         stopContinuousAlarm();
@@ -672,12 +674,19 @@
                     timestamp: Date.now()
                 };
 
+                let removedNames = removedItemsTracker[orderId];
+                let msgText = `✅ आपका ऑर्डर स्वीकार कर लिया गया है! (₹${order.totalAmount})`;
+                if (removedNames && removedNames.length > 0) {
+                    msgText = `✅ आपका ऑर्डर स्वीकार कर लिया गया है! (स्टॉक न होने के कारण '${removedNames.join(', ')}' को हटा दिया गया है)।`;
+                }
+
                 set(ref(db, 'customerNotification/' + order.customerPhone), {
                     status: 'accepted',
-                    msg: `✅ आपका ऑर्डर स्वीकार कर लिया गया है! (₹${order.totalAmount})`,
+                    msg: msgText,
                     timestamp: Date.now()
                 }).then(() => {
                     push(ref(db, 'orderHistory'), historyData).then(() => {
+                        delete removedItemsTracker[orderId];
                         alert('ऑर्डर स्वीकार कर लिया गया है!');
                         remove(orderRef);
                     });
@@ -712,6 +721,7 @@
                         timestamp: Date.now()
                     }).then(() => {
                         push(ref(db, 'orderHistory'), historyData).then(() => {
+                            delete removedItemsTracker[orderId];
                             alert('ऑर्डर रद्द कर दिया गया है।');
                             remove(orderRef);
                         });
