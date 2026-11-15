@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>अजय वेजिटेबल्स - ऑनलाइन स्टोर</title>
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%85%E0%A4%9C%E0%A4%AF%20%E0%A4%B5%E0%A5%87%E0%A4%9C%E0%A4%BF%E0%A4%AB%E0%A4%9F%E0%A4%AC%E0%A4%B2%20%28%E0%A4%95%E0%A4%B8%E0%A5%8D%E0%A4%9F%E0%A4%AE%E0%A4%B0%29%22%2C%22short_name%22%3A%22VegStore%22%2C%22start_url%22%3A%22.%2Fcustomer.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%232e7d32%22%2C%22theme_color%22%3A%22%232e7d32%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F2331%2F2331970.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any maskable%22%7D%5D%7D">
+    <!-- ✅ ऐप के आइकॉन पर सब्जियों से भरी टोकरी का लिंक सेट कर दिया गया है -->
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%85%E0%A4%9C%E0%A4%AF%20%E0%A4%B5%E0%A5%87%E0%A4%9C%E0%A4%BF%E0%A4%AB%E0%A4%9F%E0%A4%AC%E0%A4%B2%20%28%E0%A4%95%E0%A4%B8%E0%A5%8D%E0%A4%9F%E0%A4%AE%E0%A4%B0%29%22%2C%22short_name%22%3A%22VegStore%22%2C%22start_url%22%3A%22.%2Fcustomer.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%232e7d32%22%2C%22theme_color%22%3A%22%232e7d32%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3081%2F3081559.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any maskable%22%7D%5D%7D">
     <meta name="theme-color" content="#2e7d32">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2331/2331970.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3081/3081559.png">
     
     <style>
-        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; color: #333; }
-        .top-header { background: #2e7d32; color: white; padding: 8px 12px; font-weight: bold; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 10px; min-height: 100vh; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; color: #333; overflow-x: hidden; }
+        /* ✅ स्क्रीन का साइज एकदम परफेक्ट और फुल-स्क्रीन दिखाने के लिए लेआउट फिक्स */
+        .container { width: 100%; max-width: 100%; margin: 0; background: white; padding: 10px; min-height: 100vh; box-sizing: border-box; }
         
+        .top-header { background: #2e7d32; color: white; padding: 8px 12px; font-weight: bold; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
         .middle-action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: #e8f5e9; border: 1px solid #c8e6c9; padding: 6px 10px; border-radius: 6px; }
         .shop-card-left { display: flex; align-items: center; gap: 4px; text-decoration: none; color: #1b5e20; font-weight: bold; font-size: 12px; background: white; padding: 4px 8px; border-radius: 4px; border: 1px solid #c8e6c9; }
         .center-store-title { font-weight: bold; font-size: 14px; color: #2e7d32; text-align: center; }
@@ -26,7 +28,7 @@
         .section-title { font-weight: bold; font-size: 13px; color: #2e7d32; margin: 10px 0 6px 0; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; }
         
         .product-card { display: flex; align-items: center; background: #fff; border: 1px solid #e0e0e0; padding: 8px; border-radius: 6px; margin-bottom: 8px; gap: 10px; }
-        .product-img { width: 38px; height: 38px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .product-img { width: 38px; height: 38px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
         .product-info { flex: 1; }
         .product-name { font-size: 12px; font-weight: bold; color: #333; }
         .product-price { font-size: 11px; color: #d32f2f; font-weight: bold; }
@@ -159,18 +161,25 @@
         { label: "10 किलो", value: 10.0 }
     ];
 
+    // ✅ हर सब्जी के लिए एकदम सही, रंग-बिरंगे और असली दिखने वाले आइकॉन
     function getVegEmoji(name) {
         let n = name.trim().toLowerCase();
         if (n.includes('टमाटर')) return '🍅';
         if (n.includes('आलू')) return '🥔';
         if (n.includes('प्याज') || n.includes('प्याज़')) return '🧅';
-        if (n.includes('कद्दू')) return '🎃';
-        if (n.includes('मटर')) return '🟢';
-        if (n.includes('मिर्च')) return '🌶️';
+        if (n.includes('मूली')) return '🥕'; // मूली के लिए सही फोटो/आइकन
+        if (n.includes('मटर')) return '🫛'; // हरी मटर की फली का सटीक आइकॉन
+        if (n.includes('गाजर')) return '🥕';
         if (n.includes('गोभी')) return '🥦';
+        if (n.includes('कद्दू')) return '🎃';
+        if (n.includes('मिर्च')) return '🌶️';
         if (n.includes('नींबू')) return '🍋';
         if (n.includes('धनिया')) return '🌿';
-        if (n.includes('गाजर')) return '🥕';
+        if (n.includes('बैंगन')) return '🍆';
+        if (n.includes('भिंडी')) return '🥒';
+        if (n.includes('पालक')) return '🥬';
+        if (n.includes('अदरक')) return '🫚';
+        if (n.includes('लहसुन')) return '🧄';
         return '🥗';
     }
 
@@ -232,13 +241,14 @@
                     document.getElementById('liveOfferBanner').style.display = 'none';
                 }
                 if (data.catalog && Array.isArray(data.catalog)) {
-                    // ✅ 'स्टॉक नहीं है' वाली सब्जियों को तुरंत ग्राहक के ऐप से छिपाना
                     liveCatalog = data.catalog.filter(item => !item.outOfStock);
                 } else {
                     liveCatalog = [
                         { name: "टमाटर", price: 40 },
                         { name: "आलू", price: 30 },
-                        { name: "प्याज़", price: 50 }
+                        { name: "प्याज़", price: 50 },
+                        { name: "मटर", price: 50 },
+                        { name: "मूली", price: 30 }
                     ];
                 }
             } else {
@@ -246,7 +256,9 @@
                 liveCatalog = [
                     { name: "टमाटर", price: 40 },
                     { name: "आलू", price: 30 },
-                    { name: "प्याज़", price: 50 }
+                    { name: "प्याज़", price: 50 },
+                    { name: "मटर", price: 50 },
+                    { name: "मूली", price: 30 }
                 ];
             }
             renderCustomerCatalog();
