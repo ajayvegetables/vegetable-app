@@ -15,7 +15,7 @@
             <i class="fa-solid fa-store"></i> अजय वेजिटेबल्स - ऑनलाइन स्टोर
         </h1>
         <div class="flex items-center gap-2">
-            <!-- मास्टर हेल्प बटन -->
+            <!-- मास्टर हेल्प बटन (आपका सही नंबर) -->
             <a href="tel:919997077062" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow">
                 <i class="fa-solid fa-phone"></i> Help
             </a>
@@ -86,7 +86,7 @@
                 </div>
             </div>
 
-            <!-- ग्राहक का विवरण (दुकान के हिसाब से ऑटोमैटिक लोड होगा) -->
+            <!-- ग्राहक का विवरण (दुकान के हिसाब से ऑटो-फिल होगा) -->
             <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 space-y-2.5">
                 <h2 class="text-xs font-bold text-gray-800 flex items-center gap-1">
                     <i class="fa-solid fa-user text-emerald-600"></i> आपका विवरण (इस दुकान के लिए)
@@ -113,7 +113,7 @@
     </main>
 
     <script>
-        // दुकानदारों की सूची (आगे चलकर नए दुकानदार जुड़ने पर यहाँ स्वतः अपडेट होंगे)
+        // आपकी अपनी दुकान 'अजय वेजिटेबल्स' और सही मोबाइल नंबर
         const shopsData = [
             {
                 id: 1,
@@ -128,17 +128,6 @@
                     { name: "गोभी", price: 45 },
                     { name: "मटर", price: 50 }
                 ]
-            },
-            {
-                id: 2,
-                name: "शिवम वेजिटेबल्स (सिविल लाइन्स)",
-                phone: "919997077062",
-                upi: "shivamveg@paytm",
-                vegetables: [
-                    { name: "आलू", price: 28 },
-                    { name: "टमाटर", price: 38 },
-                    { name: "भिंडी", price: 40 }
-                ]
             }
         ];
 
@@ -146,10 +135,12 @@
         let customerCart = {}; 
         let grandTotalAmount = 0;
 
-        // होम पेज पर दुकान लोड करना
+        // होम पेज पर दुकान लोड करना (ताकि लिस्ट खाली न दिखे)
         function loadShops() {
             const container = document.getElementById('shopListContainer');
+            if (!container) return;
             container.innerHTML = '';
+            
             shopsData.forEach(shop => {
                 container.innerHTML += `
                     <div class="flex items-center justify-between p-2.5 bg-emerald-50/50 border border-emerald-100 rounded-lg">
@@ -167,6 +158,7 @@
         // कैटलॉग खोलना और पिछले सहेजे गए एड्रेस को ऑटो-लोड करना
         function openCatalog(shopId) {
             currentShop = shopsData.find(s => s.id === shopId);
+            if (!currentShop) return;
             
             // टॉप हेडर में दुकानदार का कॉल आइकॉन और सही नंबर सेट करना
             document.getElementById('shopkeeperHeaderLabel').innerText = "दुकानदार";
@@ -176,7 +168,7 @@
             document.getElementById('selectedShopTitle').innerText = `${currentShop.name} का कैटलॉग`;
 
             renderVegetablesCatalog();
-            loadCustomerSavedData(shopId); // इस दुकान के लिए सेव किया गया डेटा लोड करें
+            loadCustomerSavedData(shopId);
 
             document.getElementById('shopSelectionView').classList.add('hidden');
             document.getElementById('catalogView').classList.remove('hidden');
@@ -277,7 +269,7 @@
             }
         }
 
-        // प्रत्येक दुकान के हिसाब से ग्राहक का डेटा लोड करना (स्मार्ट कैचिंग)
+        // प्रत्येक दुकान के हिसाब से ग्राहक का डेटा लोड करना
         function loadCustomerSavedData(shopId) {
             const savedData = localStorage.getItem(`customer_shop_${shopId}`);
             if (savedData) {
@@ -286,7 +278,6 @@
                 document.getElementById('custPhone').value = customer.phone || '';
                 document.getElementById('custAddress').value = customer.address || '';
             } else {
-                // अगर इस दुकान से पहले कभी नहीं खरीदा, तो फॉर्म खाली रहेगा
                 document.getElementById('custName').value = '';
                 document.getElementById('custPhone').value = '';
                 document.getElementById('custAddress').value = '';
@@ -309,7 +300,6 @@
                 return;
             }
 
-            // इस दुकानदार के लिए ग्राहक का डेटा ब्राउज़र में सुरक्षित (Save) कर लें ताकि अगली बार दोबारा न मांगना पड़े
             const customerData = { name: name, phone: phone, address: address };
             localStorage.setItem(`customer_shop_${currentShop.id}`, JSON.stringify(customerData));
 
@@ -323,7 +313,10 @@
             document.getElementById('shopSelectionView').classList.remove('hidden');
         }
 
-        window.onload = loadShops;
+        // पेज लोड होते ही दुकान की लिस्ट लोड करें
+        window.onload = function() {
+            loadShops();
+        };
     </script>
 </body>
 </html>
