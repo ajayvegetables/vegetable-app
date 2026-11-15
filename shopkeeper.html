@@ -48,12 +48,14 @@
 
         .history-floating-btn { background: #37474f; color: white; border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); margin: 10px auto 4px auto; }
 
-        /* ✅ बाहर खाली जगह (Background) पर क्लिक करने से बंद होने वाला मॉडल */
+        /* मॉडल पॉप-अप */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 5px; box-sizing: border-box; }
         .modal-content { background: white; padding: 10px; width: 92%; max-width: 360px; border-radius: 6px; max-height: 80vh; overflow-y: auto; box-sizing: border-box; position: relative; margin: auto; }
         
         .close-modal { position: absolute; top: 8px; right: 8px; font-size: 14px; font-weight: bold; cursor: pointer; color: #fff; background: #c62828; padding: 2px 7px; border-radius: 50%; z-index: 10; }
-        .clear-all-btn { background: #c62828; color: white; border: none; padding: 4px 8px; font-size: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 35px; }
+        .history-top-actions { display: flex; gap: 4px; align-items: center; margin-right: 35px; }
+        .clear-all-btn { background: #c62828; color: white; border: none; padding: 4px 6px; font-size: 9px; border-radius: 3px; cursor: pointer; font-weight: bold; }
+        .restore-btn { background: #2e7d32; color: white; border: none; padding: 4px 6px; font-size: 9px; border-radius: 3px; cursor: pointer; font-weight: bold; }
 
         .history-item-box { background: #f1f8e9; border-left: 2px solid #2e7d32; padding: 6px; margin-bottom: 6px; font-size: 10px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; }
         .rejected-item-box { background: #fafafa; border-left: 2px solid #757575; padding: 6px; margin-bottom: 6px; font-size: 10px; border-radius: 3px; color: #555; display: flex; justify-content: space-between; align-items: center; }
@@ -62,6 +64,10 @@
         .action-icon-btn { background: #ddd; border: none; padding: 4px 6px; border-radius: 3px; font-size: 11px; cursor: pointer; text-decoration: none; display: inline-block; }
         .share-btn { background: #25D366; color: white; }
         .delete-btn { background: #c62828; color: white; }
+
+        /* कस्टम नोटिफिकेशन अलर्ट बॉक्स (बाहर क्लिक करने पर बंद होगा) */
+        .custom-alert-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 10px; box-sizing: border-box; }
+        .custom-alert-content { background: white; padding: 15px; width: 85%; max-width: 280px; border-radius: 8px; text-align: center; position: relative; }
     </style>
 </head>
 <body>
@@ -71,13 +77,24 @@
     <a href="tel:9997077062" class="help-btn">📞 Help</a>
 </div>
 
+<!-- कस्टम नोटिफिकेशन अलर्ट (बाहर क्लिक करने पर बंद होगा) -->
+<div id="customAlertModal" class="custom-alert-modal" onclick="closeCustomAlertOutside(event)">
+    <div class="custom-alert-content" id="customAlertBox">
+        <p id="customAlertText" style="font-size: 12px; font-weight: bold; margin-bottom: 12px; color: #333;"></p>
+        <button onclick="closeCustomAlert()" style="background: #e65100; color: white; border: none; padding: 5px 15px; font-size: 11px; border-radius: 4px; font-weight: bold; cursor: pointer;">ठीक है (OK)</button>
+    </div>
+</div>
+
 <!-- हिस्ट्री पॉप-अप विंडो (बाहर क्लिक करने पर बंद होगी) -->
 <div id="historyModal" class="modal" onclick="checkOutsideClick(event)">
     <div class="modal-content">
         <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding-right: 30px;">
-            <h3 style="color:#e65100; margin:0; font-size:13px;">📊 आर्डर का इतिहास (History)</h3>
-            <button class="clear-all-btn" onclick="clearAllHistory()">🗑️ सभी हटाएं</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <h3 style="color:#e65100; margin:0; font-size:13px;">📊 आर्डर का इतिहास</h3>
+            <div class="history-top-actions">
+                <button class="clear-all-btn" onclick="clearAllHistory()">🗑️ सभी हटाएं</button>
+                <button class="restore-btn" onclick="restoreAllHistory()">♻️ वापस लाएं</button>
+            </div>
         </div>
         <hr style="border:0; border-top:1px solid #ddd; margin-bottom:6px;">
         
@@ -185,6 +202,7 @@
 
     let customerNotifications = [];
     let alarmInterval = null;
+    let lastDeletedHistory = null; // डिलीट की गई हिस्ट्री को वापस लाने के लिए बैकअप
 
     window.onload = function() {
         let savedPhone = localStorage.getItem("partnerPhone");
@@ -339,10 +357,27 @@
         });
     };
 
+    // ✅ कस्टम नोटिफिकेशन अलर्ट (जो खाली जगह पर टच करने से भी बंद हो जाएगा)
     window.openNotifications = function() {
         customerNotifications = [];
         document.getElementById('notifCount').innerText = "0";
-        alert("सभी नए आर्डर्स देखे जा चुके हैं।");
+        showCustomAlert("सभी नए आर्डर्स देखे जा चुके हैं।");
+    };
+
+    function showCustomAlert(msg) {
+        document.getElementById('customAlertText').innerText = msg;
+        document.getElementById('customAlertModal').style.display = 'flex';
+    }
+
+    window.closeCustomAlert = function() {
+        document.getElementById('customAlertModal').style.display = 'none';
+    };
+
+    window.closeCustomAlertOutside = function(event) {
+        let box = document.getElementById('customAlertBox');
+        if (!box.contains(event.target)) {
+            closeCustomAlert();
+        }
     };
 
     function startContinuousAlarm() {
@@ -498,13 +533,40 @@
 
     window.deleteHistoryItem = function(key) {
         if(confirm("क्या आप वाकई इस आर्डर को हिस्ट्री से हटाना चाहते हैं?")) {
-            remove(ref(db, 'orderHistory/' + key));
+            const itemRef = ref(db, 'orderHistory/' + key);
+            onValue(itemRef, (snapshot) => {
+                lastDeletedHistory = { key: key, data: snapshot.val() };
+            }, { onlyOnce: true });
+            remove(itemRef);
         }
     };
 
     window.clearAllHistory = function() {
         if(confirm("क्या आप वाकई सभी आर्डर हिस्ट्री को साफ़ करना चाहते हैं?")) {
-            remove(ref(db, 'orderHistory'));
+            const historyRef = ref(db, 'orderHistory');
+            onValue(historyRef, (snapshot) => {
+                lastDeletedHistory = { all: true, data: snapshot.val() };
+            }, { onlyOnce: true });
+            remove(historyRef);
+        }
+    };
+
+    // ✅ डिलीट की गई हिस्ट्री को वापस लाने (Restore) का फंक्शन
+    window.restoreAllHistory = function() {
+        if (!lastDeletedHistory) {
+            alert("वापस लाने के लिए कोई हालिया डिलीट किया गया डेटा नहीं है!");
+            return;
+        }
+        if (lastDeletedHistory.all) {
+            set(ref(db, 'orderHistory'), lastDeletedHistory.data).then(() => {
+                alert("सभी हिस्ट्री सफलतापूर्वक वापस आ गई है!");
+                lastDeletedHistory = null;
+            });
+        } else if (lastDeletedHistory.key) {
+            set(ref(db, 'orderHistory/' + lastDeletedHistory.key), lastDeletedHistory.data).then(() => {
+                alert("आर्डर सफलतापूर्वक वापस आ गया है!");
+                lastDeletedHistory = null;
+            });
         }
     };
 
@@ -562,7 +624,6 @@
         document.getElementById('historyModal').style.display = 'none';
     };
 
-    // ✅ बाहर खाली जगह (Background) पर क्लिक करने से हिस्ट्री बंद होने का फंक्शन
     window.checkOutsideClick = function(event) {
         let modalContent = document.querySelector('.modal-content');
         if (!modalContent.contains(event.target)) {
