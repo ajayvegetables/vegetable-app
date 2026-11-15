@@ -20,7 +20,6 @@
 
         .live-offer-banner { background: #fffde7; border: 1px solid #ffee58; padding: 8px; border-radius: 6px; font-size: 11px; margin-bottom: 10px; color: #d32f2f; font-weight: bold; line-height: 1.4; display: none; }
 
-        /* ✅ ग्राहक के लिए लाइव नोटिफिकेशन पॉप-अप (गुणा के निशान के साथ) */
         .status-popup-banner { background: #e8f5e9; border: 2px solid #2e7d32; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 10px; color: #1b5e20; font-weight: bold; display: none; position: relative; }
         .close-popup-btn { position: absolute; top: 6px; right: 8px; background: #c62828; color: white; border: none; font-size: 11px; font-weight: bold; padding: 1px 6px; border-radius: 50%; cursor: pointer; }
 
@@ -122,7 +121,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
@@ -187,23 +186,39 @@
         fetchLiveShopData();
     };
 
-    // ✅ दुकानदार द्वारा स्वीकार या रद्द किए जाने पर लाइव नोटिफिकेशन चेक करना
+    // ✅ दुकानदार द्वारा स्वीकार या रद्द किए जाने पर लाइव नोटिफिकेशन चेक करना (यदि हटाया न गया हो)
     function checkCustomerOrderStatus(phone) {
+        let dismissedKey = localStorage.getItem("dismissedNotifTime");
         const notifRef = ref(db, 'customerNotification/' + phone);
         onValue(notifRef, (snapshot) => {
             const data = snapshot.val();
             if(data) {
+                // अगर इस नोटिफिकेशन को पहले ही हटाया जा चुका है, तो दोबारा न दिखाएं
+                if (dismissedKey && parseInt(dismissedKey) === data.timestamp) {
+                    return;
+                }
+
                 let banner = document.getElementById('customerStatusBanner');
                 let textEl = document.getElementById('statusMsgText');
                 textEl.innerText = data.msg;
                 banner.style.display = 'block';
+                banner.dataset.timestamp = data.timestamp; // टाइमस्टैम्प सेव करें
             }
         });
     }
 
-    // ✅ गुणा (×) बटन दबाने पर नोटिफिकेशन बैनर को स्क्रीन से हटाना
+    // ✅ गुणा (×) बटन दबाने पर नोटिफिकेशन हमेशा के लिए हटाना (डेटाबेस से भी डिलीट)
     window.dismissStatusBanner = function() {
-        document.getElementById('customerStatusBanner').style.display = 'none';
+        let banner = document.getElementById('customerStatusBanner');
+        let timestamp = banner.dataset.timestamp;
+        if(timestamp) {
+            localStorage.setItem("dismissedNotifTime", timestamp);
+            let phone = document.getElementById('custPhone').value.trim();
+            if(phone) {
+                remove(ref(db, 'customerNotification/' + phone)); // डेटाबेस से भी साफ करें
+            }
+        }
+        banner.style.display = 'none';
     };
 
     function fetchLiveShopData() {
@@ -310,7 +325,7 @@
             subTotal += itemTotal;
             html += `
                 <div class="cart-row">
-                    <span><b>${item.name}</b> (${item.qtyText}) - ₹${itemTotal.lift ? itemTotal.toFixed(1) : itemTotal.toFixed(1)}</span>
+                    <span><b>${item.name}</b> (${item.qtyText}) - ₹${itemTotal.toFixed(1)}</span>
                     <button class="remove-cart" onclick="removeFromCart(${index})">हटाएं</button>
                 </div>
             `;
@@ -380,7 +395,7 @@
         window.location.href = upiLink;
     };
 
-    // ✅ लाइव GPS ट्रैकिंग और Google Maps लिंक के साथ आर्डर भेजना
+    // ✅ ऑर्डर भेजने पर अपडेटेड पॉप-अप मैसेज
     window.sendOrderToShop = function() {
         if (!paymentDone) {
             alert("कृपया पहले ऊपर दिए गए बटन से भुगतान करें, तभी आर्डर भेजा जा सकेगा!");
@@ -398,8 +413,6 @@
                 let custLng = position.coords.longitude;
                 let distanceKm = calculateDistance(shopLat, shopLng, custLat, custLng);
                 let distanceText = distanceKm < 1 ? `${Math.round(distanceKm * 1000)} मीटर` : `${distanceKm.toFixed(1)} किमी`;
-                
-                // Google Maps लाइव लोकेशन लिंक
                 let mapLink = `https://www.google.com/maps?q=${custLat},${custLng}`;
 
                 saveOrderToFirebase(name, phone, address, distanceText, mapLink, bill);
@@ -434,7 +447,7 @@
             customerPhone: phone,
             customerAddress: address,
             distance: distanceText,
-            mapLocationUrl: mapLink, // गूगल मैप्स लाइव लिंक
+            mapLocationUrl: mapLink,
             items: cart,
             subTotal: bill.subTotal,
             deliveryCharge: bill.deliveryCharge,
@@ -445,7 +458,8 @@
 
         const ordersRef = ref(db, 'orders');
         push(ordersRef, orderData).then(() => {
-            alert("ऑर्डर दुकानदार के पास सफलतापर्वक भेज दिया गया है!");
+            // ✅ माँगा गया नया पॉप-अप मैसेज
+            alert("ऑर्डर भेज दिया गया है, कृपया आर्डर स्वीकार हुआ है या नहीं ऊपर चेक कर लें।");
             location.reload();
         }).catch((error) => {
             alert("त्रुटि: " + error.message);
