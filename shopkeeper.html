@@ -4,57 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>वेजिटेबल पार्टनर</title>
-    <!-- PWA Manifest & Icons -->
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%B5%E0%A5%87%E0%A4%9C%E0%A4%BF%E0%A4%9F%E0%A5%87%E0%A4%AC%E0%A4%B2%20%E0%A4%AA%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%9F%E0%A4%A8%E0%A4%B0%22%2C%22short_name%22%3A%22VegPartner%22%2C%22start_url%22%3A%22.%2Fshopkeeper.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fff3e0%22%2C%22theme_color%22%3A%22%23e65100%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3081%2F3081559.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%B5%E0%A5%87%E0%A4%9C%E0%A4%BF%E0%A4%AB%E0%A4%9F%E0%A4%AC%E0%A4%B2%20%E0%A4%AA%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%9F%E0%A4%A8%E0%A4%B0%22%2C%22short_name%22%3A%22VegPartner%22%2C%22start_url%22%3A%22.%2Fshopkeeper.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fff3e0%22%2C%22theme_color%22%3A%22%23e65100%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3081%2F3081559.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any maskable%22%7D%5D%7D">
     <meta name="theme-color" content="#e65100">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3081/3081559.png">
     
     <style>
-        body { font-family: Arial, sans-serif; background: #fff3e0; margin: 0; padding: 15px; color: #333; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { color: #e65100; text-align: center; margin-bottom: 5px; font-size: 22px; }
+        body { font-family: Arial, sans-serif; background: #fff3e0; margin: 0; padding: 10px; color: #333; }
+        .container { max-width: 100%; width: 100%; box-sizing: border-box; margin: auto; background: white; padding: 12px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h2 { color: #e65100; text-align: center; margin-bottom: 5px; font-size: 18px; }
         .screen { display: none; }
         .active { display: block; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
-        .btn-main { background: #e65100; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 3px; font-size: 13px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        .btn-main { background: #e65100; color: white; border: none; width: 100%; padding: 10px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; }
         
-        /* टॉप फिक्सड हेल्प और नोटिफिकेशन बटन */
-        .top-bar-fixed { position: fixed; top: 12px; right: 12px; display: flex; gap: 8px; z-index: 100; }
-        .help-btn { background: #2e7d32; color: white; padding: 6px 12px; border-radius: 15px; text-decoration: none; font-weight: bold; font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .notif-badge-btn { background: #c62828; color: white; padding: 6px 12px; border-radius: 15px; font-weight: bold; font-size: 13px; cursor: pointer; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        /* टॉप फिक्सड बटन */
+        .top-bar-fixed { position: fixed; top: 8px; right: 8px; display: flex; gap: 6px; z-index: 100; }
+        .help-btn { background: #2e7d32; color: white; padding: 5px 9px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .notif-badge-btn { background: #c62828; color: white; padding: 5px 9px; border-radius: 12px; font-weight: bold; font-size: 12px; cursor: pointer; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-        .status-bar { text-align: center; background: #ffe0b2; padding: 10px; border-radius: 6px; font-weight: bold; margin-bottom: 15px; color: #bf360c; font-size: 14px; }
-        .section-box { background: #fafafa; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .section-box h3 { margin-top: 0; color: #e65100; font-size: 16px; border-bottom: 2px solid #ffe0b2; padding-bottom: 6px; }
+        .status-bar { text-align: center; background: #ffe0b2; padding: 8px; border-radius: 6px; font-weight: bold; margin-bottom: 12px; color: #bf360c; font-size: 13px; }
+        .section-box { background: #fafafa; border: 1px solid #ddd; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
+        .section-box h3 { margin-top: 0; color: #e65100; font-size: 14px; border-bottom: 2px solid #ffe0b2; padding-bottom: 4px; }
         
-        .order-card { background: #ffebee; border: 1px solid #ffcdd2; border-left: 5px solid #d32f2f; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 15px; }
-        .location-info { font-size: 13px; color: #d32f2f; font-weight: bold; margin: 5px 0; background: #fff; padding: 5px 8px; border-radius: 4px; display: inline-block; border: 1px solid #ffcdd2; }
+        .order-card { background: #ffebee; border: 1px solid #ffcdd2; border-left: 5px solid #d32f2f; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
+        .location-info { font-size: 12px; color: #d32f2f; font-weight: bold; margin: 3px 0; background: #fff; padding: 3px 6px; border-radius: 4px; display: inline-block; border: 1px solid #ffcdd2; }
         
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        .btn { flex: 1; padding: 10px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; font-size: 14px; }
+        .btn-group { display: flex; gap: 8px; margin-top: 8px; }
+        .btn { flex: 1; padding: 8px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; font-size: 13px; }
         .btn-accept { background: #2e7d32; }
         .btn-reject { background: #c62828; }
-        .btn-call { background: #0288d1; text-decoration: none; text-align: center; display: inline-block; padding: 8px 10px; border-radius: 5px; color: white; font-weight: bold; margin-top: 8px; font-size: 13px; }
-        .item-list { font-size: 14px; margin: 8px 0; padding-left: 20px; }
-        .error-msg { color: red; font-size: 14px; text-align: center; margin-top: 10px; }
+        .btn-call { background: #0288d1; text-decoration: none; text-align: center; display: inline-block; padding: 6px 8px; border-radius: 5px; color: white; font-weight: bold; margin-top: 6px; font-size: 12px; }
+        .item-list { font-size: 13px; margin: 5px 0; padding-left: 18px; }
+        .error-msg { color: red; font-size: 13px; text-align: center; margin-top: 8px; }
 
-        /* सुधरा हुआ कैटलॉग लेआउट (अब पेज के अंदर एकदम फिट) */
-        .item-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; width: 100%; box-sizing: border-box; }
-        .item-row input.item-name { flex: 2; padding: 8px; font-size: 15px; border: 1px solid #ccc; border-radius: 5px; }
-        .item-row input.item-price { flex: 1; padding: 8px; font-size: 15px; border: 1px solid #ccc; border-radius: 5px; }
-        .item-row button { background: #c62828; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 15px; }
+        /* एकदम फिट कैटलॉग लेआउट (स्क्रीन के अंदर) */
+        .item-row { display: flex; gap: 5px; margin-bottom: 6px; align-items: center; width: 100%; box-sizing: border-box; }
+        .item-row input.item-name { flex: 1.8; padding: 6px; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .item-row input.item-price { flex: 1; padding: 6px; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .item-row button { flex: 0.4; background: #c62828; color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; box-sizing: border-box; text-align: center; }
 
-        /* हिस्ट्री बटन (अब नीचे डैशबोर्ड में दिया गया है) */
-        .history-section-btn { background: #37474f; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .history-section-btn { background: #37474f; color: white; border: none; width: 100%; padding: 10px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
-        /* पॉप-अप मॉडल */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: white; margin: 15% auto; padding: 20px; width: 85%; max-width: 480px; border-radius: 10px; max-height: 70vh; overflow-y: auto; }
-        .close-modal { float: right; font-size: 24px; font-weight: bold; cursor: pointer; color: #777; }
-        .history-item-box { background: #f1f8e9; border-left: 4px solid #2e7d32; padding: 10px; margin-bottom: 8px; font-size: 13px; border-radius: 4px; }
-        .rejected-item-box { background: #fafafa; border-left: 4px solid #757575; padding: 10px; margin-bottom: 8px; font-size: 13px; border-radius: 4px; color: #555; }
+        /* परफेक्ट साइज़ हिस्ट्री पॉप-अप मॉडल (अब स्क्रीन के अंदर फिट और कट बटन साफ़ दिखेगा) */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 15px; width: 90%; max-width: 400px; border-radius: 10px; max-height: 80vh; overflow-y: auto; box-sizing: border-box; position: relative; margin: auto; }
+        .close-modal { position: absolute; top: 10px; right: 12px; font-size: 20px; font-weight: bold; cursor: pointer; color: #333; background: #eee; padding: 2px 8px; border-radius: 50%; }
+        .history-item-box { background: #f1f8e9; border-left: 4px solid #2e7d32; padding: 8px; margin-bottom: 6px; font-size: 12px; border-radius: 4px; }
+        .rejected-item-box { background: #fafafa; border-left: 4px solid #757575; padding: 8px; margin-bottom: 6px; font-size: 12px; border-radius: 4px; color: #555; }
     </style>
 </head>
 <body>
@@ -65,21 +64,21 @@
     <a href="tel:9997077062" class="help-btn">📞 Help</a>
 </div>
 
-<!-- हिस्ट्री पॉप-अप विंडो -->
+<!-- हिस्ट्री पॉप-अप विंडो (फिक्स साइज) -->
 <div id="historyModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
-        <h3 style="color:#e65100; margin-top:0; font-size:17px;">📊 आर्डर का इतिहास (History)</h3>
-        <hr style="border:0; border-top:1px solid #ddd; margin-bottom:12px;">
+        <h3 style="color:#e65100; margin-top:0; font-size:16px;">📊 आर्डर का इतिहास</h3>
+        <hr style="border:0; border-top:1px solid #ddd; margin-bottom:10px;">
         
-        <h4 style="color:#2e7d32; margin:5px 0; font-size:14px;">✅ स्वीकृत आर्डर्स:</h4>
+        <h4 style="color:#2e7d32; margin:5px 0; font-size:13px;">✅ स्वीकृत आर्डर्स:</h4>
         <div id="accepted-history-container">
-            <p style="font-size: 13px; color: #777;">कोई स्वीकृत आर्डर नहीं है।</p>
+            <p style="font-size: 12px; color: #777;">कोई स्वीकृत आर्डर नहीं है।</p>
         </div>
 
-        <h4 style="color:#c62828; margin:15px 0 5px 0; font-size:14px;">❌ रद्द किए गए आर्डर्स:</h4>
+        <h4 style="color:#c62828; margin:12px 0 4px 0; font-size:13px;">❌ रद्द किए गए आर्डर्स:</h4>
         <div id="rejected-history-container">
-            <p style="font-size: 13px; color: #777;">कोई रद्द किया गया आर्डर नहीं है।</p>
+            <p style="font-size: 12px; color: #777;">कोई रद्द किया गया आर्डर नहीं है।</p>
         </div>
     </div>
 </div>
@@ -89,17 +88,17 @@
     <!-- 1. लॉगिन स्क्रीन -->
     <div id="loginScreen" class="screen active">
         <h2>🔐 वेजिटेबल पार्टनर - लॉगिन</h2>
-        <p style="text-align: center; color: #666; font-size: 14px;">लॉगिन करने के लिए मोबाइल नंबर दर्ज करें</p>
+        <p style="text-align: center; color: #666; font-size: 13px;">लॉगिन करने के लिए मोबाइल नंबर दर्ज करें</p>
         
-        <div class="form-group" style="margin-top: 20px;">
+        <div class="form-group" style="margin-top: 15px;">
             <label>मोबाइल नंबर:</label>
             <input type="tel" id="loginPhone" placeholder="10 अंकों का नंबर" maxlength="10">
         </div>
         <button class="btn-main" onclick="sendOtp()">ओटीपी भेजें</button>
-        <div id="otpBox" style="display:none; margin-top:15px;">
+        <div id="otpBox" style="display:none; margin-top:12px;">
             <label>ओटीपी दर्ज करें (सुरक्षा कोड: 1234):</label>
             <input type="text" id="enteredOtp" placeholder="4 अंकों का OTP" maxlength="4">
-            <button class="btn-main" style="margin-top:10px;" onclick="verifyOtp()">सत्यापित करें (Verify)</button>
+            <button class="btn-main" style="margin-top:8px;" onclick="verifyOtp()">सत्यापित करें (Verify)</button>
         </div>
         <div id="loginError" class="error-msg"></div>
     </div>
@@ -107,13 +106,13 @@
     <!-- 2. सब्सक्रिप्शन पेमेंट स्क्रीन (₹30) -->
     <div id="subScreen" class="screen">
         <h2>💳 सब्सक्रिप्शन भुगतान</h2>
-        <p style="text-align: center; color: #d32f2f; font-weight: bold; font-size:15px;">आपका सब्सक्रिप्शन सक्रिय नहीं है!</p>
-        <p style="text-align: center; font-size: 14px;">ऐप को 30 दिनों के लिए चालू रखने हेतु नीचे दिए गए क्यूआर कोड पर **₹30** का भुगतान करें:</p>
+        <p style="text-align: center; color: #d32f2f; font-weight: bold; font-size:14px;">आपका सब्सक्रिप्शन सक्रिय नहीं है!</p>
+        <p style="text-align: center; font-size: 13px;">ऐप को 30 दिनों के लिए चालू रखने हेतु नीचे दिए गए क्यूआर कोड पर **₹30** का भुगतान करें:</p>
         
-        <div style="text-align: center; margin: 20px 0;">
-            <div style="background: #eee; padding: 20px; border-radius: 8px; display:inline-block;">
-                <p style="margin:0; font-weight:bold; color:#555; font-size:14px;">[आपका UPI QR Code]</p>
-                <p style="font-size: 12px; color: #777; margin:5px 0 0 0;">UPI ID: 9997077062@paytm</p>
+        <div style="text-align: center; margin: 15px 0;">
+            <div style="background: #eee; padding: 15px; border-radius: 8px; display:inline-block;">
+                <p style="margin:0; font-weight:bold; color:#555; font-size:13px;">[आपका UPI QR Code]</p>
+                <p style="font-size: 11px; color: #777; margin:4px 0 0 0;">UPI ID: 9997077062@paytm</p>
             </div>
         </div>
 
@@ -137,7 +136,7 @@
                 <input type="tel" id="shopWhatsapp" value="9997077062">
             </div>
 
-            <h4 style="margin: 15px 0 5px 0; color:#e65100; font-size:15px;">सब्जी / फल और रेट (₹/kg):</h4>
+            <h4 style="margin: 10px 0 4px 0; color:#e65100; font-size:13px;">सब्जी / फल और रेट (₹/kg):</h4>
             <div id="catalog-items-container">
                 <div class="item-row">
                     <input type="text" class="item-name" value="टमाटर" placeholder="आइटम नाम">
@@ -156,21 +155,21 @@
                 </div>
             </div>
             
-            <button class="btn-main" style="background:#2e7d32; font-size:14px; padding:9px; margin-top:8px;" onclick="addNewItemRow()">+ नया आइटम जोड़ें</button>
-            <button class="btn-main" style="font-size:14px; padding:10px; margin-top:10px;" onclick="saveCatalogSettings()">कैटलॉग व सेटिंग्स सेव करें</button>
+            <button class="btn-main" style="background:#2e7d32; font-size:13px; padding:7px; margin-top:6px;" onclick="addNewItemRow()">+ नया आइटम जोड़ें</button>
+            <button class="btn-main" style="font-size:13px; padding:8px; margin-top:8px;" onclick="saveCatalogSettings()">कैटलॉग व सेटिंग्स सेव करें</button>
         </div>
 
-        <h3 style="font-size:16px;">🛍️ नए ऑर्डर्स की सूची:</h3>
+        <h3 style="font-size:15px;">🛍️ नए ऑर्डर्स की सूची:</h3>
         <div id="orders-container">
-            <p style="text-align: center; color: #777; font-size:14px;">नया ऑर्डर आने का इंतज़ार है...</p>
+            <p style="text-align: center; color: #777; font-size:13px;">नया ऑर्डर आने का इंतज़ार है...</p>
         </div>
 
-        <!-- हिस्ट्री खोलने वाला बटन (अब नीचे स्क्रीन पर आ गया है) -->
+        <!-- हिस्ट्री खोलने वाला बटन -->
         <button class="history-section-btn" onclick="openHistoryModal()">
             📜 आर्डर का इतिहास (History देखें)
         </button>
         
-        <button style="background: #c62828; color: white; border: none; width: 100%; padding: 10px; border-radius: 6px; margin-top: 15px; cursor: pointer; font-weight: bold; font-size:15px;" onclick="logout()">लॉग आउट</button>
+        <button style="background: #c62828; color: white; border: none; width: 100%; padding: 8px; border-radius: 6px; margin-top: 15px; cursor: pointer; font-weight: bold; font-size:14px;" onclick="logout()">लॉग आउट</button>
     </div>
 
 </div>
@@ -274,10 +273,12 @@
     };
 
     window.openHistoryModal = function() {
-        document.getElementById('historyModal').style.display = 'block';
+        let modal = document.getElementById('historyModal');
+        modal.style.display = 'flex';
     };
     window.closeHistoryModal = function() {
-        document.getElementById('historyModal').style.display = 'none';
+        let modal = document.getElementById('historyModal');
+        modal.style.display = 'none';
     };
 
     window.openNotifications = function() {
@@ -319,7 +320,7 @@
             const data = snapshot.val();
 
             if (!data) {
-                container.innerHTML = '<p style="text-align: center; color: #777; font-size:14px;">फिलहाल कोई नया ऑर्डर नहीं है।</p>';
+                container.innerHTML = '<p style="text-align: center; color: #777; font-size:13px;">फिलहाल कोई नया ऑर्डर नहीं है।</p>';
                 previousCount = 0;
                 return;
             }
