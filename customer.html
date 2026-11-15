@@ -3,147 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>अजय कुमार वेजिटेबल्स - ऑनलाइन स्टोर</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 0; color: #333; }
-        .header { background-color: #1b5e20; color: white; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; }
-        .container { max-width: 500px; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .section-title { font-size: 16px; font-weight: bold; color: #1b5e20; margin-top: 20px; margin-bottom: 10px; border-bottom: 2px solid #c8e6c9; padding-bottom: 5px; }
-        label { display: block; margin-top: 10px; font-size: 14px; font-weight: bold; }
-        input[type="text"], select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .btn { background-color: #2e7d32; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 15px; font-weight: bold; }
-        .btn:hover { background-color: #1b5e20; }
-        .help-btn { background-color: #0288d1; margin-top: 15px; text-decoration: none; display: block; text-align: center; color: white; padding: 12px; border-radius: 4px; font-size: 16px; font-weight: bold; }
-        .help-btn:hover { background-color: #01579b; }
-        .hidden { display: none; }
-        .vendor-card { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 15px; margin-top: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
-        .veg-item-box { background: #f9f9f9; padding: 12px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
-        .info-box { background: #fff3e0; border: 1px solid #ffe0b2; padding: 12px; margin-top: 15px; border-radius: 6px; font-size: 14px; color: #e65100; }
-    </style>
+    <title>वेजिटेबल ऐप</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-gray-100 font-sans">
 
-    <div class="header">
-        अजय कुमार वेजिटेबल्स - ऑनलाइन स्टोर
-    </div>
+    <!-- टॉप हेडर (हर जगह दिखेगा) -->
+    <header class="bg-emerald-600 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-50">
+        <h1 class="text-lg font-bold flex items-center gap-2">
+            <i class="fa-solid fa-basket-shopping"></i> वेजिटेबल ऐप
+        </h1>
+        <div class="flex items-center gap-3">
+            <!-- ऐप ओनर हेल्प बटन -->
+            <a href="tel:YOUR_ADMIN_PHONE_NUMBER" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-phone"></i> Help
+            </a>
+            <!-- दुकानदार कॉल बटन (जब कैटलॉग खुलेगा तब दिखेगा) -->
+            <a id="shopCallBtn" href="#" class="hidden bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-phone"></i> <span id="shopkeeperNameHeader">दुकानदार</span>
+            </a>
+        </div>
+    </header>
 
-    <div class="container">
-        <!-- 1. दुकानदार चुनने का सेक्शन (Vendor Selection) -->
-        <div id="selectVendorSection">
-            <div class="section-title">🛒 अपने नजदीकी सब्जी विक्रेता चुनें</div>
-            <p style="font-size: 14px; color: #555;">नीचे सूची में से चुनें कि आप किससे सब्ज़ी खरीदना चाहते हैं:</p>
-            
-            <div id="vendorListContainer">
-                <!-- दुकानदारों की लिस्ट यहाँ लोड होगी -->
+    <main class="max-w-md mx-auto p-4 pb-20">
+        
+        <!-- व्यू 1: दुकान चयन और एड्रेस फॉर्म (पहला पेज) -->
+        <div id="shopSelectionView" class="space-y-4">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                <h2 class="text-md font-semibold text-gray-800 mb-3">अपनी नज़दीकी दुकान चुनें:</h2>
+                <div id="shopListContainer" class="space-y-2">
+                    <!-- दुकानदारों की लिस्ट यहाँ JavaScript से आएगी -->
+                </div>
             </div>
+
+            <!-- अलग-अलग एड्रेस बॉक्स -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-3">
+                <h2 class="text-md font-semibold text-gray-800">डिलीवरी का पता और विवरण:</h2>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">आपका नाम</label>
+                    <input type="text" id="custName" placeholder="अपना नाम लिखें" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">मोबाइल नंबर</label>
+                    <input type="tel" id="custPhone" placeholder="10 अंकों का मोबाइल नंबर" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">पूरा पता (मकान नंबर, गली, मोहल्ला / एरिया)</label>
+                    <textarea id="custAddress" rows="2" placeholder="मकान नंबर, गली, मोहल्ला / एरिया" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                </div>
+            </div>
+
+            <button onclick="proceedToCatalog()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl shadow transition">
+                आगे बढ़ें और कैटलॉग देखें
+            </button>
         </div>
 
-        <!-- 2. चुने गए दुकानदार का कैटलॉग और आर्डर फॉर्म -->
-        <div id="customerOrderSection" class="hidden">
-            <button onclick="goBackToVendors()" style="background: #757575; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-bottom: 10px;">← दूसरे विक्रेता की सूची देखें</button>
-            
-            <div class="section-title" id="activeVendorTitle">दुकानदार का कैटलॉग</div>
-            
-            <div class="info-box" id="vendorContactBox">
-                <!-- चुने हुए दुकानदार का मोबाइल नंबर और UPI दिखेगा -->
+        <!-- व्यू 2: कैटलॉग पेज (दुकान चुनने के बाद खुलेगा) -->
+        <div id="catalogView" class="hidden space-y-4">
+            <div class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm border border-gray-200">
+                <button onclick="goBackToShops()" class="text-emerald-600 text-sm font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-left">3</i> दूसरी दुकान चुनें
+                </button>
+                <span id="selectedShopTitle" class="font-bold text-gray-800 text-sm"></span>
             </div>
 
-            <div class="section-title">📋 उपलब्ध सब्जियां</div>
-            <div id="customerVegList">
-                <!-- दुकानदार की जोड़ी गई सब्जियां यहाँ दिखेंगी -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                <h2 class="text-md font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-box text-amber-600"></i> उपलब्ध सब्जियां (ताज़ा स्टॉक)
+                </h2>
+                <div id="vegetableListContainer" class="space-y-3">
+                    <!-- सब्जियों की लिस्ट -->
+                </div>
             </div>
 
-            <div class="section-title">👤 आपका विवरण (ग्राहक)</div>
-            <label>आपका नाम:</label>
-            <input type="text" id="custName" placeholder="अपना नाम दर्ज करें">
+            <!-- आर्डर टोकरी (Cart) -->
+            <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 space-y-2">
+                <h3 class="font-semibold text-emerald-900 text-sm">🛒 आपकी आर्डर टोकरी (Cart)</h3>
+                <p id="cartSummary" class="text-xs text-gray-600">कोई सामान नहीं चुना गया है।</p>
+                <div class="text-sm font-bold text-gray-800 pt-2 border-t border-emerald-200 flex justify-between">
+                    <span>कुल देय राशि:</span>
+                    <span id="totalPrice">₹0</span>
+                </div>
+            </div>
 
-            <label>आपका मोबाइल नंबर:</label>
-            <input type="text" id="custMobile" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10">
-
-            <label>डिलीवरी का पूरा पता:</label>
-            <input type="text" id="custAddress" placeholder="घर का पता / कॉलोनी / मार्ग">
-
-            <button class="btn" onclick="placeOrderToVendor()">🚀 आर्डर भेजें</button>
+            <button onclick="sendOrder()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl shadow transition flex items-center justify-center gap-2">
+                <i class="fa-brands fa-whatsapp"></i> UPI पेमेंट करें और आर्डर भेजें
+            </button>
         </div>
 
-        <!-- मास्टर हेल्प बटन (हर जगह दिखेगा) -->
-        <a href="tel:9997077062" class="help-btn">📞 मास्टर हेल्प (तकनीकी सहायता: 9997077062)</a>
-    </div>
+    </main>
 
     <script>
-        let selectedVendorMobile = "";
+        // दुकानदारों और उनकी सब्जियों का डेटा (आप इसमें नए दुकानदार और सब्जियां आसानी से जोड़ सकते हैं)
+        const shopsData = [
+            {
+                id: 1,
+                name: "शिवम वेजिटेबल्स (सिविल लाइन्स)",
+                phone: "9876543210",
+                vegetables: [
+                    { name: "आलू (नया)", price: 30 },
+                    { name: "टमाटर (देशी)", price: 40 },
+                    { name: "प्याज़", price: 35 },
+                    { name: "हरी मिर्च", price: 60 }
+                ]
+            },
+            {
+                id: 2,
+                name: "राहुल वेजिटेबल्स (मंडी रोड)",
+                phone: "9123456789",
+                vegetables: [
+                    { name: "आलू (नया)", price: 28 },
+                    { name: "टमाटर", price: 38 },
+                    { name: "गोभी", price: 45 },
+                    { name: "मटर", price: 50 }
+                ]
+            }
+        ];
 
-        window.onload = function() {
-            loadVendorsList();
-        };
+        let currentShop = null;
+        let cart = {};
 
-        function loadVendorsList() {
-            let container = document.getElementById('vendorListContainer');
-            container.innerHTML = "";
-
-            let sampleVendors = [
-                { name: "शिवम (सब्जी विक्रेता)", mobile: "919997077062", upi: "8218231811@nyes" },
-                { name: "राहुल (सब्जी विक्रेता)", mobile: "9876543210", upi: "rahulveg@paytm" }
-            ];
-
-            sampleVendors.forEach(vendor => {
-                let div = document.createElement('div');
-                div.className = 'vendor-card';
-                div.innerHTML = `
-                    <div>
-                        <b>${vendor.name}</b><br>
-                        <span style="font-size: 13px; color: #555;">मोबाइल: ${vendor.mobile}</span>
-                    </div>
-                    <button class="btn" style="margin:0; width:auto; padding:8px 15px;" onclick="selectVendor('${vendor.mobile}', '${vendor.name}', '${vendor.upi}')">दुकान देखें</button>
+        // पेज लोड होने पर दुकानदारों की लिस्ट दिखाना
+        function loadShops() {
+            const container = document.getElementById('shopListContainer');
+            container.innerHTML = '';
+            shopsData.forEach(shop => {
+                container.innerHTML += `
+                    <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-emerald-50 transition">
+                        <input type="radio" name="selectedShop" value="${shop.id}" class="w-4 h-4 text-emerald-600">
+                        <span class="text-sm font-medium text-gray-700">${shop.name}</span>
+                    </label>
                 `;
-                container.appendChild(div);
             });
         }
 
-        function selectVendor(mobile, name, upi) {
-            selectedVendorMobile = mobile;
-            document.getElementById('selectVendorSection').classList.add('hidden');
-            document.getElementById('customerOrderSection').classList.remove('hidden');
-            
-            document.getElementById('activeVendorTitle').innerText = `${name} का कैटलॉग`;
-            document.getElementById('vendorContactBox').innerHTML = `
-                <b>विक्रेता मोबाइल:</b> <a href="tel:${mobile}" style="color:#d32f2f; font-weight:bold;">${mobile}</a><br>
-                <b>UPI ID (भुगतान हेतु):</b> <span style="color:#2e7d32; font-weight:bold;">${upi}</span>
-            `;
+        // कैटलॉग पर आगे बढ़ना
+        function proceedToCatalog() {
+            const selectedRadio = document.querySelector('input[name="selectedShop"]:checked');
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
 
-            loadVendorVegetables(mobile);
+            if (!selectedRadio) {
+                alert("कृपया पहले सूची में से कोई एक दुकान चुनें!");
+                return;
+            }
+            if (!name || !phone || !address) {
+                alert("कृपया अपना नाम, मोबाइल नंबर और पूरा पता सही से भरें!");
+                return;
+            }
+
+            const shopId = selectedRadio.value;
+            currentShop = shopsData.find(s => s.id == shopId);
+
+            // टॉप हेडर में दुकानदार का कॉल बटन सेट करना
+            document.getElementById('shopkeeperNameHeader').innerText = "Shopkeeper";
+            document.getElementById('shopCallBtn').href = `tel:${currentShop.phone}`;
+            document.getElementById('shopCallBtn').classList.remove('hidden');
+
+            // शीर्षक सेट करना
+            document.getElementById('selectedShopTitle').innerText = currentShop.name;
+
+            // सब्जियां रेंडर करना
+            renderVegetables();
+
+            // व्यू बदलना
+            document.getElementById('shopSelectionView').classList.add('hidden');
+            document.getElementById('catalogView').classList.remove('hidden');
         }
 
-        function loadVendorVegetables(mobile) {
-            let vegContainer = document.getElementById('customerVegList');
-            vegContainer.innerHTML = `
-                <div class="veg-item-box">
-                    <span><b>आलू</b> - ₹30 / किग्रा <span style="color:green; font-size:12px;">(उपलब्ध)</span></span>
-                    <input type="number" placeholder="किग्रा" style="width:70px; padding:5px;" id="qty_aloo" value="0">
-                </div>
-                <div class="veg-item-box">
-                    <span><b>टमाटर</b> - ₹40 / किग्रा <span style="color:green; font-size:12px;">(उपलब्ध)</span></span>
-                    <input type="number" placeholder="किग्रा" style="width:70px; padding:5px;" id="qty_tamatar" value="0">
-                </div>
-            `;
+        // सब्जियां दिखाना
+        function renderVegetables() {
+            const container = document.getElementById('vegetableListContainer');
+            container.innerHTML = '';
+            cart = {};
+
+            currentShop.vegetables.forEach((veg, index) => {
+                cart[index] = { name: veg.name, price: veg.price, qty: 0 };
+                container.innerHTML += `
+                    <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-200">
+                        <span class="text-sm font-medium text-gray-800">${veg.name} - ₹${veg.price}/किग्रा</span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateQty(${index}, -1)" class="w-7 h-7 bg-red-500 text-white rounded font-bold flex items-center justify-center">-</button>
+                            <span id="qty-${index}" class="w-6 text-center text-sm font-bold">0</span>
+                            <button onclick="updateQty(${index}, 1)" class="w-7 h-7 bg-emerald-600 text-white rounded font-bold flex items-center justify-center">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+            updateCartSummary();
         }
 
-        function goBackToVendors() {
-            document.getElementById('customerOrderSection').classList.add('hidden');
-            document.getElementById('selectVendorSection').classList.remove('hidden');
-        }
-
-        function placeOrderToVendor() {
-            let name = document.getElementById('custName').value;
-            let mobile = document.getElementById('custMobile').value;
-            let address = document.getElementById('custAddress').value;
-
-            if(name && mobile.length === 10 && address) {
-                alert(`सफलतापूर्वक आर्डर दर्ज हो गया! विक्रेता (${selectedVendorMobile}) को आपका आर्डर भेज दिया गया है।`);
-            } else {
-                alert('कृपया अपना नाम, सही 10 अंकों का मोबाइल नंबर और पूरा पता दर्ज करें।');
+        // मात्रा (Quantity) घटाना-बढ़ाना
+        function updateQty(index, change) {
+            if (cart[index].qty + change >= 0) {
+                cart[index].qty += change;
+                document.getElementById(`qty-${index}`).innerText = cart[index].qty;
+                updateCartSummary();
             }
         }
+
+        // कार्ट समरी अपडेट करना
+        function updateCartSummary() {
+            let summaryText = "";
+            let total = 0;
+            let hasItems = false;
+
+            for (let index in cart) {
+                if (cart[index].qty > 0) {
+                    hasItems = true;
+                    let cost = cart[index].qty * cart[index].price;
+                    total += cost;
+                    summaryText += `${cart[index].name} (${cart[index].qty} किग्रा) - ₹${cost}<br>`;
+                }
+            }
+
+            if (!hasItems) {
+                document.getElementById('cartSummary').innerText = "कोई सामान नहीं चुना गया है।";
+            } else {
+                document.getElementById('cartSummary').innerHTML = summaryText;
+            }
+            document.getElementById('totalPrice').innerText = `₹${total}`;
+        }
+
+        // वापस दुकान चयन पर जाना
+        function goBackToShops() {
+            document.getElementById('shopCallBtn').classList.add('hidden');
+            document.getElementById('catalogView').classList.add('hidden');
+            document.getElementById('shopSelectionView').classList.remove('hidden');
+        }
+
+        function sendOrder() {
+            alert("आर्डर की प्रक्रिया पूरी हुई! इसे व्हाट्सएप या यूपीआई से जोड़ा जा सकता है।");
+        }
+
+        // लोड होने पर फंक्शन कॉल करें
+        window.onload = loadShops;
     </script>
 </body>
 </html>
