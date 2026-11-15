@@ -2,96 +2,160 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>अजय कुमार वेजिटेबल्स - ऑनलाइन आर्डर</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>वेजिटेबल पार्टनर - कस्टमर स्टोर</title>
+    
     <style>
-        body { font-family: Arial, sans-serif; background: #e8f5e9; margin: 0; padding: 15px; color: #333; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { color: #2e7d32; text-align: center; margin-bottom: 5px; }
-        .sub-title { text-align: center; color: #666; font-size: 14px; margin-bottom: 20px; }
-        .product-card { display: flex; justify-content: space-between; align-items: center; background: #f1f8e9; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #c8e6c9; }
-        .product-info h4 { margin: 0 0 5px 0; color: #1b5e20; }
-        .product-info p { margin: 0; color: #555; font-size: 14px; }
-        .qty-box { display: flex; align-items: center; gap: 8px; }
-        .qty-box input { width: 50px; padding: 5px; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
-        .form-group { margin-top: 15px; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        .btn-submit { background: #2e7d32; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .btn-submit:hover { background: #1b5e20; }
+        body { font-family: Arial, sans-serif; background: #fff3e0; margin: 0; padding: 5px; color: #333; padding-top: 45px; box-sizing: border-box; }
+        .container { width: 94%; max-width: 420px; box-sizing: border-box; margin: auto; background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        h2 { color: #2e7d32; text-align: center; margin-bottom: 5px; font-size: 16px; }
+        .sub-title { text-align: center; color: #666; font-size: 11px; margin-bottom: 12px; }
+        .screen { display: none; }
+        .active { display: block; }
+
+        /* टॉप फिक्सड बटन (हेल्प और दुकानदार) */
+        .top-bar-fixed { position: fixed; top: 5px; right: 8px; display: flex; gap: 4px; z-index: 999; }
+        .help-btn { background: #2e7d32; color: white; padding: 3px 7px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .shop-call-btn { background: #e65100; color: white; padding: 3px 7px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+
+        .form-group { margin-bottom: 8px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 2px; font-size: 11px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 7px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 11px; }
+        .btn-main { background: #2e7d32; color: white; border: none; width: 100%; padding: 9px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; box-sizing: border-box; margin-top: 5px; }
+
+        .section-box { background: #fafafa; border: 1px solid #ddd; padding: 10px; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box; }
+        .section-box h3 { margin-top: 0; color: #2e7d32; font-size: 12px; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; }
+
+        /* दुकान कार्ड (List of Shops) */
+        .shop-card { background: #e8f5e9; border: 1px solid #c8e6c9; padding: 8px; border-radius: 5px; margin-bottom: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .shop-card span { font-weight: bold; font-size: 12px; color: #1b5e20; }
+
+        /* कैटलॉग आइटम रो */
+        .product-item { display: flex; flex-direction: column; background: #fff; border: 1px solid #eee; padding: 6px; border-radius: 5px; margin-bottom: 6px; box-sizing: border-box; }
+        .product-top { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 4px; }
+        .product-name { font-size: 12px; font-weight: bold; color: #333; }
+        .product-price { font-size: 11px; color: #e65100; font-weight: bold; }
+        
+        .product-bottom { display: flex; align-items: center; gap: 6px; width: 100%; border-top: 1px dashed #f0f0f0; padding-top: 4px; }
+        .product-bottom select { width: 110px; padding: 3px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px; }
+        .add-btn { background: #2e7d32; color: white; border: none; padding: 3px 8px; border-radius: 3px; font-size: 10px; font-weight: bold; cursor: pointer; margin-left: auto; }
+
+        /* कार्ट / टोकरी */
+        .cart-box { background: #fffde7; border: 1px solid #fff59d; padding: 8px; border-radius: 5px; margin-bottom: 8px; font-size: 11px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px dotted #ccc; padding-bottom: 2px; }
+        .remove-cart-btn { background: #c62828; color: white; border: none; padding: 1px 5px; font-size: 9px; border-radius: 3px; cursor: pointer; }
+
+        .total-bill { font-size: 12px; font-weight: bold; color: #333; background: #e8f5e9; padding: 6px; border-radius: 4px; text-align: right; margin-bottom: 8px; }
+        
+        /* QR Code Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 10px; box-sizing: border-box; }
+        .modal-content { background: white; padding: 15px; width: 90%; max-width: 300px; border-radius: 8px; text-align: center; position: relative; }
+        .close-modal { position: absolute; top: 5px; right: 8px; font-size: 14px; font-weight: bold; cursor: pointer; color: #fff; background: #c62828; padding: 1px 6px; border-radius: 50%; }
+        .error-msg { color: red; font-size: 11px; text-align: center; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>🥬 अजय कुमार वेजिटेबल्स</h2>
-    <div class="sub-title">ताज़ा सब्ज़ी सीधे आपके घर! अपना आर्डर चुनें</div>
-
-    <div id="products-list">
-        <!-- प्रोडक्ट लिस्ट यहाँ दिखेगी -->
-        <div class="product-card">
-            <div class="product-info">
-                <h4>टमाटर (Tomato)</h4>
-                <p>₹40 / kg</p>
-            </div>
-            <div class="qty-box">
-                <input type="number" id="qty_0" min="0" value="0" placeholder="Kg">
-            </div>
-        </div>
-
-        <div class="product-card">
-            <div class="product-info">
-                <h4>आलू (Potato)</h4>
-                <p>₹30 / kg</p>
-            </div>
-            <div class="qty-box">
-                <input type="number" id="qty_1" min="0" value="0" placeholder="Kg">
-            </div>
-        </div>
-
-        <div class="product-card">
-            <div class="product-info">
-                <h4>प्याज़ (Onion)</h4>
-                <p>₹50 / kg</p>
-            </div>
-            <div class="qty-box">
-                <input type="number" id="qty_2" min="0" value="0" placeholder="Kg">
-            </div>
-        </div>
-
-        <div class="product-card">
-            <div class="product-info">
-                <h4>हरी मिर्च (Green Chilli)</h4>
-                <p>₹80 / kg</p>
-            </div>
-            <div class="qty-box">
-                <input type="number" id="qty_3" min="0" value="0" placeholder="Kg">
-            </div>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label>आपका नाम:</label>
-        <input type="text" id="customerName" placeholder="अपना नाम लिखें">
-    </div>
-
-    <div class="form-group">
-        <label>मोबाइल नंबर:</label>
-        <input type="tel" id="customerPhone" placeholder="10 अंकों का मोबाइल नंबर">
-    </div>
-
-    <div class="form-group">
-        <label>पूरी डिलीवरी का पता (Address):</label>
-        <textarea id="customerAddress" rows="3" placeholder="घर का नंबर, गली, मोहल्ला..."></textarea>
-    </div>
-
-    <button class="btn-submit" onclick="sendOrder()">🚀 आर्डर भेजें</button>
+<!-- टॉप फिक्सड हेल्प और दुकानदार कॉल बटन -->
+<div class="top-bar-fixed">
+    <a href="tel:9997077062" class="help-btn">📞 Help</a>
+    <a id="shopCallIcon" href="tel:9997077062" class="shop-call-btn" style="display:none;">🏪 दुकान कॉल</a>
 </div>
 
-<!-- Firebase SDKs -->
+<div class="container">
+
+    <!-- 1. लॉगिन स्क्रीन (मोबाइल नंबर व OTP) -->
+    <div id="loginScreen" class="screen active">
+        <h2>🔐 कस्टमर - लॉगिन</h2>
+        <div class="sub-title">सब्जी खरीदने के लिए मोबाइल नंबर दर्ज करें</div>
+        
+        <div class="form-group" style="margin-top: 10px;">
+            <label>मोबाइल नंबर:</label>
+            <input type="tel" id="loginPhone" placeholder="10 अंकों का नंबर" maxlength="10">
+        </div>
+        <button class="btn-main" onclick="sendOtp()">ओटीपी भेजें</button>
+        
+        <div id="otpBox" style="display:none; margin-top:8px;">
+            <label>ओटीपी दर्ज करें (मास्टर कोड 9997077062 के लिए डायरेक्ट लॉगिन):</label>
+            <input type="text" id="enteredOtp" placeholder="4 अंकों का OTP (जैसे: 1234)" maxlength="4">
+            <button class="btn-main" style="margin-top:5px;" onclick="verifyOtp()">सत्यापित करें (Verify)</button>
+        </div>
+        <div id="loginError" class="error-msg"></div>
+    </div>
+
+    <!-- 2. दुकान चुनें स्क्रीन (List of Shops) -->
+    <div id="shopListScreen" class="screen">
+        <h2>🛒 आस-पास की दुकानें</h2>
+        <div class="sub-title">जिस दुकान से सब्जी लेनी है उसपर क्लिक करें</div>
+        <div id="shopsContainer">
+            <!-- यहाँ सभी दुकानों की लिस्ट आएगी -->
+        </div>
+    </div>
+
+    <!-- 3. कैटलॉग और आर्डर स्क्रीन -->
+    <div id="catalogScreen" class="screen">
+        <h2 id="storeTitle">🥬 स्टोर</h2>
+        <div class="sub-title" id="storeSubTitle">अपनी पसंद की सब्ज़ी चुनें</div>
+
+        <div class="section-box">
+            <h3>📦 उपलब्ध सब्ज़ियाँ</h3>
+            <div id="catalogContainer">
+                <!-- कैटलॉग आइटम्स -->
+            </div>
+        </div>
+
+        <!-- आर्डर टोकरी (Cart) -->
+        <div class="section-box">
+            <h3>🛍️ आपकी आर्डर टोकरी</h3>
+            <div id="cartContainer">
+                <p style="font-size: 11px; color: #777; text-align: center; margin: 4px 0;">कोई सामान नहीं चुना गया है।</p>
+            </div>
+        </div>
+
+        <div class="total-bill" id="totalBillDisplay">कुल देय राशि: ₹0</div>
+
+        <!-- ग्राहक विवरण फॉर्म -->
+        <div class="section-box">
+            <h3>📍 आपका डिलीवरी विवरण</h3>
+            <div class="form-group">
+                <label>आपका नाम:</label>
+                <input type="text" id="custName" placeholder="अपना नाम लिखें">
+            </div>
+            <div class="form-group">
+                <label>मोबाइल नंबर:</label>
+                <input type="tel" id="custPhone" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10">
+            </div>
+            <div class="form-group">
+                <label>पूरा पता (लोकेशन/पत्ता):</label>
+                <textarea id="custAddress" rows="2" placeholder="गली नंबर, मकान नंबर, मोहल्ला"></textarea>
+            </div>
+        </div>
+
+        <button class="btn-main" style="background:#e65100; margin-bottom:6px;" onclick="showQrModal()">💳 QR कोड स्कैन करें व भुगतान करें</button>
+        <button class="btn-main" onclick="placeOrder()">🚀 दुकानदार को आर्डर भेजें</button>
+        <button class="btn-main" style="background:#757575; margin-top:6px;" onclick="backToShops()">⬅️ दूसरी दुकान देखें</button>
+    </div>
+
+</div>
+
+<!-- QR Code Modal -->
+<div id="qrModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeQrModal()">&times;</span>
+        <h3 style="color:#2e7d32; margin-top:0; font-size:14px;">📷 स्कैन करके भुगतान करें</h3>
+        <div style="background:#eee; padding:15px; border-radius:6px; margin:10px 0;">
+            <p style="margin:0; font-weight:bold; font-size:12px;" id="modalUpiText">UPI ID: 9997077062@paytm</p>
+            <p style="font-size:14px; color:#e65100; font-weight:bold; margin-top:8px;" id="modalAmountText">देय राशि: ₹0</p>
+            <p style="font-size:10px; color:#555; margin-top:5px;">[यहाँ दुकानदार का ऑटोमैटिक QR कोड स्कैन होगा]</p>
+        </div>
+        <button class="btn-main" onclick="closeQrModal()">भुगतान हो गया (वापस जाएं)</button>
+    </div>
+</div>
+
+<!-- Firebase और लॉजिक स्क्रिप्ट -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
@@ -107,62 +171,234 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    window.sendOrder = function() {
-        const name = document.getElementById('customerName').value.trim();
-        const phone = document.getElementById('customerPhone').value.trim();
-        const address = document.getElementById('customerAddress').value.trim();
+    let currentCart = [];
+    let selectedShop = null;
 
-        if (!name || !phone || !address) {
-            alert('कृपया अपना नाम, फोन नंबर और पता सही से भरें!');
+    // वजन के विकल्प
+    const weightOptions = [
+        { label: "50 ग्राम", value: 0.05 },
+        { label: "100 ग्राम", value: 0.1 },
+        { label: "200 ग्राम", value: 0.2 },
+        { label: "250 ग्राम", value: 0.25 },
+        { label: "500 ग्राम", value: 0.5 },
+        { label: "750 ग्राम", value: 0.75 },
+        { label: "1 किलो", value: 1.0 },
+        { label: "2 किलो", value: 2.0 },
+        { label: "3 किलो", value: 3.0 },
+        { label: "5 किलो", value: 5.0 },
+        { label: "10 किलो", value: 10.0 }
+    ];
+
+    window.onload = function() {
+        let savedPhone = localStorage.getItem("custPhone");
+        if (savedPhone) {
+            loadShopsList();
+        }
+    };
+
+    window.sendOtp = function() {
+        let phone = document.getElementById('loginPhone').value.trim();
+        let errorEl = document.getElementById('loginError');
+
+        if (phone.length !== 10) {
+            errorEl.innerText = "कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!";
             return;
         }
 
-        const products = [
-            { name: "टमाटर", price: 40, qtyId: "qty_0" },
-            { name: "आलू", price: 30, qtyId: "qty_1" },
-            { name: "प्याज़", price: 50, qtyId: "qty_2" },
-            { name: "हरी मिर्च", price: 80, qtyId: "qty_3" }
+        localStorage.setItem("custPhone", phone);
+        if (phone === "9997077062") {
+            // मास्टर कोड डायरेक्ट लॉगिन
+            loadShopsList();
+        } else {
+            alert("आपका OTP है: 1234");
+            document.getElementById('otpBox').style.display = 'block';
+            errorEl.innerText = "";
+        }
+    };
+
+    window.verifyOtp = function() {
+        let entered = document.getElementById('enteredOtp').value.trim();
+        let errorEl = document.getElementById('loginError');
+        if (entered === "1234" || localStorage.getItem("custPhone") === "9997077062") {
+            loadShopsList();
+        } else {
+            errorEl.innerText = "गलत ओटीपी!";
+        }
+    };
+
+    function loadShopsList() {
+        document.getElementById('loginScreen').classList.remove('active');
+        document.getElementById('shopListScreen').classList.add('active');
+        
+        const container = document.getElementById('shopsContainer');
+        container.innerHTML = "<p style='font-size:11px; text-align:center; color:#777;'>दुकाने लोड हो रही हैं...</p>";
+
+        // उदाहरण के लिए दुकानें (आप इन्हें डेटाबेस से भी जोड़ सकते हैं)
+        let shops = [
+            { name: "अजय वेजिटेबल्स (मुख्य दुकान)", phone: "9997077062", upi: "9997077062@paytm" },
+            { name: "शुभम वेजिटेबल स्टोर", phone: "9876543210", upi: "shubham@paytm" },
+            { name: "राहुल फ्रेश सब्जी वाला", phone: "9123456789", upi: "rahul@paytm" }
         ];
 
-        let orderedItems = [];
-        let totalAmount = 0;
-
-        products.forEach(p => {
-            let qty = parseFloat(document.getElementById(p.qtyId).value) || 0;
-            if (qty > 0) {
-                let itemTotal = qty * p.price;
-                orderedItems.push({ name: p.name, qty: qty, price: p.price });
-                totalAmount += itemTotal;
-            }
+        container.innerHTML = "";
+        shops.forEach(shop => {
+            let div = document.createElement('div');
+            div.className = "shop-card";
+            div.innerHTML = `<span>🏪 ${shop.name}</span> <span style="font-size:10px; background:#fff; padding:2px 6px; border-radius:3px;">देखें ➔</span>`;
+            div.onclick = () => openShop(shop);
+            container.appendChild(div);
         });
+    }
 
-        if (orderedItems.length === 0) {
-            alert('कृपया कम से कम एक सब्ज़ी की मात्रा (Quantity) चुनें!');
+    function openShop(shop) {
+        selectedShop = shop;
+        document.getElementById('shopListScreen').classList.remove('active');
+        document.getElementById('catalogScreen').classList.add('active');
+        
+        document.getElementById('storeTitle').innerText = `🥬 ${shop.name}`;
+        document.getElementById('shopCallIcon').style.display = 'inline-block';
+        document.getElementById('shopCallIcon.href') = `tel:${shop.phone}`;
+
+        loadCatalogItems();
+    }
+
+    window.backToShops = function() {
+        document.getElementById('catalogScreen').classList.remove('active');
+        document.getElementById('shopListScreen').classList.add('active');
+        document.getElementById('shopCallIcon').style.display = 'none';
+        currentCart = [];
+    };
+
+    function loadCatalogItems() {
+        const container = document.getElementById('catalogContainer');
+        // डिफ़ॉल्ट कैटलॉग आइटम्स
+        let items = [
+            { name: "टमाटर", price: 40 },
+            { name: "आलू", price: 30 },
+            { name: "प्याज़", price: 50 },
+            { name: "हरी मिर्च", price: 60 }
+        ];
+
+        container.innerHTML = "";
+        items.forEach((item, index) => {
+            let optionsHtml = '';
+            weightOptions.forEach(w => {
+                optionsHtml += `<option value="${w.value}">${w.label}</option>`;
+            });
+
+            let div = document.createElement('div');
+            div.className = "product-item";
+            div.innerHTML = `
+                <div class="product-top">
+                    <span class="product-name" id="p_name_${index}">${item.name}</span>
+                    <span class="product-price">₹${item.price} / kg</span>
+                </div>
+                <div class="product-bottom">
+                    <select id="p_weight_${index}">
+                        ${optionsHtml}
+                    </select>
+                    <button class="add-btn" onclick="addToCart('${item.name}', ${item.price}, ${index})">+ जोड़े</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    window.addToCart = function(name, price, index) {
+        let selectEl = document.getElementById(`p_weight_${index}`);
+        let qtyValue = parseFloat(selectEl.value);
+        let qtyLabel = selectEl.options[selectEl.selectedIndex].text;
+
+        let existing = currentCart.find(i => i.name === name);
+        if(existing) {
+            existing.qty += qtyValue;
+            existing.qtyLabel = `${existing.qty} Kg`; // सरल प्रदर्शन
+        } else {
+            currentCart.push({ name: name, price: price, qty: qtyValue, qtyLabel: qtyLabel });
+        }
+        renderCart();
+    };
+
+    window.removeFromCart = function(index) {
+        currentCart.splice(index, 1);
+        renderCart();
+    };
+
+    function renderCart() {
+        const cartContainer = document.getElementById('cartContainer');
+        if(currentCart.length === 0) {
+            cartContainer.innerHTML = '<p style="font-size: 11px; color: #777; text-align: center; margin: 4px 0;">कोई सामान नहीं चुना गया है।</p>';
+            document.getElementById('totalBillDisplay').innerText = "कुल देय राशि: ₹0";
             return;
         }
 
-        const orderData = {
+        let html = "";
+        let total = 0;
+        currentCart.forEach((item, index) => {
+            let itemTotal = item.price * item.qty;
+            total += itemTotal;
+            html += `
+                <div class="cart-item">
+                    <span><b>${item.name}</b> (${item.qtyLabel}) - ₹${itemTotal.toFixed(1)}</span>
+                    <button class="remove-cart-btn" onclick="removeFromCart(${index})">हटाएं</button>
+                </div>
+            `;
+        });
+        cartContainer.innerHTML = html;
+        document.getElementById('totalBillDisplay').innerText = `कुल देय राशि: ₹${total.toFixed(1)}`;
+    }
+
+    window.showQrModal = function() {
+        let total = currentCart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+        if(total <= 0) {
+            alert("कृपया पहले कैटलॉग से कोई सब्जी चुनें!");
+            return;
+        }
+        document.getElementById('modalUpiText').innerText = `UPI ID: ${selectedShop.upi}`;
+        document.getElementById('modalAmountText').innerText = `देय राशि: ₹${total.toFixed(1)}`;
+        document.getElementById('qrModal').style.display = 'flex';
+    };
+
+    window.closeQrModal = function() {
+        document.getElementById('qrModal').style.display = 'none';
+    };
+
+    window.placeOrder = function() {
+        let name = document.getElementById('custName').value.trim();
+        let phone = document.getElementById('custPhone').value.trim();
+        let address = document.getElementById('custAddress').value.trim();
+
+        if(!name || phone.length !== 10 || !address) {
+            alert("कृपया अपना नाम, 10 अंकों का मोबाइल नंबर और पूरा पता भरें!");
+            return;
+        }
+
+        if(currentCart.length === 0) {
+            alert("आपकी टोकरी खाली है!");
+            return;
+        }
+
+        let totalAmount = currentCart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+
+        let orderData = {
             customerName: name,
             customerPhone: phone,
             customerAddress: address,
-            items: orderedItems,
+            items: currentCart,
             totalAmount: totalAmount,
+            shopPhone: selectedShop.phone,
+            shopName: selectedShop.name,
             timestamp: Date.now()
         };
 
-        push(ref(db, 'orders'), orderData)
-            .then(() => {
-                alert('🎉 आपका आर्डर सफलतापर्वक भेज दिया गया है!');
-                // फॉर्म खाली करें
-                document.getElementById('customerName').value = '';
-                document.getElementById('customerPhone').value = '';
-                document.getElementById('customerAddress').value = '';
-                products.forEach(p => document.getElementById(p.qtyId).value = 0);
-            })
-            .catch((error) => {
-                alert('आर्डर भेजने में कुछ दिक्कत आई: ' + error.message);
-            });
-    };
+        const ordersRef = ref(db, 'orders');
+        push(ordersRef, orderData).then(() => {
+            alert("ऑर्डर दुकानदार के पास सफलतापर्वक भेज दिया गया है!");
+            location.reload();
+        }).catch((error) => {
+            alert("त्रुटि: " + error.message);
+        });
+    }
 </script>
 
 </body>
