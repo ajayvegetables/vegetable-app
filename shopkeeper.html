@@ -42,13 +42,14 @@
         .item-list { font-size: 10px; margin: 2px 0; padding-left: 10px; }
         .error-msg { color: red; font-size: 10px; text-align: center; margin-top: 4px; }
 
-        /* ✅ कैटलॉग - नाम और रेट/हटाएं बटन को बिल्कुल पास-पास (Compact) सेट किया गया है */
-        .item-row { display: flex; align-items: center; justify-content: flex-start; margin-bottom: 6px; width: 100%; box-sizing: border-box; border-bottom: 1px solid #eee; padding-bottom: 4px; gap: 10px; }
-        .item-row input.item-name { width: 110px; border: none; background: transparent; font-size: 12px; font-weight: bold; color: #333; outline: none; }
-        .right-group { display: flex; align-items: center; gap: 6px; margin-left: auto; }
-        .item-row input.item-price { width: 38px; border: none; border-bottom: 1px dashed #999; background: transparent; padding: 2px; font-size: 12px; text-align: center; outline: none; font-weight: bold; color: #e65100; }
-        .item-row span { font-size: 10px; color: #666; white-space: nowrap; }
-        .item-row button.remove-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 3px 6px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 9px; white-space: nowrap; }
+        /* ✅ नया कैटलॉग डिज़ाइन - नाम के ठीक नीचे या पास में रेट और हटाएं बटन बिल्कुल सेट */
+        .item-row { display: flex; flex-direction: column; background: #fff; border: 1px solid #eee; padding: 6px; border-radius: 5px; margin-bottom: 6px; box-sizing: border-box; }
+        .item-top { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 4px; }
+        .item-row input.item-name { width: 65%; border: none; background: transparent; font-size: 12px; font-weight: bold; color: #333; outline: none; }
+        .item-bottom { display: flex; align-items: center; gap: 6px; width: 100%; border-top: 1px dashed #f0f0f0; padding-top: 4px; }
+        .item-row input.item-price { width: 45px; border: 1px solid #ccc; background: #fff; padding: 2px; font-size: 11px; text-align: center; border-radius: 3px; outline: none; font-weight: bold; color: #e65100; }
+        .item-row span { font-size: 10px; color: #666; }
+        .item-row button.remove-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 10px; margin-left: auto; }
 
         /* क्लिक करने योग्य आर्डर सूची हेडिंग */
         .orders-header { font-size: 12px; color: #e65100; background: #e0f2f1; padding: 6px; border-radius: 4px; cursor: pointer; text-align: center; font-weight: bold; margin-bottom: 8px; border: 1px solid #b2dfdb; }
@@ -138,27 +139,33 @@
                 <input type="tel" id="shopWhatsapp" value="9997077062">
             </div>
 
-            <h4 style="margin: 6px 0 3px 0; color:#e65100; font-size:11px;">सब्जी / फल और रेट (क्लिक करके बदलें):</h4>
+            <h4 style="margin: 6px 0 4px 0; color:#e65100; font-size:11px;">सब्जी / फल और रेट (क्लिक करके बदलें):</h4>
             <div id="catalog-items-container">
                 <div class="item-row">
-                    <input type="text" class="item-name" value="टमाटर">
-                    <div class="right-group">
+                    <div class="item-top">
+                        <input type="text" class="item-name" value="टमाटर">
+                    </div>
+                    <div class="item-bottom">
                         <input type="number" class="item-price" value="40">
                         <span>₹/kg</span>
                         <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
                     </div>
                 </div>
                 <div class="item-row">
-                    <input type="text" class="item-name" value="आलू">
-                    <div class="right-group">
+                    <div class="item-top">
+                        <input type="text" class="item-name" value="आलू">
+                    </div>
+                    <div class="item-bottom">
                         <input type="number" class="item-price" value="30">
                         <span>₹/kg</span>
                         <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
                     </div>
                 </div>
                 <div class="item-row">
-                    <input type="text" class="item-name" value="प्याज़">
-                    <div class="right-group">
+                    <div class="item-top">
+                        <input type="text" class="item-name" value="प्याज़">
+                    </div>
+                    <div class="item-bottom">
                         <input type="number" class="item-price" value="50">
                         <span>₹/kg</span>
                         <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
@@ -170,7 +177,6 @@
             <button class="btn-main" style="font-size:11px; padding:7px; margin-top:6px;" onclick="saveCatalogSettings()">कैटलॉग व सेटिंग्स सेव करें</button>
         </div>
 
-        <!-- क्लिक करने योग्य नया आर्डर सूची हेडिंग/बटन -->
         <div class="orders-header" onclick="checkOrdersManually()">
             🛍️ नए ऑर्डर्स की सूची (रिफ्रेश/जाँच करें) 🔄
         </div>
@@ -271,8 +277,10 @@
         let div = document.createElement('div');
         div.className = "item-row";
         div.innerHTML = `
-            <input type="text" class="item-name" placeholder="आइटम नाम">
-            <div class="right-group">
+            <div class="item-top">
+                <input type="text" class="item-name" placeholder="आइटम नाम">
+            </div>
+            <div class="item-bottom">
                 <input type="number" class="item-price" placeholder="रेट">
                 <span>₹/kg</span>
                 <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
@@ -304,7 +312,7 @@
     };
 
     window.checkOrdersManually = function() {
-        alert("ऑर्डर सूची ताज़ा कर दी गई है। यदि कोई नया ऑर्डर होगा तो वह ऊपर दिखाई देगा।");
+        alert("ऑर्डर सूची ताज़ा कर दी गई है।");
     };
 
     function playLoudAlarm() {
@@ -373,7 +381,7 @@
                     <a href="tel:${order.customerPhone}" class="btn-call">📞 ग्राहक को कॉल करें</a>
                     <div class="btn-group">
                         <button class="btn btn-accept" onclick="acceptOrder('${order.id}', '${order.customerName}', '${order.totalAmount}', '${summaryText}')">✅ स्वीकार करें</button>
-                        <button class="btn btn-reject" onclick="rejectOrder('${order.id}', '${order.customerName}', '${summaryText}')">❌ रद्द करें</button>
+                        <button class="btn btn-reject" onclick="rejectOrder('${order.id}', '${order.customerName}')">❌ रद्द करें</button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -393,12 +401,12 @@
             remove(ref(db, 'orders/' + orderId));
         };
 
-        window.rejectOrder = function(orderId, name, items) {
+        window.rejectOrder = function(orderId, name) {
             if(confirm('क्या आप वाकई इस ऑर्डर को रद्द करना चाहते हैं?')) {
                 let timeString = new Date().toLocaleString('hi-IN');
                 let rejectItem = document.createElement('div');
                 rejectItem.className = "rejected-item-box";
-                rejectItem.innerHTML = `<strong>👤 ${name}</strong><br>🛒 ${items}<br><span style="color:#555; font-size:8px;">⏰ रद्द समय: ${timeString}</span>`;
+                rejectItem.innerHTML = `<strong>👤 ${name}</strong><br><span style="color:#555; font-size:8px;">⏰ रद्द समय: ${timeString}</span>`;
                 
                 if(rejectedContainer.innerHTML.includes('कोई रद्द')) rejectedContainer.innerHTML = "";
                 rejectedContainer.prepend(rejectItem);
