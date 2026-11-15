@@ -232,7 +232,8 @@
                     document.getElementById('liveOfferBanner').style.display = 'none';
                 }
                 if (data.catalog && Array.isArray(data.catalog)) {
-                    liveCatalog = data.catalog;
+                    // ✅ 'स्टॉक नहीं है' वाली सब्जियों को तुरंत ग्राहक के ऐप से छिपाना
+                    liveCatalog = data.catalog.filter(item => !item.outOfStock);
                 } else {
                     liveCatalog = [
                         { name: "टमाटर", price: 40 },
@@ -255,6 +256,12 @@
     function renderCustomerCatalog() {
         const container = document.getElementById('catalogContainer');
         container.innerHTML = "";
+        
+        if(liveCatalog.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #777; font-size: 12px;">फिलहाल कोई सब्जी उपलब्ध नहीं है (स्टॉक खत्म)।</p>';
+            return;
+        }
+
         liveCatalog.forEach((item, index) => {
             let optionsHtml = '';
             weightOptions.forEach(w => {
@@ -333,7 +340,6 @@
         document.getElementById('subTotalDisplay').innerText = `सब्जी का कुल मूल्य: ₹${subTotal.toFixed(1)}`;
     }
 
-    // ✅ केवल और केवल दुकानदार के लाइव लिखे ऑफर के आधार पर बिल बनाने वाला नया लॉजिक
     window.calculateFinalBill = function() {
         let subTotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
         let deliveryCharge = 0;
@@ -342,13 +348,11 @@
 
         let text = currentOfferText.trim();
 
-        // यदि ऑफर बॉक्स खाली है या साधारण टेक्स्ट (जैसे "नमस्ते") है
         if (!text || text.toLowerCase().includes("नमस्ते") || (!text.includes("डिलीवरी") && !text.includes("%"))) {
             deliveryCharge = 0;
             discountAmount = 0;
-            ruleMessage = text ? `दुकान की सूचना: "${text}" (कोई अतिरिक्त शुल्क या छूट नहीं)` : "कोई विशेष ऑफर या डिलीवरी चार्ज लागू नहीं है।";
+            ruleMessage = text ? `दुकान की सूचना: "${text}"` : "कोई विशेष ऑफर लागू नहीं है।";
         } else {
-            // 1. यदि दुकानदार ने डिलीवरी चार्ज का नियम लिखा है
             if (text.includes("डिलीवरी")) {
                 let limitMatch = text.match(/(\d+)\s*(से कम|से अधिक)/);
                 let chargeMatch = text.match(/(\d+)\s*(रुपये|रु|₹)?\s*डिलीवरी/i);
@@ -358,16 +362,15 @@
 
                 if (text.includes("से कम") && subTotal < limit && subTotal > 0) {
                     deliveryCharge = charge;
-                    ruleMessage = `शर्त के अनुसार: ₹${limit} से कम का ऑर्डर है, इसलिए ₹${charge} डिलीवरी चार्ज जुड़ा है।`;
+                    ruleMessage = `₹${limit} से कम का ऑर्डर है, इसलिए ₹${charge} डिलीवरी चार्ज जुड़ा है।`;
                 } else if (text.includes("से अधिक") && subTotal >= limit) {
                     deliveryCharge = charge;
-                    ruleMessage = `शर्त के अनुसार: ₹${limit} या अधिक का ऑर्डर है, इसलिए ₹${charge} डिलीवरी चार्ज जुड़ा है।`;
+                    ruleMessage = `₹${limit} या अधिक का ऑर्डर है, इसलिए ₹${charge} डिलीवरी चार्ज जुड़ा है।`;
                 } else {
                     ruleMessage = "ऑर्डर पर फ्री डिलीवरी लागू है।";
                 }
             }
 
-            // 2. यदि दुकानदार ने प्रतिशत छूट (% off) का नियम लिखा है
             let percentMatch = text.match(/(\d+)\s*%/);
             let offerLimitMatch = text.match(/(\d+)\s*(से अधिक|पर)/);
 
@@ -378,7 +381,7 @@
                 if (subTotal >= offerLimit) {
                     let baseBeforeDisc = subTotal + deliveryCharge;
                     discountAmount = Math.round((baseBeforeDisc * percent) / 100);
-                    ruleMessage += `<br>🎯 लाइव ऑफर लागू: "${text}" (${percent}% छूट -₹${discountAmount})`;
+                    ruleMessage += `<br>🎯 ऑफर लागू: "${text}" (${percent}% छूट -₹${discountAmount})`;
                 } else {
                     ruleMessage += `<br>ℹ️ ${percent}% छूट पाने के लिए कम से कम ₹${offerLimit} की खरीदी आवश्यक है।`;
                 }
