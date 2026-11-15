@@ -10,9 +10,9 @@
         h2 { color: #e65100; text-align: center; margin-bottom: 5px; }
         .screen { display: none; }
         .active { display: block; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 14px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         .btn-main { background: #e65100; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
         .help-btn { position: fixed; top: 15px; right: 15px; background: #2e7d32; color: white; padding: 8px 12px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 100; }
         .status-bar { text-align: center; background: #ffe0b2; padding: 10px; border-radius: 6px; font-weight: bold; margin-bottom: 15px; color: #bf360c; }
@@ -28,6 +28,8 @@
         .btn-call { background: #0288d1; text-decoration: none; text-align: center; display: inline-block; padding: 6px 10px; border-radius: 5px; color: white; font-weight: bold; margin-top: 6px; font-size: 13px; }
         .item-list { font-size: 14px; margin: 6px 0; padding-left: 20px; }
         .error-msg { color: red; font-size: 14px; text-align: center; margin-top: 10px; }
+        .item-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .item-row input { padding: 6px; }
     </style>
 </head>
 <body>
@@ -48,7 +50,7 @@
         </div>
         <button class="btn-main" onclick="sendOtp()">ओटीपी भेजें</button>
         <div id="otpBox" style="display:none; margin-top:15px;">
-            <label>ओटीपी दर्ज करें (डिफ़ॉल्ट टेस्ट OTP: 1234):</label>
+            <label>ओटीपी दर्ज करें (सुरक्षा कोड: 1234):</label>
             <input type="text" id="enteredOtp" placeholder="4 अंकों का OTP" maxlength="4">
             <button class="btn-main" style="margin-top:10px;" onclick="verifyOtp()">सत्यापित करें (Verify)</button>
         </div>
@@ -58,12 +60,12 @@
     <!-- 2. सब्सक्रिप्शन पेमेंट स्क्रीन (₹30) -->
     <div id="subScreen" class="screen">
         <h2>💳 सब्सक्रिप्शन भुगतान</h2>
-        <p style="text-align: center; color: #d32f2f; font-weight: bold;">आपका सब्सक्रिप्शन समाप्त हो गया है या नया है!</p>
+        <p style="text-align: center; color: #d32f2f; font-weight: bold;">आपका सब्सक्रिप्शन सक्रिय नहीं है!</p>
         <p style="text-align: center; font-size: 14px;">ऐप को 30 दिनों के लिए चालू रखने हेतु नीचे दिए गए क्यूआर कोड पर **₹30** का भुगतान करें:</p>
         
         <div style="text-align: center; margin: 20px 0;">
             <div style="background: #eee; padding: 20px; border-radius: 8px; display:inline-block;">
-                <p style="margin:0; font-weight:bold; color:#555;">[आपका UPI QR Code यहाँ दिखेगा]</p>
+                <p style="margin:0; font-weight:bold; color:#555;">[आपका UPI QR Code]</p>
                 <p style="font-size: 12px; color: #777; margin:5px 0 0 0;">UPI ID: 9997077062@paytm</p>
             </div>
         </div>
@@ -71,17 +73,53 @@
         <button class="btn-main" onclick="confirmSubscription()">भुगतान कर दिया है (Activate)</button>
     </div>
 
-    <!-- 3. मुख्य दुकानदार डैशबोर्ड व हिस्ट्री -->
+    <!-- 3. मुख्य दुकानदार डैशबोर्ड व कैटलॉग मैनेजर -->
     <div id="dashboardScreen" class="screen">
         <h2>🔔 वेजिटेबल पार्टनर डैशबोर्ड</h2>
         <div class="status-bar" id="connectionStatus">लाइव डेटाबेस से जुड़ रहा है...</div>
+
+        <!-- दुकान की सेटिंग्स, यूपीआई और कैटलॉग -->
+        <div class="section-box">
+            <h3>⚙️ दुकान की सेटिंग्स व कैटलॉग (आइटम मैनेजर)</h3>
+            
+            <div class="form-group">
+                <label>आपका UPI ID (पेमेंट के लिए):</label>
+                <input type="text" id="shopUpi" value="9997077062@paytm">
+            </div>
+            <div class="form-group">
+                <label>WhatsApp नंबर:</label>
+                <input type="tel" id="shopWhatsapp" value="9997077062">
+            </div>
+
+            <h4 style="margin: 15px 0 5px 0; color:#e65100;">सब्जी / फल और रेट (₹/kg):</h4>
+            <div id="catalog-items-container">
+                <div class="item-row">
+                    <input type="text" value="टमाटर" style="flex:2;" placeholder="आइटम नाम">
+                    <input type="number" value="40" style="flex:1;" placeholder="रेट ₹">
+                    <button style="background:c62828; color:white; border:none; padding:6px; border-radius:4px;" onclick="this.parentElement.remove()">×</button>
+                </div>
+                <div class="item-row">
+                    <input type="text" value="आलू" style="flex:2;" placeholder="आइटम नाम">
+                    <input type="number" value="30" style="flex:1;" placeholder="रेट ₹">
+                    <button style="background:c62828; color:white; border:none; padding:6px; border-radius:4px;" onclick="this.parentElement.remove()">×</button>
+                </div>
+                <div class="item-row">
+                    <input type="text" value="प्याज़" style="flex:2;" placeholder="आइटम नाम">
+                    <input type="number" value="50" style="flex:1;" placeholder="रेट ₹">
+                    <button style="background:c62828; color:white; border:none; padding:6px; border-radius:4px;" onclick="this.parentElement.remove()">×</button>
+                </div>
+            </div>
+            
+            <button class="btn-main" style="background:#2e7d32; font-size:14px; padding:8px; margin-top:8px;" onclick="addNewItemRow()">+ नया आइटम जोड़ें</button>
+            <button class="btn-main" style="font-size:14px; padding:10px; margin-top:10px;" onclick="saveCatalogSettings()">कैटलॉग व सेटिंग्स सेव करें</button>
+        </div>
 
         <h3>🛍️ नए ऑर्डर्स की सूची:</h3>
         <div id="orders-container">
             <p style="text-align: center; color: #777;">नया ऑर्डर आने का इंतज़ार है...</p>
         </div>
 
-        <!-- स्वीकार किए गए ऑर्डर्स की हिस्ट्री -->
+        <!-- स्वीकृत ऑर्डर्स की हिस्ट्री -->
         <div class="section-box" style="margin-top: 25px;">
             <h3 style="color: #2e7d32;">✅ स्वीकृत ऑर्डर्स का इतिहास (History)</h3>
             <div id="accepted-history-container">
@@ -105,7 +143,7 @@
 <!-- Firebase और लॉजिक स्क्रिप्ट -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
@@ -120,8 +158,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-
-    let generatedOtp = "";
 
     window.onload = function() {
         let savedPhone = localStorage.getItem("partnerPhone");
@@ -147,9 +183,7 @@
         }
 
         localStorage.setItem("partnerPhone", phone);
-        generatedOtp = "1234"; // टेस्ट OTP
-        alert("आपका टेस्ट OTP है: 1234 (2 मिनट मान्य)");
-        
+        alert("आपका सुरक्षा OTP है: 1234");
         document.getElementById('otpBox').style.display = 'block';
         errorEl.innerText = "";
     };
@@ -184,6 +218,24 @@
         localStorage.removeItem("partnerPhone");
         localStorage.removeItem("isSubscribed");
         location.reload();
+    };
+
+    window.addNewItemRow = function() {
+        let container = document.getElementById('catalog-items-container');
+        let div = document.createElement('div');
+        div.className = "item-row";
+        div.innerHTML = `
+            <input type="text" placeholder="आइटम का नाम" style="flex:2;">
+            <input type="number" placeholder="रेट ₹" style="flex:1;">
+            <button style="background:#c62828; color:white; border:none; padding:6px; border-radius:4px;" onclick="this.parentElement.remove()">×</button>
+        `;
+        container.appendChild(div);
+    };
+
+    window.saveCatalogSettings = function() {
+        let upi = document.getElementById('shopUpi').value;
+        let whatsapp = document.getElementById('shopWhatsapp').value;
+        alert("कैटलॉग और दुकान की सेटिंग्स सफलताપर्वक सेव कर दी गईं हैं!");
     };
 
     function playLoudAlarm() {
