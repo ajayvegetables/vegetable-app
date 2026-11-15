@@ -4,71 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>अजय वेजिटेबल्स - ऑनलाइन स्टोर</title>
-    <!-- PWA Manifest - कस्टमर ऐप के लिए अलग नाम और कार्ट लोगो -->
+    <!-- PWA Manifest -->
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%85%E0%A4%9C%E0%A4%AF%20%E0%A4%B5%E0%A5%87%E0%A4%9C%E0%A4%BF%E0%A4%AB%E0%A4%9F%E0%A4%AC%E0%A4%B2%20%28%E0%A4%95%E0%A4%B8%E0%A5%8D%E0%A4%9F%E0%A4%AE%E0%A4%B0%29%22%2C%22short_name%22%3A%22VegStore%22%2C%22start_url%22%3A%22.%2Fcustomer.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%232e7d32%22%2C%22theme_color%22%3A%22%232e7d32%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F2331%2F2331970.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any maskable%22%7D%5D%7D">
     <meta name="theme-color" content="#2e7d32">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2331/2331970.png">
     
     <style>
         body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; color: #333; }
-        .top-header { background: #2e7d32; color: white; padding: 12px; text-align: center; font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .top-header { background: #2e7d32; color: white; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
         .container { max-width: 500px; margin: auto; background: white; padding: 10px; min-height: 100vh; box-sizing: border-box; }
         
+        /* वेलकम बैनर */
         .welcome-banner { background: #fffde7; border: 1px solid #ffee58; padding: 8px; border-radius: 5px; font-size: 11px; margin-bottom: 10px; color: #555; line-height: 1.4; }
-        .help-strip { background: #e3f2fd; border: 1px solid #bbdefb; padding: 8px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px; }
-        .help-strip a { background: #1976d2; color: white; padding: 4px 10px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 11px; }
+        
+        /* टॉप हेल्प बटन */
+        .help-btn { background: #c62828; color: white; padding: 4px 10px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
-        .section-title { font-weight: bold; font-size: 14px; color: #2e7d32; margin: 10px 0 6px 0; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; }
+        .shop-info-bar { display: flex; justify-content: space-between; align-items: center; background: #e8f5e9; border: 1px solid #c8e6c9; padding: 8px 10px; border-radius: 6px; margin-bottom: 10px; font-size: 12px; font-weight: bold; color: #1b5e20; }
+        .shop-call-icon { background: #2e7d32; color: white; text-decoration: none; padding: 4px 8px; border-radius: 15px; font-size: 11px; display: flex; align-items: center; gap: 4px; }
 
+        .section-title { font-weight: bold; font-size: 13px; color: #2e7d32; margin: 10px 0 6px 0; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; }
+
+        /* कैटलॉग कार्ड */
         .product-card { display: flex; align-items: center; background: #fff; border: 1px solid #e0e0e0; padding: 8px; border-radius: 6px; margin-bottom: 8px; gap: 10px; }
-        .product-img { width: 40px; height: 40px; background: #ddd; border-radius: 4px; object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .product-img { width: 38px; height: 38px; background: #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
         .product-info { flex: 1; }
-        .product-name { font-size: 13px; font-weight: bold; color: #333; }
-        .product-price { font-size: 12px; color: #d32f2f; font-weight: bold; }
-        .product-action { display: flex; align-items: center; gap: 5px; }
+        .product-name { font-size: 12px; font-weight: bold; color: #333; }
+        .product-price { font-size: 11px; color: #d32f2f; font-weight: bold; }
+        .product-action { display: flex; align-items: center; gap: 4px; }
         .product-action select { padding: 4px; font-size: 11px; border: 1px solid #ccc; border-radius: 4px; }
-        .add-btn { background: #2e7d32; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer; }
+        .add-btn { background: #2e7d32; color: white; border: none; padding: 5px 9px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer; }
 
-        .cart-box { background: #fafafa; border: 1px solid #ddd; padding: 8px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; }
-        .cart-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; border-bottom: 1px dotted #ccc; padding-bottom: 3px; }
-        .remove-cart { background: #c62828; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px; cursor: pointer; }
+        /* कार्ट समरी */
+        .cart-box { background: #fafafa; border: 1px solid #ddd; padding: 8px; border-radius: 6px; margin-bottom: 10px; font-size: 11px; }
+        .cart-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px dotted #ccc; padding-bottom: 2px; }
+        .remove-cart { background: #c62828; color: white; border: none; padding: 2px 5px; border-radius: 3px; font-size: 10px; cursor: pointer; }
 
         .form-group { margin-bottom: 8px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 2px; font-size: 11px; color: #555; }
-        .form-group input, .form-group textarea { width: 100%; padding: 7px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 12px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 7px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 11px; }
 
-        .btn-proceed { background: #2e7d32; color: white; border: none; width: 100%; padding: 10px; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; margin-top: 10px; }
+        .btn-proceed { background: #2e7d32; color: white; border: none; width: 100%; padding: 10px; border-radius: 5px; font-size: 13px; font-weight: bold; cursor: pointer; text-align: center; margin-top: 8px; }
 
-        .qr-section { background: #fff; border: 1px dashed #2e7d32; padding: 12px; border-radius: 6px; margin-top: 15px; display: none; text-align: center; }
-        .qr-box { width: 160px; height: 160px; margin: 10px auto; background: #eee; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; }
+        /* QR बिल बॉक्स */
+        .qr-section { background: #fff; border: 1px dashed #2e7d32; padding: 10px; border-radius: 6px; margin-top: 12px; display: none; text-align: center; }
+        .qr-box { width: 150px; height: 150px; margin: 8px auto; background: #eee; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; }
         .qr-box img { width: 100%; height: 100%; object-fit: contain; }
         .pay-gpay-btn { background: #1976d2; color: white; border: none; width: 100%; padding: 9px; border-radius: 5px; font-weight: bold; font-size: 12px; cursor: pointer; margin-top: 8px; }
-        .pay-whatsapp-btn { background: #25D366; color: white; border: none; width: 100%; padding: 9px; border-radius: 5px; font-weight: bold; font-size: 12px; cursor: pointer; margin-top: 6px; }
+        .send-order-btn { background: #e65100; color: white; border: none; width: 100%; padding: 10px; border-radius: 5px; font-weight: bold; font-size: 13px; cursor: pointer; margin-top: 8px; }
     </style>
 </head>
 <body>
 
 <div class="top-header">
-    <span>🛒 अजय वेजिटेबल्स (कस्टमर स्टोर)</span>
-    <a href="shopkeeper.html" style="color:white; font-size:11px; text-decoration:none; background:#1b5e20; padding:4px 8px; border-radius:4px;">डैशबोर्ड</a>
+    <span>🛒 अजय वेजिटेबल्स</span>
+    <a href="tel:9997077062" class="help-btn">📞 Help</a>
 </div>
 
 <div class="container">
     
+    <!-- वेलकम बैनर -->
     <div class="welcome-banner">
         <b>स्वागत है आपका! 🙏</b><br>
         • ₹200 से कम के ऑर्डर पर ₹50 डिलीवरी चार्ज लगेगा।<br>
-        • ₹200 से अधिक के ऑर्डर पर ₹3 प्रति किलोमीटर के हिसाब से चार्ज लगेगा।<br>
-        • 5 किलोमीटर से अधिक दूरी पर डिलीवरी संभव नहीं है।
+        • ₹200 से अधिक के ऑर्डर पर ₹10 प्रति किलो के हिसाब से चार्ज लगेगा।<br>
+        • <b>अधिकतम 1 किलोमीटर तक ही डिलीवरी होगी।</b>
     </div>
 
-    <div class="help-strip">
-        <span>❓ कोई समस्या या शिकायत?<br><b style="font-size:11px;">तुरंत कॉल करें:</b></span>
-        <a href="tel:9997077062">अभी कॉल करें</a>
+    <!-- दुकानदार की जानकारी और कॉल करने का फोन आइकॉन -->
+    <div class="shop-info-bar">
+        <span>🏪 दुकानदार: अजय कुमार</span>
+        <a href="tel:9997077062" class="shop-call-icon">📞 9997077062</a>
     </div>
 
     <div class="section-title">सब्जी कैटलॉग (अपनी पसंद चुनें)</div>
     
+    <!-- कैटलॉग लिस्ट (सारे वजन के विकल्पों के साथ) -->
     <div id="catalogContainer">
         <div class="product-card">
             <div class="product-img">🎃</div>
@@ -78,11 +89,17 @@
             </div>
             <div class="product-action">
                 <select id="qty_0">
+                    <option value="0.05">50 ग्राम</option>
+                    <option value="0.1">100 ग्राम</option>
+                    <option value="0.2">200 ग्राम</option>
+                    <option value="0.25">250 ग्राम</option>
                     <option value="0.5">500 ग्राम</option>
+                    <option value="0.75">750 ग्राम</option>
                     <option value="1" selected>1 किलो</option>
                     <option value="2">2 किलो</option>
                     <option value="3">3 किलो</option>
                     <option value="5">5 किलो</option>
+                    <option value="10">10 किलो</option>
                 </select>
                 <button class="add-btn" onclick="addToCart('कद्दू', 40, 'qty_0')">जोड़ें</button>
             </div>
@@ -96,11 +113,17 @@
             </div>
             <div class="product-action">
                 <select id="qty_1">
+                    <option value="0.05">50 ग्राम</option>
+                    <option value="0.1">100 ग्राम</option>
+                    <option value="0.2">200 ग्राम</option>
+                    <option value="0.25">250 ग्राम</option>
                     <option value="0.5">500 ग्राम</option>
+                    <option value="0.75">750 ग्राम</option>
                     <option value="1" selected>1 किलो</option>
                     <option value="2">2 किलो</option>
                     <option value="3">3 किलो</option>
                     <option value="5">5 किलो</option>
+                    <option value="10">10 किलो</option>
                 </select>
                 <button class="add-btn" onclick="addToCart('टमाटर', 60, 'qty_1')">जोड़ें</button>
             </div>
@@ -114,11 +137,17 @@
             </div>
             <div class="product-action">
                 <select id="qty_2">
+                    <option value="0.05">50 ग्राम</option>
+                    <option value="0.1">100 ग्राम</option>
+                    <option value="0.2">200 ग्राम</option>
+                    <option value="0.25">250 ग्राम</option>
                     <option value="0.5">500 ग्राम</option>
+                    <option value="0.75">750 ग्राम</option>
                     <option value="1" selected>1 किलो</option>
                     <option value="2">2 किलो</option>
                     <option value="3">3 किलो</option>
                     <option value="5">5 किलो</option>
+                    <option value="10">10 किलो</option>
                 </select>
                 <button class="add-btn" onclick="addToCart('आलू', 30, 'qty_2')">जोड़ें</button>
             </div>
@@ -132,27 +161,38 @@
             </div>
             <div class="product-action">
                 <select id="qty_3">
+                    <option value="0.05">50 ग्राम</option>
+                    <option value="0.1">100 ग्राम</option>
+                    <option value="0.2">200 ग्राम</option>
+                    <option value="0.25">250 ग्राम</option>
                     <option value="0.5">500 ग्राम</option>
+                    <option value="0.75">750 ग्राम</option>
                     <option value="1" selected>1 किलो</option>
                     <option value="2">2 किलो</option>
+                    <option value="3">3 किलो</option>
+                    <option value="5">5 किलो</option>
+                    <option value="10">10 किलो</option>
                 </select>
                 <button class="add-btn" onclick="addToCart('मटर', 150, 'qty_3')">जोड़ें</button>
             </div>
         </div>
     </div>
 
+    <!-- कार्ट समरी -->
     <div class="section-title">आपका कार्ट (Cart Summary)</div>
     <div class="cart-box" id="cartContainer">
         <p style="text-align: center; color: #777; margin: 4px 0;">कार्ट खाली है।</p>
     </div>
 
-    <div style="font-size:13px; font-weight:bold; margin-bottom:8px;" id="subTotalDisplay">सब्जी का कुल मूल्य: ₹0</div>
+    <div style="font-size:12px; font-weight:bold; margin-bottom:8px;" id="subTotalDisplay">सब्जी का कुल मूल्य: ₹0</div>
 
+    <!-- दूरी इनपुट (अधिकतम 1 किमी सीमा) -->
     <div class="form-group">
-        <label>दूरी दर्ज करें (किलोमीटर में):</label>
-        <input type="number" id="custDistance" value="2" min="1" max="5" oninput="calculateFinalBill()">
+        <label>दूरी दर्ज करें (अधिकतम 1 किलोमीटर):</label>
+        <input type="number" id="custDistance" value="1" min="0.1" max="1" step="0.1" oninput="calculateFinalBill()">
     </div>
 
+    <!-- ग्राहक जानकारियां (ऑटो-सेव) -->
     <div class="section-title">ग्राहक की जानकारियां (ऑटो-सेव):</div>
     <div class="form-group">
         <label>नाम:</label>
@@ -169,9 +209,10 @@
 
     <button class="btn-proceed" onclick="proceedToPayment()">ऑर्डर आगे बढ़ाएं और भुगतान करें</button>
 
+    <!-- QR कोड और पेमेंट सेक्शन -->
     <div class="qr-section" id="qrSection">
-        <div style="font-weight: bold; font-size: 13px; color: #2e7d32; margin-bottom: 5px;">ऑर्डर का लाइन विवरण</div>
-        <div id="billBreakdown" style="font-size: 11px; color: #555; line-height: 1.5; margin-bottom: 8px;"></div>
+        <div style="font-weight: bold; font-size: 12px; color: #2e7d32; margin-bottom: 4px;">ऑर्डर का लाइन विवरण</div>
+        <div id="billBreakdown" style="font-size: 11px; color: #555; line-height: 1.4; margin-bottom: 6px;"></div>
         
         <div style="font-size: 12px; font-weight: bold; color: #d32f2f;" id="finalPayableText">कुल भुगतान योग्य राशि: ₹0</div>
         <div style="font-size: 10px; color: #666; margin-top: 2px;">स्कैन करके सटीक भुगतान करें (अमाउंट ऑटोमैटिक लॉक होगा):</div>
@@ -181,11 +222,12 @@
         </div>
 
         <button class="pay-gpay-btn" onclick="openGPay()">📱 Google Pay / PhonePe से भुगतान करें</button>
-        <button class="pay-whatsapp-btn" onclick="sendOrderToShop()">💬 भुगतान करने के बाद WhatsApp पर ऑर्डर भेजें</button>
+        <button class="send-order-btn" onclick="sendOrderToShop()">🚀 दुकानदार को आर्डर भेजें</button>
     </div>
 
 </div>
 
+<!-- Firebase और लॉजिक स्क्रिप्ट -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -228,7 +270,7 @@
         let existing = cart.find(i => i.name === name);
         if(existing) {
             existing.qty += qty;
-            existing.qtyText = `${existing.qty} किलो`;
+            existing.qtyText = `${existing.qty.toFixed(2)} किलो`;
         } else {
             cart.push({ name: name, price: price, qty: qty, qtyText: qtyText });
         }
@@ -255,19 +297,25 @@
             subTotal += itemTotal;
             html += `
                 <div class="cart-row">
-                    <span><b>${item.name}</b> (${item.qtyText}) - ₹${itemTotal}</span>
+                    <span><b>${item.name}</b> (${item.qtyText}) - ₹${itemTotal.toFixed(1)}</span>
                     <button class="remove-cart" onclick="removeFromCart(${index})">हटाएं</button>
                 </div>
             `;
         });
         container.innerHTML = html;
-        document.getElementById('subTotalDisplay').innerText = `सब्जी का कुल मूल्य: ₹${subTotal}`;
+        document.getElementById('subTotalDisplay').innerText = `सब्जी का कुल मूल्य: ₹${subTotal.toFixed(1)}`;
     }
 
     window.calculateFinalBill = function() {
         let subTotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-        let distance = parseFloat(document.getElementById('custDistance').value) || 2;
+        let distance = parseFloat(document.getElementById('custDistance').value) || 1;
         
+        if(distance > 1) {
+            alert("अधिकतम डिलीवरी दूरी केवल 1 किलोमीटर है!");
+            document.getElementById('custDistance').value = 1;
+            distance = 1;
+        }
+
         let deliveryCharge = 0;
         let ruleText = "";
 
@@ -275,11 +323,13 @@
             deliveryCharge = 50;
             ruleText = "₹200 से कम का ऑर्डर है, इसलिए ₹50 फिक्स डिलीवरी चार्ज है।";
         } else if(subTotal >= 200) {
-            deliveryCharge = distance * 3;
-            ruleText = `₹200 से अधिक का ऑर्डर है (${distance} किमी × ₹3)।`;
+            // ₹10 प्रति किलो (कुल वजन के हिसाब से) या प्रति किमी
+            let totalKg = cart.reduce((sum, i) => sum + i.qty, 0);
+            deliveryCharge = Math.ceil(totalKg * 10);
+            ruleText = `₹200 से अधिक का ऑर्डर है (₹10 प्रति किलो की दर से)।`;
         }
 
-        let grandTotal = subTotal + deliveryCharge;
+        let grandTotal = Math.round(subTotal + deliveryCharge);
         return { subTotal, deliveryCharge, grandTotal, ruleText };
     };
 
@@ -301,7 +351,7 @@
         let bill = calculateFinalBill();
 
         let breakdownHtml = `
-            सब्जी का कुल मूल्य: ₹${bill.subTotal}<br>
+            सब्जी का कुल मूल्य: ₹${bill.subTotal.toFixed(1)}<br>
             डिलीवरी चार्ज: ₹${bill.deliveryCharge}<br>
             <b>कुल भुगतान योग्य राशि: ₹${bill.grandTotal}</b><br>
             <span style="color:#d32f2f; font-size:10px;">${bill.ruleText}</span>
@@ -310,7 +360,7 @@
         document.getElementById('finalPayableText').innerText = `कुल भुगतान योग्य राशि: ₹${bill.grandTotal}`;
 
         let upiLink = `upi://pay?pa=${shopUpi}&pn=AjayVegetables&am=${bill.grandTotal}&cu=INR`;
-        let qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiLink)}`;
+        let qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiLink)}`;
         document.getElementById('dynamicQrImg').src = qrApiUrl;
 
         document.getElementById('qrSection').style.display = 'block';
@@ -345,11 +395,7 @@
 
         const ordersRef = ref(db, 'orders');
         push(ordersRef, orderData).then(() => {
-            let msg = `नया ऑर्डर आया है!\nनाम: ${name}\nफ़ोन: ${phone}\nपता: ${address}\nकुल राशि: ₹${bill.grandTotal}`;
-            let waUrl = `https://wa.me/91${shopPhone}?text=${encodeURIComponent(msg)}`;
-            
-            alert("ऑर्डर दुकानदार के पास सफलतापर्वक भेज दिया गया है!");
-            window.open(waUrl, '_blank');
+            alert("ऑर्डर दुकानदार के पास सफलतापर्वक भेज दिया गया है! दुकानदार के ऐप में घंटी बज गई है।");
             location.reload();
         }).catch((error) => {
             alert("त्रुटि: " + error.message);
