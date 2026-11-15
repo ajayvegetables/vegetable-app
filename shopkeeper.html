@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>वेजिटेबल पार्टनर - दुकानदार डैशबोर्ड</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #fff3e0; margin: 0; padding: 15px; color: #333; }
+        body { font-family: Arial, sans-serif; background: #fff3e0; margin: 0; padding: 15px; color: #333; padding-bottom: 60px; }
         .container { max-width: 650px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         h2 { color: #e65100; text-align: center; margin-bottom: 5px; }
         .screen { display: none; }
@@ -14,13 +14,22 @@
         .form-group label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 14px; }
         .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         .btn-main { background: #e65100; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .help-btn { position: fixed; top: 15px; right: 15px; background: #2e7d32; color: white; padding: 8px 12px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 100; }
+        
+        /* टॉप हेल्प और नोटिफिकेशन बटन */
+        .top-bar-fixed { position: fixed; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 100; }
+        .help-btn { background: #2e7d32; color: white; padding: 6px 10px; border-radius: 15px; text-decoration: none; font-weight: bold; font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .notif-badge-btn { background: #c62828; color: white; padding: 6px 10px; border-radius: 15px; font-weight: bold; font-size: 13px; cursor: pointer; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
         .status-bar { text-align: center; background: #ffe0b2; padding: 10px; border-radius: 6px; font-weight: bold; margin-bottom: 15px; color: #bf360c; }
         .section-box { background: #fafafa; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
         .section-box h3 { margin-top: 0; color: #e65100; font-size: 16px; border-bottom: 2px solid #ffe0b2; padding-bottom: 5px; }
+        
         .order-card { background: #ffebee; border: 1px solid #ffcdd2; border-left: 5px solid #d32f2f; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .history-card { background: #f1f8e9; border: 1px solid #c8e6c9; border-left: 5px solid #2e7d32; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 14px; }
-        .rejected-card { background: #fafafa; border: 1px solid #ddd; border-left: 5px solid #757575; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 14px; color: #555; }
+        .location-info { font-size: 13px; color: #d32f2f; font-weight: bold; margin: 4px 0; background: #fff; padding: 4px 8px; border-radius: 4px; display: inline-block; border: 1px solid #ffcdd2; }
+        
+        .history-card { background: #f1f8e9; border: 1px solid #c8e6c9; border-left: 5px solid #2e7d32; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 13px; }
+        .rejected-card { background: #fafafa; border: 1px solid #ddd; border-left: 5px solid #757575; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 13px; color: #555; }
+        
         .btn-group { display: flex; gap: 10px; margin-top: 10px; }
         .btn { flex: 1; padding: 10px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
         .btn-accept { background: #2e7d32; }
@@ -29,13 +38,20 @@
         .item-list { font-size: 14px; margin: 6px 0; padding-left: 20px; }
         .error-msg { color: red; font-size: 14px; text-align: center; margin-top: 10px; }
         .item-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-        .item-row input { padding: 6px; }
+        
+        /* टैब नेविगेशन बटन */
+        .tab-menu { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 8px; background: #ddd; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; font-size: 13px; }
+        .tab-btn.active-tab { background: #e65100; color: white; }
     </style>
 </head>
 <body>
 
-<!-- ओनर/हेल्प कॉलिंग बटन -->
-<a href="tel:9997077062" class="help-btn">📞 Help / Owner</a>
+<!-- टॉप फिक्सड बटन (हेल्प और नोटिफिकेशन बेल) -->
+<div class="top-bar-fixed">
+    <button class="notif-badge-btn" onclick="openNotifications()">🔔 <span id="notifCount">0</span></button>
+    <a href="tel:9997077062" class="help-btn">📞 Help</a>
+</div>
 
 <div class="container">
     
@@ -81,9 +97,8 @@
         <!-- दुकान की सेटिंग्स, यूपीआई और कैटलॉग -->
         <div class="section-box">
             <h3>⚙️ दुकान की सेटिंग्स व कैटलॉग (आइटम मैनेजर)</h3>
-            
             <div class="form-group">
-                <label>आपका UPI ID (पेमेंट के लिए):</label>
+                <label>आपका UPI ID:</label>
                 <input type="text" id="shopUpi" value="9997077062@paytm">
             </div>
             <div class="form-group">
@@ -96,17 +111,17 @@
                 <div class="item-row">
                     <input type="text" value="टमाटर" style="flex:2;" placeholder="आइटम नाम">
                     <input type="number" value="40" style="flex:1;" placeholder="रेट ₹">
-                    <button style="background:c62828; color:white; border:none; padding:6px; border-radius:4px;" onclick="this.parentElement.remove()">×</button>
+                    <button style="background:#c62828; color:white; border:none; padding:6px; border-radius:4px;" onclick="this.parentElement.remove()">×</button>
                 </div>
                 <div class="item-row">
                     <input type="text" value="आलू" style="flex:2;" placeholder="आइटम नाम">
                     <input type="number" value="30" style="flex:1;" placeholder="रेट ₹">
-                    <button style="background:c62828; color:white; border:none; padding:6px; border-radius:4px;" onclick="this.parentElement.remove()">×</button>
+                    <button style="background:#c62828; color:white; border:none; padding:6px; border-radius:4px;" onclick="this.parentElement.remove()">×</button>
                 </div>
                 <div class="item-row">
                     <input type="text" value="प्याज़" style="flex:2;" placeholder="आइटम नाम">
                     <input type="number" value="50" style="flex:1;" placeholder="रेट ₹">
-                    <button style="background:c62828; color:white; border:none; padding:6px; border-radius:4px;" onclick="this.parentElement.remove()">×</button>
+                    <button style="background:#c62828; color:white; border:none; padding:6px; border-radius:4px;" onclick="this.parentElement.remove()">×</button>
                 </div>
             </div>
             
@@ -119,19 +134,26 @@
             <p style="text-align: center; color: #777;">नया ऑर्डर आने का इंतज़ार है...</p>
         </div>
 
-        <!-- स्वीकृत ऑर्डर्स की हिस्ट्री -->
+        <!-- मॉडर्न हिस्ट्री टैब मेनू -->
         <div class="section-box" style="margin-top: 25px;">
-            <h3 style="color: #2e7d32;">✅ स्वीकृत ऑर्डर्स का इतिहास (History)</h3>
-            <div id="accepted-history-container">
-                <p style="font-size: 13px; color: #777;">कोई पुराना स्वीकृत ऑर्डर नहीं है।</p>
+            <h3>📊 ऑर्डर रिकॉर्ड (हिस्ट्री)</h3>
+            <div class="tab-menu">
+                <button class="tab-btn active-tab" id="btnAcceptedTab" onclick="switchHistoryTab('accepted')">स्वीकृत ऑर्डर्स</button>
+                <button class="tab-btn" id="btnRejectedTab" onclick="switchHistoryTab('rejected')">रद्द ऑर्डर्स</button>
             </div>
-        </div>
 
-        <!-- रद्द किए गए ऑर्डर्स की हिस्ट्री -->
-        <div class="section-box">
-            <h3 style="color: #c62828;">❌ रद्द किए गए ऑर्डर्स का इतिहास (Rejected)</h3>
-            <div id="rejected-history-container">
-                <p style="font-size: 13px; color: #777;">कोई रद्द किया गया ऑर्डर नहीं है।</p>
+            <!-- स्वीकृत हिस्ट्री व्यू -->
+            <div id="acceptedHistoryView">
+                <div id="accepted-history-container">
+                    <p style="font-size: 13px; color: #777;">कोई पुराना स्वीकृत ऑर्डर नहीं है।</p>
+                </div>
+            </div>
+
+            <!-- रद्द हिस्ट्री व्यू -->
+            <div id="rejectedHistoryView" style="display: none;">
+                <div id="rejected-history-container">
+                    <p style="font-size: 13px; color: #777;">कोई रद्द किया गया ऑर्डर नहीं है।</p>
+                </div>
             </div>
         </div>
         
@@ -143,7 +165,7 @@
 <!-- Firebase और लॉजिक स्क्रिप्ट -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
@@ -158,6 +180,8 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+
+    let customerNotifications = [];
 
     window.onload = function() {
         let savedPhone = localStorage.getItem("partnerPhone");
@@ -233,9 +257,30 @@
     };
 
     window.saveCatalogSettings = function() {
-        let upi = document.getElementById('shopUpi').value;
-        let whatsapp = document.getElementById('shopWhatsapp').value;
         alert("कैटलॉग और दुकान की सेटिंग्स सफलताપर्वक सेव कर दी गईं हैं!");
+    };
+
+    window.switchHistoryTab = function(type) {
+        if(type === 'accepted') {
+            document.getElementById('acceptedHistoryView').style.display = 'block';
+            document.getElementById('rejectedHistoryView').style.display = 'none';
+            document.getElementById('btnAcceptedTab').classList.add('active-tab');
+            document.getElementById('btnRejectedTab').classList.remove('active-tab');
+        } else {
+            document.getElementById('acceptedHistoryView').style.display = 'none';
+            document.getElementById('rejectedHistoryView').style.display = 'block';
+            document.getElementById('btnRejectedTab').classList.add('active-tab');
+            document.getElementById('btnAcceptedTab').classList.remove('active-tab');
+        }
+    };
+
+    window.openNotifications = function() {
+        if(customerNotifications.length === 0) {
+            alert("ग्राहकों की तरफ से कोई नया संदेश/नोटिफिकेशन नहीं है।");
+        } else {
+            let msgList = customerNotifications.join("\n\n");
+            alert("ग्राहकों के संदेश:\n\n" + msgList);
+        }
     };
 
     function playLoudAlarm() {
@@ -277,15 +322,19 @@
 
             if (previousCount !== null && ordersArray.length > previousCount) {
                 playLoudAlarm();
+                customerNotifications.push("नया ऑर्डर प्राप्त हुआ!");
+                document.getElementById('notifCount').innerText = customerNotifications.length;
             }
             previousCount = ordersArray.length;
 
             container.innerHTML = "";
             ordersArray.reverse().forEach(order => {
                 let itemsHtml = "";
+                let summaryText = "";
                 if (order.items) {
                     order.items.forEach(i => {
                         itemsHtml += `<li>${i.name} - ${i.qty} kg (₹${i.price}/kg)</li>`;
+                        summaryText += `${i.name}(${i.qty}kg) `;
                     });
                 }
 
@@ -294,24 +343,24 @@
                 card.innerHTML = `
                     <strong>ग्राहक: ${order.customerName}</strong><br>
                     📍 पता: ${order.customerAddress}<br>
-                    📍 <strong>दूरी (Location):</strong> ग्राहक दुकान से लगभग <strong>2.5 किमी</strong> दूर है<br>
+                    <div class="location-info">📍 दूरी: ग्राहक दुकान से लगभग 2.5 किमी दूर है</div><br>
                     <strong>कुल राशि: ₹${order.totalAmount}</strong>
                     <div class="item-list"><ul>${itemsHtml}</ul></div>
                     <a href="tel:${order.customerPhone}" class="btn-call">📞 ग्राहक को कॉल करें</a>
                     <div class="btn-group" style="margin-top:10px;">
-                        <button class="btn btn-accept" onclick="acceptOrder('${order.id}', '${order.customerName}', '${order.totalAmount}')">✅ स्वीकार करें</button>
-                        <button class="btn btn-reject" onclick="rejectOrder('${order.id}', '${order.customerName}')">❌ रद्द करें</button>
+                        <button class="btn btn-accept" onclick="acceptOrder('${order.id}', '${order.customerName}', '${order.totalAmount}', '${summaryText}')">✅ स्वीकार करें</button>
+                        <button class="btn btn-reject" onclick="rejectOrder('${order.id}', '${order.customerName}', '${summaryText}')">❌ रद्द करें</button>
                     </div>
                 `;
                 container.appendChild(card);
             });
         });
 
-        window.acceptOrder = function(orderId, name, amount) {
+        window.acceptOrder = function(orderId, name, amount, items) {
             let timeString = new Date().toLocaleString('hi-IN');
             let historyItem = document.createElement('div');
             historyItem.className = "history-card";
-            historyItem.innerHTML = `<strong>स्वीकृत ऑर्डर: ${name}</strong> (₹${amount})<br><span style="color:#555; font-size:12px;">समय: ${timeString}</span>`;
+            historyItem.innerHTML = `<strong>👤 ${name}</strong> (₹${amount})<br>🛒 ${items}<br><span style="color:#555; font-size:11px;">⏰ समय: ${timeString}</span>`;
             
             if(acceptedContainer.innerHTML.includes('कोई पुराना')) acceptedContainer.innerHTML = "";
             acceptedContainer.prepend(historyItem);
@@ -320,12 +369,12 @@
             remove(ref(db, 'orders/' + orderId));
         };
 
-        window.rejectOrder = function(orderId, name) {
+        window.rejectOrder = function(orderId, name, items) {
             if(confirm('क्या आप वाकई इस ऑर्डर को रद्द करना चाहते हैं?')) {
                 let timeString = new Date().toLocaleString('hi-IN');
                 let rejectItem = document.createElement('div');
                 rejectItem.className = "rejected-card";
-                rejectItem.innerHTML = `<strong>रद्द किया गया: ${name}</strong><br><span style="color:#777; font-size:12px;">समय: ${timeString}</span>`;
+                rejectItem.innerHTML = `<strong>👤 ${name}</strong><br>🛒 ${items}<br><span style="color:#777; font-size:11px;">⏰ रद्द समय: ${timeString}</span>`;
                 
                 if(rejectedContainer.innerHTML.includes('कोई रद्द')) rejectedContainer.innerHTML = "";
                 rejectedContainer.prepend(rejectItem);
