@@ -13,10 +13,11 @@
         input[type="text"], input[type="number"], select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         .btn { background-color: #2e7d32; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 15px; font-weight: bold; }
         .btn:hover { background-color: #1b5e20; }
-        .help-btn { background-color: #0288d1; margin-top: 10px; }
+        .help-btn { background-color: #0288d1; margin-top: 10px; text-decoration: none; display: block; text-align: center; color: white; padding: 12px; border-radius: 4px; font-size: 16px; font-weight: bold; }
         .help-btn:hover { background-color: #01579b; }
         .hidden { display: none; }
         .veg-item { background: #f9f9f9; padding: 10px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        .otp-msg { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 10px; margin-top: 10px; border-radius: 4px; color: #2e7d32; font-weight: bold; text-align: center; }
     </style>
 </head>
 <body>
@@ -29,43 +30,52 @@
         <!-- लॉगिन सेक्शन -->
         <div id="loginSection">
             <div class="section-title">दुकानदार लॉगिन (OTP द्वारा)</div>
-            <label>मोबाइल नंबर दर्ज करें:</label>
-            <input type="text" id="loginMobile" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10">
+            <label>अपना 10 अंकों का मोबाइल नंबर दर्ज करें:</label>
+            <input type="text" id="loginMobile" placeholder="मोबाइल नंबर" maxlength="10">
             <button class="btn" onclick="sendOTP()">ओटीपी भेजें</button>
             
+            <div id="otpDisplayBox" class="hidden otp-msg"></div>
+
             <div id="otpBox" class="hidden">
-                <label>OTP दर्ज करें (डिफ़ॉल्ट: 1234):</label>
+                <label>संदेश में प्राप्त 4 अंकों का OTP दर्ज करें:</label>
                 <input type="text" id="otpInput" placeholder="4 अंकों का ओटीपी" maxlength="4">
                 <button class="btn" onclick="verifyOTP()">लॉगिन करें</button>
             </div>
         </div>
 
-        <!-- मुख्य डैशबोर्ड (लॉगिन के बाद दिखेगा) -->
+        <!-- मुख्य डैशबोर्ड -->
         <div id="dashboardSection" class="hidden">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 14px; color: #555;">स्थिति: <b>लाइफटाइम (Owner)</b></span>
+                <span style="font-size: 14px; color: #555;">लॉगिन मोबाइल: <b id="userMobileDisplay"></b></span>
                 <button onclick="logout()" style="background: #d32f2f; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">लॉग आउट</button>
             </div>
 
             <!-- दुकान की सेटिंग्स -->
-            <div class="section-title">⚙️ दुकान की सेटिंग्स & QR कोड</div>
+            <div class="section-title">⚙️ दुकान की सेटिंग्स & UPI</div>
             <label>आपकी दुकान की UPI ID:</label>
             <input type="text" id="shopUpi" value="8218231811@nyes">
 
-            <label>आपका WhatsApp नंबर:</label>
-            <input type="text" id="shopWhatsapp" value="9997077062">
+            <label>आपका WhatsApp नंबर (देश कोड के साथ):</label>
+            <input type="text" id="shopWhatsapp" value="919997077062">
 
             <button class="btn" onclick="saveSettings()">सेटिंग्स सेव करें</button>
 
-            <!-- नियम और शर्तें (Terms) -->
-            <div class="section-title">📜 डिलीवरी नियम और शर्तें</div>
+            <!-- डिलीवरी नियम और शर्तें (वेंडर द्वारा बदलने योग्य) -->
+            <div class="section-title">📜 डिलीवरी नियम और शर्तें सेट करें</div>
+            
             <label>न्यूनतम ऑर्डर राशि (₹):</label>
             <input type="number" id="minOrderAmt" value="200">
 
-            <label>कम ऑर्डर पर अतिरिक्त चार्ज (₹):</label>
+            <label>कम ऑर्डर पर अतिरिक्त फिक्स चार्ज (₹):</label>
             <input type="number" id="extraCharge" value="50">
 
-            <button class="btn" onclick="saveRules()">नियम सेव करें</button>
+            <label>₹200 से अधिक ऑर्डर पर प्रति किलो चार्ज (₹):</label>
+            <input type="number" id="perKgCharge" value="10">
+
+            <label>अधिकतम डिलीवरी दूरी (किलोमीटर में):</label>
+            <input type="number" id="maxDistance" value="5">
+
+            <button class="btn" onclick="saveRules()">शर्तें और नियम सेव करें</button>
 
             <!-- सब्जी कैटलॉग मैनेजमेंट -->
             <div class="section-title">➕ नई सब्जी कैटलॉग में जोड़ें</div>
@@ -79,24 +89,32 @@
 
             <div class="section-title">📋 वर्तमान सब्जी सूची (स्टॉक मैनेजमेंट)</div>
             <div id="vegListContainer">
-                <!-- यहाँ सब्जियां दिखेंगी -->
                 <div class="veg-item">
                     <span><b>आलू</b> - ₹30/किग्रा (उपलब्ध: हाँ)</span>
                     <button onclick="toggleStock(this)" style="background: green; color: white; border: none; padding: 5px; border-radius: 3px;">चालू</button>
                 </div>
             </div>
 
-            <!-- हेल्प बटन -->
-            <button class="btn help-btn" onclick="openHelp()">💬 सहायता / हेल्प (ततकनीकी मदद)</button>
+            <!-- हेल्प बटन (सीधे कॉल लगाने के लिए) -->
+            <a href="tel:9997077062" class="help-btn">📞 Help (तकनीकी सहायता कॉल करें)</a>
         </div>
     </div>
 
     <script>
+        let generatedOTP = "";
+
         function sendOTP() {
             var mobile = document.getElementById('loginMobile').value;
             if(mobile.length === 10) {
-                alert('OTP भेज दिया गया है। परीक्षण के लिए OTP "1234" दर्ज करें।');
+                // हर बार नया रैंडम 4 अंकों का ओटीपी जेनरेट होगा
+                generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+                
+                var otpMsgBox = document.getElementById('otpDisplayBox');
+                otpMsgBox.innerText = `📩 नया संदेश (OTP): आपका वन-टाइम पासवर्ड है -> ${generatedOTP} (इसे याद रखें या कॉपी करें)`;
+                otpMsgBox.classList.remove('hidden');
+                
                 document.getElementById('otpBox').classList.remove('hidden');
+                alert('ओटीपी जनरेट हो गया है! नीचे बॉक्स में देखें।');
             } else {
                 alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।');
             }
@@ -104,12 +122,14 @@
 
         function verifyOTP() {
             var otp = document.getElementById('otpInput').value;
-            if(otp === '1234') {
+            if(otp === generatedOTP && otp !== "") {
+                var mobile = document.getElementById('loginMobile').value;
+                document.getElementById('userMobileDisplay').innerText = mobile;
                 alert('लॉगिन सफल रहा!');
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('dashboardSection').classList.remove('hidden');
             } else {
-                alert('गलत OTP! कृपया "1234" दर्ज करें।');
+                alert('गलत OTP! कृपया ऊपर संदेश में दिया गया सही ओटीपी दर्ज करें।');
             }
         }
 
@@ -119,6 +139,7 @@
             document.getElementById('loginMobile').value = '';
             document.getElementById('otpInput').value = '';
             document.getElementById('otpBox').classList.add('hidden');
+            document.getElementById('otpDisplayBox').classList.add('hidden');
         }
 
         function saveSettings() {
@@ -126,7 +147,11 @@
         }
 
         function saveRules() {
-            alert('डिलीवरी नियम सफलतापूर्वक सेव हो गए हैं!');
+            var minOrd = document.getElementById('minOrderAmt').value;
+            var extChg = document.getElementById('extraCharge').value;
+            var pkgChg = document.getElementById('perKgCharge').value;
+            var maxDist = document.getElementById('maxDistance').value;
+            alert(`डिलीवरी नियम अपडेट हो गए!\n- मिनिमम ऑर्डर: ₹${minOrd}\n- कम ऑर्डर चार्ज: ₹${extChg}\n- प्रति किलो चार्ज: ₹${pkgChg}\n- अधिकतम दूरी: ${maxDist} किमी`);
         }
 
         function addVegetable() {
@@ -154,10 +179,6 @@
                 btn.innerText = 'चालू';
                 btn.style.backgroundColor = 'green';
             }
-        }
-
-        function openHelp() {
-            window.open('https://wa.me/9997077062?text=नमस्ते%20अजय,%20मुझे%20पार्टनर%20ऐप%20में%20सहायता%20चाहिए।', '_blank');
         }
     </script>
 </body>
