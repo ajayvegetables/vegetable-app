@@ -35,6 +35,7 @@
         .timer-text { color: #d32f2f; font-size: 14px; margin-top: 8px; }
         .badge-success { background: #4caf50; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
         .no-order { text-align: center; color: #777; font-size: 14px; padding: 15px; background: #f9f9f9; border-radius: 4px; border: 1px dashed #ccc; }
+        .pay-box { background: #e3f2fd; border: 2px dashed #2196f3; padding: 15px; border-radius: 8px; text-align: center; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -44,7 +45,7 @@
     </div>
 
     <div class="container">
-        <!-- लॉगिन सेक्शन -->
+        <!-- 1. लॉगिन सेक्शन -->
         <div id="loginSection">
             <div class="section-title">दुकानदार लॉगिन (OTP द्वारा)</div>
             <label>अपना 10 अंकों का मोबाइल नंबर दर्ज करें:</label>
@@ -63,11 +64,32 @@
             </div>
         </div>
 
-        <!-- मुख्य डैशबोर्ड -->
+        <!-- 2. मंथली सब्सक्रिप्शन पेमेंट सेक्शन (₹30 हर महीने) -->
+        <div id="subscriptionSection" class="hidden">
+            <div class="section-title" style="color: #d32f2f;">🔒 मासिक सब्सक्रिप्शन समाप्त / आवश्यक</div>
+            <p style="font-size: 14px; line-height: 1.5;" id="subMsg">पार्टनर ऐप का इस महीने का उपयोग जारी रखने के लिए <b>₹30 (₹1 प्रतिदिन)</b> का मासिक शुल्क भुगतान करें।</p>
+            
+            <div class="pay-box">
+                <p style="margin:5px 0; font-weight:bold; color:#0d47a1;">UPI ID: <span style="color:#d32f2f;">8218231811@nyes</span></p>
+                <p style="margin:5px 0; font-size:13px; color:#555;">किसी भी UPI ऐप से भुगतान करें और नीचे ट्रांजैक्शन आईडी डालें।</p>
+                <a id="upiPayLink" href="#" class="btn" style="background:#ff9800; text-decoration:none; display:inline-block; margin-top:10px; padding:10px 20px;">📲 ₹30 भुगतान करने के लिए क्लिक करें</a>
+            </div>
+
+            <label style="margin-top: 15px;">UPI Transaction ID दर्ज करें:</label>
+            <input type="text" id="txIdInput" placeholder="UPI Transaction ID दर्ज करें">
+            <button class="btn" onclick="verifyMonthlySubscription()">मासिक सब्सक्रिप्शन एक्टिवेट करें</button>
+        </div>
+
+        <!-- 3. मुख्य डैशबोर्ड -->
         <div id="dashboardSection" class="hidden">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span style="font-size: 14px; color: #555;">लॉगिन मोबाइल: <b id="userMobileDisplay"></b></span>
                 <button onclick="logout()" style="background: #d32f2f; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">लॉग आउट</button>
+            </div>
+
+            <!-- सब्सक्रिप्शन वैधता स्टेटस -->
+            <div style="background: #e8f5e9; border: 1px solid #a5d6a7; padding: 8px; margin-top: 10px; border-radius: 4px; font-size: 13px; color: #2e7d32; text-align: center;" id="subExpiryStatus">
+                🟢 सब्सक्रिप्शन वैध है (शेष दिन: गणना हो रही है...)
             </div>
 
             <!-- नए ऑर्डर्स और अलार्म सेक्शन -->
@@ -136,15 +158,54 @@
         let activeOrdersCount = 0;
         let otpTimer = null;
 
-        // पेज लोड होते ही चेक करें कि क्या पहले से लॉगिन हैं
+        const MASTER_ADMIN_MOBILE = "9997077062"; 
+
         window.onload = function() {
             let savedMobile = localStorage.getItem('vendor_mobile');
+            let currentDeviceId = localStorage.getItem('device_unique_id');
+
+            if (!currentDeviceId) {
+                currentDeviceId = 'dev_' + Math.random().toString(36).substring(2, 15);
+                localStorage.setItem('device_unique_id', currentDeviceId);
+            }
+
             if(savedMobile) {
-                document.getElementById('userMobileDisplay').innerText = savedMobile;
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('dashboardSection').classList.remove('hidden');
+                if(savedMobile === MASTER_ADMIN_MOBILE) {
+                    // आपका नंबर हमेशा फ्री चलेगा
+                    document.getElementById('userMobileDisplay').innerText = savedMobile;
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('dashboardSection').classList.remove('hidden');
+                    document.getElementById('subExpiryStatus').innerText = "🟢 मास्टर एडमिन अकाउंट (आजीवन फ्री)";
+                } else {
+                    // दूसरे दुकानदारों के लिए 30 दिन की समय सीमा चेक करें
+                    checkMonthlySubscription(savedMobile);
+                }
+            } else {
+                document.getElementById('loginSection').classList.remove('hidden');
             }
         };
+
+        function checkMonthlySubscription(mobile) {
+            let expiryTime = localStorage.getItem('sub_expiry_' + mobile);
+            let currentTime = new Date().getTime();
+
+            if (expiryTime && currentTime < parseInt(expiryTime)) {
+                // सब्सक्रिप्शन अभी चालू है
+                let remainingDays = Math.ceil((parseInt(expiryTime) - currentTime) / (1000 * 60 * 60 * 24));
+                document.getElementById('userMobileDisplay').innerText = mobile;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('subscriptionSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+                document.getElementById('subExpiryStatus').innerText = `🟢 सब्सक्रिप्शन वैध है (शेष: ${remainingDays} दिन)`;
+            } else {
+                // सब्सक्रिप्शन खत्म हो गया है या कभी नहीं लिया
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.add('hidden');
+                document.getElementById('subscriptionSection').classList.remove('hidden');
+                document.getElementById('subMsg').innerHTML = `पार्टनर ऐप की 30 दिन की अवधि समाप्त हो गई है। आगे इस्तेमाल करने के लिए <b>₹30 (₹1 प्रतिदिन)</b> का भुगतान करें।`;
+                setupUpiPaymentLink(mobile);
+            }
+        }
 
         function sendOTP() {
             var mobile = document.getElementById('loginMobile').value;
@@ -157,16 +218,13 @@
                 otpMsgBox.classList.remove('hidden');
                 document.getElementById('otpBox').classList.remove('hidden');
 
-                // 2 मिनट (120 सेकंड) का टाइमर शुरू करें[span_3](start_span)[span_3](end_span)
                 startOtpCountdown(120);
-                
                 alert('ओटीपी जनरेट हो गया है! नीचे बॉक्स में देखें।');
             } else {
                 alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।');
             }
         }
 
-        // OTP एक्सपायरी टाइमर फंक्शन[span_4](start_span)[span_4](end_span)
         function startOtpCountdown(duration) {
             let timer = duration, minutes, seconds;
             let display = document.getElementById('timerDisplay');
@@ -184,8 +242,8 @@
 
                 if (--timer < 0) {
                     clearInterval(otpTimer);
-                    generatedOTP = ""; // OTP एक्सपायर होने पर खाली कर दें[span_5](start_span)[span_5](end_span)
-                    display.innerHTML = `<span style="color:red;">❌ OTP एक्सपायर हो गया है! कृपया दोबारा 'ओटीपी भेजें' पर क्लिक करें।</span>[span_6](start_span)[span_6](end_span)`;
+                    generatedOTP = "";
+                    display.innerHTML = `<span style="color:red;">❌ OTP एक्सपायर हो गया है! कृपया दोबारा 'ओटीपी भेजें' पर क्लिक करें।</span>`;
                     document.getElementById('otpBox').classList.add('hidden');
                 }
             }, 1000);
@@ -201,15 +259,50 @@
             if(otp === generatedOTP && otp !== "") {
                 var mobile = document.getElementById('loginMobile').value;
                 localStorage.setItem('vendor_mobile', mobile);
-                
-                if (otpTimer) clearInterval(otpTimer); // टाइमर बंद करें
+                if (otpTimer) clearInterval(otpTimer);
 
-                document.getElementById('userMobileDisplay').innerText = mobile;
-                alert('लॉगिन सफल रहा!');
                 document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('dashboardSection').classList.remove('hidden');
+
+                if (mobile === MASTER_ADMIN_MOBILE) {
+                    document.getElementById('userMobileDisplay').innerText = mobile;
+                    document.getElementById('dashboardSection').classList.remove('hidden');
+                    document.getElementById('subExpiryStatus').innerText = "🟢 मास्टर एडमिन अकाउंट (आजीवन फ्री)";
+                    alert('मास्टर लॉगिन सफल!');
+                } else {
+                    checkMonthlySubscription(mobile);
+                }
             } else {
                 alert('गलत OTP! कृपया सही ओटीपी दर्ज करें।');
+            }
+        }
+
+        function setupUpiPaymentLink(mobile) {
+            let upiId = "8218231811@nyes";
+            let amount = "30";
+            let note = "Monthly Sub (30 Days) for " + mobile;
+            let upiUrl = `upi://pay?pa=${upiId}&pn=Ajay%20Kumar%20Vegetables&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+            document.getElementById('upiPayLink').href = upiUrl;
+        }
+
+        function verifyMonthlySubscription() {
+            let txId = document.getElementById('txIdInput').value;
+            let mobile = localStorage.getItem('vendor_mobile');
+            
+            if(txId.length >= 5) {
+                // वर्तमान समय से ठीक 30 दिन आगे की एक्सपायरी सेट करें (30 दिन = 30 * 24 * 60 * 60 * 1000 मिलीसेकंड)
+                let thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000;
+                let expiryTime = new Date().getTime() + thirtyDaysInMillis;
+                
+                localStorage.setItem('sub_expiry_' + mobile, expiryTime);
+
+                document.getElementById('subscriptionSection').classList.add('hidden');
+                document.getElementById('userMobileDisplay').innerText = mobile;
+                document.getElementById('dashboardSection').classList.remove('hidden');
+                document.getElementById('subExpiryStatus').innerText = "🟢 सब्सक्रिप्शन वैध है (शेष दिन: 30 दिन)";
+                
+                alert('सफल! ₹30 का मासिक सब्सक्रिप्शन 30 दिनों के लिए एक्टिवेट हो गया है।');
+            } else {
+                alert('कृपया सही UPI Transaction ID दर्ज करें।');
             }
         }
 
@@ -218,6 +311,7 @@
             stopAlarm();
             if (otpTimer) clearInterval(otpTimer);
             document.getElementById('dashboardSection').classList.add('hidden');
+            document.getElementById('subscriptionSection').classList.add('hidden');
             document.getElementById('loginSection').classList.remove('hidden');
             document.getElementById('loginMobile').value = '';
             document.getElementById('otpInput').value = '';
@@ -225,10 +319,8 @@
             document.getElementById('otpDisplayBox').classList.add('hidden');
         }
 
-        // लगातार तेज बजने वाला सायरन अलार्म
         function startContinuousAlarm() {
             if (alarmInterval) return;
-
             try {
                 if (!audioCtx) {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -270,7 +362,6 @@
             }
         }
 
-        // टेस्ट नया ऑर्डर मंगाने पर
         function simulateNewOrder() {
             var container = document.getElementById('orderListContainer');
             var noOrderText = document.getElementById('noOrderText');
