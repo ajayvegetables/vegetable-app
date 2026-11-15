@@ -19,7 +19,11 @@
         .form-group input, .form-group textarea { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 11px; }
         .btn-main { background: #e65100; color: white; border: none; width: 100%; padding: 8px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; box-sizing: border-box; }
         
-        .top-bar-fixed { position: fixed; top: 5px; right: 8px; display: flex; gap: 4px; z-index: 999; }
+        /* ✅ सबसे ऊपर फिक्स बार जिसमें गोल लॉग आउट आइकॉन भी है */
+        .top-bar-fixed { position: fixed; top: 5px; right: 8px; display: flex; gap: 4px; z-index: 999; align-items: center; }
+        .top-left-fixed { position: fixed; top: 5px; left: 8px; display: flex; gap: 4px; z-index: 999; }
+        .logout-circle-btn { background: #c62828; color: white; width: 26px; height: 26px; border-radius: 50%; border: none; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        
         .help-btn { background: #2e7d32; color: white; padding: 3px 7px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .notif-badge-btn { background: #c62828; color: white; padding: 3px 7px; border-radius: 10px; font-weight: bold; font-size: 10px; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
@@ -71,6 +75,11 @@
     </style>
 </head>
 <body>
+
+<!-- शीर्ष बाएं कोने में गोल लॉग आउट बटन -->
+<div class="top-left-fixed">
+    <button class="logout-circle-btn" onclick="logout()" title="लॉग आउट">🚪</button>
+</div>
 
 <div class="top-bar-fixed">
     <button class="notif-badge-btn" onclick="openNotifications()">🔔 <span id="notifCount">0</span></button>
@@ -185,15 +194,13 @@
         </div>
 
         <button class="history-floating-btn" onclick="openHistoryModal()" title="आर्डर हिस्ट्री">📜</button>
-        
-        <button style="background: #c62828; color: white; border: none; width: 100%; padding: 7px; border-radius: 4px; margin-top: 8px; cursor: pointer; font-weight: bold; font-size:11px;" onclick="logout()">लॉग आउट</button>
     </div>
 
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove, set, push, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
@@ -211,19 +218,14 @@
 
     let customerNotifications = [];
     let alarmInterval = null;
-    let lastDeletedHistory = {}; // सभी डिलीट किए गए ऑर्डर्स का बैकअप (Accepted और Rejected दोनों के लिए)
+    let lastDeletedHistory = {};
 
     window.onload = function() {
         let savedPhone = localStorage.getItem("partnerPhone");
         let isSubscribed = localStorage.getItem("isSubscribed");
 
-        if (savedPhone === "9997077062") {
+        if (savedPhone) {
             showDashboard();
-        } else if (savedPhone && isSubscribed === "true") {
-            showDashboard();
-        } else if (savedPhone) {
-            document.getElementById('loginScreen').classList.remove('active');
-            document.getElementById('subScreen').classList.add('active');
         }
     };
 
@@ -247,7 +249,7 @@
         let phone = localStorage.getItem("partnerPhone");
         let errorEl = document.getElementById('loginError');
 
-        if (phone === "9997077062" || entered === "1234") {
+        if (entered === "1234" || phone) {
             localStorage.setItem("isSubscribed", "true");
             showDashboard();
         } else {
@@ -271,10 +273,12 @@
         loadHistoryData();
     }
 
+    // ✅ लॉग आउट करने पर केवल सत्र (Session) हटेगा, कैटलॉग और सेटिंग्स सुरक्षित रहेंगी
     window.logout = function() {
-        localStorage.removeItem("partnerPhone");
-        localStorage.removeItem("isSubscribed");
-        location.reload();
+        if(confirm("क्या आप वाकई लॉग आउट करना चाहते हैं?")) {
+            localStorage.removeItem("partnerPhone");
+            location.reload();
+        }
     };
 
     function loadShopSettings() {
@@ -540,8 +544,9 @@
         });
     }
 
-    // ✅ आर्डर पर क्लिक करते ही उसकी पूरी डिटेल (आइटम, नाम, नंबर, पता, समय) दिखाने वाला फंक्शन
+    // ✅ आर्डर पर क्लिक करते ही हिस्ट्री पॉप-अप छिप जाएगा और पूरी डिटेल का बॉक्स सामने आ जाएगा
     window.showOrderDetails = function(event, key) {
+        closeHistoryModal(); // हिस्ट्री विंडो को बंद/छिपायें ताकि डिटेल दिखे
         const historyRef = ref(db, 'orderHistory/' + key);
         get(historyRef).then((snapshot) => {
             if (snapshot.exists()) {
@@ -583,33 +588,30 @@
         }
     };
 
-    // ✅ सिंगल हिस्ट्री डिलीट करने पर पॉप-अप बंद नहीं होगा
     window.deleteHistoryItem = function(key) {
         if(confirm("क्या आप वाकई इस आर्डर को हिस्ट्री से हटाना चाहते हैं?")) {
             const itemRef = ref(db, 'orderHistory/' + key);
             get(itemRef).then((snapshot) => {
                 if(snapshot.exists()) {
-                    lastDeletedHistory[key] = snapshot.val(); // बैकअप में सेव करें
+                    lastDeletedHistory[key] = snapshot.val();
                 }
                 remove(itemRef);
             });
         }
     };
 
-    // ✅ सभी हिस्ट्री डिलीट करने पर बैकअप लेना
     window.clearAllHistory = function() {
         if(confirm("क्या आप वाकई सभी आर्डर हिस्ट्री को साफ़ करना चाहते हैं?")) {
             const historyRef = ref(db, 'orderHistory');
             get(historyRef).then((snapshot) => {
                 if(snapshot.exists()) {
-                    lastDeletedHistory = snapshot.val(); // सभी का बैकअप
+                    lastDeletedHistory = snapshot.val();
                 }
                 remove(historyRef);
             });
         }
     };
 
-    // ✅ सभी या डिलीट किए गए ऑर्डर्स को वापस लाने (Restore) का फंक्शन
     window.restoreAllHistory = function() {
         if (Object.keys(lastDeletedHistory).length === 0) {
             alert("वापस लाने के लिए कोई हालिया डिलीट किया गया डेटा नहीं है!");
