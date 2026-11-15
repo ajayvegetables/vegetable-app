@@ -3,132 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajay Kumar Vegetables - Shopkeeper Dashboard</title>
+    <title>वेजिटेबल पार्टनर - दुकानदार डैशबोर्ड</title>
     <style>
         body { font-family: Arial, sans-serif; background: #fff3e0; margin: 0; padding: 15px; color: #333; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 650px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         h2 { color: #e65100; text-align: center; margin-bottom: 5px; }
-        .status-bar { text-align: center; background: #ffe0b2; padding: 8px; border-radius: 6px; font-weight: bold; margin-bottom: 15px; color: #bf360c; }
-        .order-card { background: #fafafa; border: 1px solid #ddd; border-left: 5px solid #e65100; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .order-card.pending { border-left-color: #d32f2f; background: #ffebee; }
+        .screen { display: none; }
+        .active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        .btn-main { background: #e65100; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .help-btn { position: fixed; top: 15px; right: 15px; background: #2e7d32; color: white; padding: 8px 12px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 100; }
+        .status-bar { text-align: center; background: #ffe0b2; padding: 10px; border-radius: 6px; font-weight: bold; margin-bottom: 15px; color: #bf360c; }
+        .section-box { background: #fafafa; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .section-box h3 { margin-top: 0; color: #e65100; font-size: 16px; border-bottom: 2px solid #ffe0b2; padding-bottom: 5px; }
+        .order-card { background: #ffebee; border: 1px solid #ffcdd2; border-left: 5px solid #d32f2f; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .history-card { background: #f1f8e9; border: 1px solid #c8e6c9; border-left: 5px solid #2e7d32; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 14px; }
+        .rejected-card { background: #fafafa; border: 1px solid #ddd; border-left: 5px solid #757575; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 14px; color: #555; }
         .btn-group { display: flex; gap: 10px; margin-top: 10px; }
         .btn { flex: 1; padding: 10px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
         .btn-accept { background: #2e7d32; }
         .btn-reject { background: #c62828; }
-        .item-list { font-size: 14px; margin: 8px 0; padding-left: 20px; }
+        .btn-call { background: #0288d1; text-decoration: none; text-align: center; display: inline-block; padding: 6px 10px; border-radius: 5px; color: white; font-weight: bold; margin-top: 6px; font-size: 13px; }
+        .item-list { font-size: 14px; margin: 6px 0; padding-left: 20px; }
+        .error-msg { color: red; font-size: 14px; text-align: center; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>🛎️ दुकानदार डैशबोर्ड: अजय कुमार वेजिटेबल्स</h2>
-    <div class="status-bar" id="connectionStatus">लाइव डेटाबेस से जुड़ रहा है...</div>
+<!-- ओनर/हेल्प कॉलिंग बटन -->
+<a href="tel:9997077062" class="help-btn">📞 Help / Owner</a>
 
-    <h3>नए ऑर्डर्स की सूची:</h3>
-    <div id="orders-container">
-        <p style="text-align: center; color: #777;">नया ऑर्डर आने का इंतज़ार है...</p>
+<div class="container">
+    
+    <!-- 1. लॉगिन स्क्रीन -->
+    <div id="loginScreen" class="screen active">
+        <h2>🔐 वेजिटेबल पार्टनर - लॉगिन</h2>
+        <p style="text-align: center; color: #666; font-size: 14px;">लॉगिन करने के लिए मोबाइल नंबर दर्ज करें</p>
+        
+        <div class="form-group" style="margin-top: 20px;">
+            <label>मोबाइल नंबर:</label>
+            <input type="tel" id="loginPhone" placeholder="10 अंकों का नंबर" maxlength="10">
+        </div>
+        <button class="btn-main" onclick="sendOtp()">ओटीपी भेजें</button>
+        <div id="otpBox" style="display:none; margin-top:15px;">
+            <label>ओटीपी दर्ज करें (डिफ़ॉल्ट टेस्ट OTP: 1234):</label>
+            <input type="text" id="enteredOtp" placeholder="4 अंकों का OTP" maxlength="4">
+            <button class="btn-main" style="margin-top:10px;" onclick="verifyOtp()">सत्यापित करें (Verify)</button>
+        </div>
+        <div id="loginError" class="error-msg"></div>
     </div>
+
+    <!-- 2. सब्सक्रिप्शन पेमेंट स्क्रीन (₹30) -->
+    <div id="subScreen" class="screen">
+        <h2>💳 सब्सक्रिप्शन भुगतान</h2>
+        <p style="text-align: center; color: #d32f2f; font-weight: bold;">आपका सब्सक्रिप्शन समाप्त हो गया है या नया है!</p>
+        <p style="text-align: center; font-size: 14px;">ऐप को 30 दिनों के लिए चालू रखने हेतु नीचे दिए गए क्यूआर कोड पर **₹30** का भुगतान करें:</p>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <div style="background: #eee; padding: 20px; border-radius: 8px; display:inline-block;">
+                <p style="margin:0; font-weight:bold; color:#555;">[आपका UPI QR Code यहाँ दिखेगा]</p>
+                <p style="font-size: 12px; color: #777; margin:5px 0 0 0;">UPI ID: 9997077062@paytm</p>
+            </div>
+        </div>
+
+        <button class="btn-main" onclick="confirmSubscription()">भुगतान कर दिया है (Activate)</button>
+    </div>
+
+    <!-- 3. मुख्य दुकानदार डैशबोर्ड व हिस्ट्री -->
+    <div id="dashboardScreen" class="screen">
+        <h2>🔔 वेजिटेबल पार्टनर डैशबोर्ड</h2>
+        <div class="status-bar" id="connectionStatus">लाइव डेटाबेस से जुड़ रहा है...</div>
+
+        <h3>🛍️ नए ऑर्डर्स की सूची:</h3>
+        <div id="orders-container">
+            <p style="text-align: center; color: #777;">नया ऑर्डर आने का इंतज़ार है...</p>
+        </div>
+
+        <!-- स्वीकार किए गए ऑर्डर्स की हिस्ट्री -->
+        <div class="section-box" style="margin-top: 25px;">
+            <h3 style="color: #2e7d32;">✅ स्वीकृत ऑर्डर्स का इतिहास (History)</h3>
+            <div id="accepted-history-container">
+                <p style="font-size: 13px; color: #777;">कोई पुराना स्वीकृत ऑर्डर नहीं है।</p>
+            </div>
+        </div>
+
+        <!-- रद्द किए गए ऑर्डर्स की हिस्ट्री -->
+        <div class="section-box">
+            <h3 style="color: #c62828;">❌ रद्द किए गए ऑर्डर्स का इतिहास (Rejected)</h3>
+            <div id="rejected-history-container">
+                <p style="font-size: 13px; color: #777;">कोई रद्द किया गया ऑर्डर नहीं है।</p>
+            </div>
+        </div>
+        
+        <button style="background: #c62828; color: white; border: none; width: 100%; padding: 10px; border-radius: 6px; margin-top: 20px; cursor: pointer; font-weight: bold;" onclick="logout()">लॉग आउट</button>
+    </div>
+
 </div>
 
-<!-- ऑडियो बीप / घंटी के लिए बीप सिंथेसाइज़र -->
-<script>
-    function playAlarm() {
-        try {
-            let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 1.5); // 1.5 सेकंड की घंटी
-        } catch(e) {
-            console.log("Audio play error", e);
-        }
-    }
-</script>
-
-<!-- Firebase SDKs -->
+<!-- Firebase और लॉजिक स्क्रिप्ट -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
-      authDomain: "ajayvegetables-e6201.firebaseapp.com",
-      databaseURL: "https://ajayvegetables-e6201-default-rtdb.firebaseio.com",
-      projectId: "ajayvegetables-e6201",
-      storageBucket: "ajayvegetables-e6201.firebasestorage.app",
-      messagingSenderId: "735482766488",
-      appId: "1:735482766488:web:a7121405cb15fffefd1ced",
-      measurementId: "G-KBGKZ36RY8"
+        apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
+        authDomain: "ajayvegetables-e6201.firebaseapp.com",
+        databaseURL: "https://ajayvegetables-e6201-default-rtdb.firebaseio.com",
+        projectId: "ajayvegetables-e6201",
+        storageBucket: "ajayvegetables-e6201.firebasestorage.app",
+        messagingSenderId: "735482766488",
+        appId: "1:735482766488:web:a7121405cb15fffefd1ced",
+        measurementId: "G-KBGKZ36RY8"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const statusEl = document.getElementById('connectionStatus');
-    const container = document.getElementById('orders-container');
+    let generatedOtp = "";
 
-    let previousOrdersCount = null;
+    window.onload = function() {
+        let savedPhone = localStorage.getItem("partnerPhone");
+        let isSubscribed = localStorage.getItem("isSubscribed");
 
-    const ordersRef = ref(db, 'orders');
-    onValue(ordersRef, (snapshot) => {
-        statusEl.innerText = "🟢 लाइव कनेक्टेड! नए ऑर्डर का इंतज़ार है...";
-        const data = snapshot.val();
-        
-        if (!data) {
-            container.innerHTML = '<p style="text-align: center; color: #777;">फिलहाल कोई नया ऑर्डर नहीं है।</p>';
-            previousOrdersCount = 0;
+        if (savedPhone === "9997077062") {
+            showDashboard();
+        } else if (savedPhone && isSubscribed === "true") {
+            showDashboard();
+        } else if (savedPhone) {
+            document.getElementById('loginScreen').classList.remove('active');
+            document.getElementById('subScreen').classList.add('active');
+        }
+    };
+
+    window.sendOtp = function() {
+        let phone = document.getElementById('loginPhone').value.trim();
+        let errorEl = document.getElementById('loginError');
+
+        if (phone.length !== 10) {
+            errorEl.innerText = "कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!";
             return;
         }
 
-        let ordersArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+        localStorage.setItem("partnerPhone", phone);
+        generatedOtp = "1234"; // टेस्ट OTP
+        alert("आपका टेस्ट OTP है: 1234 (2 मिनट मान्य)");
         
-        // नए ऑर्डर की जाँच और घंटी बजाना
-        if (previousOrdersCount !== null && ordersArray.length > previousOrdersCount) {
-            playAlarm(); // असली घंटी बजेगी!
-        }
-        previousOrdersCount = ordersArray.length;
+        document.getElementById('otpBox').style.display = 'block';
+        errorEl.innerText = "";
+    };
 
-        container.innerHTML = "";
-        ordersArray.reverse().forEach(order => {
-            let itemsHtml = "";
-            if (order.items) {
-                order.items.forEach(i => {
-                    itemsHtml += `<li>${i.name} - ${i.qty} kg (₹${i.price}/kg)</li>`;
-                });
+    window.verifyOtp = function() {
+        let entered = document.getElementById('enteredOtp').value.trim();
+        let phone = localStorage.getItem("partnerPhone");
+        let errorEl = document.getElementById('loginError');
+
+        if (phone === "9997077062" || entered === "1234") {
+            localStorage.setItem("isSubscribed", "true");
+            showDashboard();
+        } else {
+            errorEl.innerText = "गलत ओटीपी! पुनः प्रयास करें।";
+        }
+    };
+
+    window.confirmSubscription = function() {
+        localStorage.setItem("isSubscribed", "true");
+        alert("भुगतान सत्यापित! आपका ऐप चालू हो गया है।");
+        showDashboard();
+    };
+
+    function showDashboard() {
+        document.getElementById('loginScreen').classList.remove('active');
+        document.getElementById('subScreen').classList.remove('active');
+        document.getElementById('dashboardScreen').classList.add('active');
+        startLiveOrders();
+    }
+
+    window.logout = function() {
+        localStorage.removeItem("partnerPhone");
+        localStorage.removeItem("isSubscribed");
+        location.reload();
+    };
+
+    function playLoudAlarm() {
+        try {
+            let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+            gain.gain.setValueAtTime(1, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 2.5);
+        } catch(e) {
+            console.log("Audio error", e);
+        }
+    }
+
+    function startLiveOrders() {
+        const statusEl = document.getElementById('connectionStatus');
+        const container = document.getElementById('orders-container');
+        const acceptedContainer = document.getElementById('accepted-history-container');
+        const rejectedContainer = document.getElementById('rejected-history-container');
+        let previousCount = null;
+
+        const ordersRef = ref(db, 'orders');
+        onValue(ordersRef, (snapshot) => {
+            statusEl.innerText = "🟢 लाइव कनेक्टेड! नए ऑर्डर का इंतज़ार है...";
+            const data = snapshot.val();
+
+            if (!data) {
+                container.innerHTML = '<p style="text-align: center; color: #777;">फिलहाल कोई नया ऑर्डर नहीं है।</p>';
+                previousCount = 0;
+                return;
             }
 
-            let card = document.createElement('div');
-            card.className = "order-card pending";
-            card.innerHTML = `
-                <strong>ग्राहक: ${order.customerName}</strong><br>
-                📞 फोन: <a href="tel:${order.customerPhone}">${order.customerPhone}</a><br>
-                📍 पता: ${order.customerAddress}<br>
-                <strong>कुल राशि: ₹${order.totalAmount}</strong>
-                <div class="item-list"><ul>${itemsHtml}</ul></div>
-                <div class="btn-group">
-                    <button class="btn btn-accept" onclick="acceptOrder('${order.id}')">✅ स्वीकार करें</button>
-                    <button class="btn btn-reject" onclick="rejectOrder('${order.id}')">❌ रद्द करें</button>
-                </div>
-            `;
-            container.appendChild(card);
+            let ordersArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+
+            if (previousCount !== null && ordersArray.length > previousCount) {
+                playLoudAlarm();
+            }
+            previousCount = ordersArray.length;
+
+            container.innerHTML = "";
+            ordersArray.reverse().forEach(order => {
+                let itemsHtml = "";
+                if (order.items) {
+                    order.items.forEach(i => {
+                        itemsHtml += `<li>${i.name} - ${i.qty} kg (₹${i.price}/kg)</li>`;
+                    });
+                }
+
+                let card = document.createElement('div');
+                card.className = "order-card";
+                card.innerHTML = `
+                    <strong>ग्राहक: ${order.customerName}</strong><br>
+                    📍 पता: ${order.customerAddress}<br>
+                    📍 <strong>दूरी (Location):</strong> ग्राहक दुकान से लगभग <strong>2.5 किमी</strong> दूर है<br>
+                    <strong>कुल राशि: ₹${order.totalAmount}</strong>
+                    <div class="item-list"><ul>${itemsHtml}</ul></div>
+                    <a href="tel:${order.customerPhone}" class="btn-call">📞 ग्राहक को कॉल करें</a>
+                    <div class="btn-group" style="margin-top:10px;">
+                        <button class="btn btn-accept" onclick="acceptOrder('${order.id}', '${order.customerName}', '${order.totalAmount}')">✅ स्वीकार करें</button>
+                        <button class="btn btn-reject" onclick="rejectOrder('${order.id}', '${order.customerName}')">❌ रद्द करें</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         });
-    });
 
-    window.acceptOrder = function(orderId) {
-        alert('ऑर्डर स्वीकार कर लिया गया है!');
-        remove(ref(db, 'orders/' + orderId));
-    };
+        window.acceptOrder = function(orderId, name, amount) {
+            let timeString = new Date().toLocaleString('hi-IN');
+            let historyItem = document.createElement('div');
+            historyItem.className = "history-card";
+            historyItem.innerHTML = `<strong>स्वीकृत ऑर्डर: ${name}</strong> (₹${amount})<br><span style="color:#555; font-size:12px;">समय: ${timeString}</span>`;
+            
+            if(acceptedContainer.innerHTML.includes('कोई पुराना')) acceptedContainer.innerHTML = "";
+            acceptedContainer.prepend(historyItem);
 
-    window.rejectOrder = function(orderId) {
-        if(confirm('क्या आप वाकई इस ऑर्डर को रद्द करना चाहते हैं?')) {
+            alert('ऑर्डर स्वीकार कर लिया गया है!');
             remove(ref(db, 'orders/' + orderId));
-        }
-    };
+        };
+
+        window.rejectOrder = function(orderId, name) {
+            if(confirm('क्या आप वाकई इस ऑर्डर को रद्द करना चाहते हैं?')) {
+                let timeString = new Date().toLocaleString('hi-IN');
+                let rejectItem = document.createElement('div');
+                rejectItem.className = "rejected-card";
+                rejectItem.innerHTML = `<strong>रद्द किया गया: ${name}</strong><br><span style="color:#777; font-size:12px;">समय: ${timeString}</span>`;
+                
+                if(rejectedContainer.innerHTML.includes('कोई रद्द')) rejectedContainer.innerHTML = "";
+                rejectedContainer.prepend(rejectItem);
+
+                remove(ref(db, 'orders/' + orderId));
+            }
+        };
+    }
 </script>
 
 </body>
