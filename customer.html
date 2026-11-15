@@ -10,18 +10,19 @@
     
     <style>
         body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; color: #333; }
-        
-        /* क्लीन टॉप हेडर */
         .top-header { background: #2e7d32; color: white; padding: 8px 12px; font-weight: bold; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
         .container { max-width: 500px; margin: auto; background: white; padding: 10px; min-height: 100vh; box-sizing: border-box; }
         
-        /* दुकान, 'अजय वेजिटेबल्स' और Help बटन एक ही लाइन में */
         .middle-action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: #e8f5e9; border: 1px solid #c8e6c9; padding: 6px 10px; border-radius: 6px; }
         .shop-card-left { display: flex; align-items: center; gap: 4px; text-decoration: none; color: #1b5e20; font-weight: bold; font-size: 12px; background: white; padding: 4px 8px; border-radius: 4px; border: 1px solid #c8e6c9; }
         .center-store-title { font-weight: bold; font-size: 14px; color: #2e7d32; text-align: center; }
         .help-btn-right { background: #c62828; color: white; padding: 4px 10px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 4px; }
 
         .live-offer-banner { background: #fffde7; border: 1px solid #ffee58; padding: 8px; border-radius: 6px; font-size: 11px; margin-bottom: 10px; color: #d32f2f; font-weight: bold; line-height: 1.4; display: none; }
+
+        /* ✅ ग्राहक के लिए लाइव नोटिफिकेशन पॉप-अप (गुणा के निशान के साथ) */
+        .status-popup-banner { background: #e8f5e9; border: 2px solid #2e7d32; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 10px; color: #1b5e20; font-weight: bold; display: none; position: relative; }
+        .close-popup-btn { position: absolute; top: 6px; right: 8px; background: #c62828; color: white; border: none; font-size: 11px; font-weight: bold; padding: 1px 6px; border-radius: 50%; cursor: pointer; }
 
         .section-title { font-weight: bold; font-size: 13px; color: #2e7d32; margin: 10px 0 6px 0; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; }
         
@@ -48,7 +49,6 @@
         .qr-box img { width: 100%; height: 100%; object-fit: contain; }
         .pay-gpay-btn { background: #1976d2; color: white; border: none; width: 100%; padding: 9px; border-radius: 5px; font-weight: bold; font-size: 12px; cursor: pointer; margin-top: 8px; }
         
-        /* लॉक किया हुआ आर्डर भेजने वाला बटन */
         .send-order-btn { background: #b0bec5; color: #fff; border: none; width: 100%; padding: 10px; border-radius: 5px; font-weight: bold; font-size: 13px; cursor: not-allowed; margin-top: 8px; }
         .send-order-btn.unlocked { background: #e65100; cursor: pointer; }
     </style>
@@ -62,15 +62,17 @@
 </div>
 
 <div class="container">
-    <!-- दुकान, बीच में 'अजय वेजिटेबल्स' और Help बटन एक लाइन में -->
     <div class="middle-action-bar">
         <a href="tel:9997077062" class="shop-card-left"><span>🏪</span> दुकान</a>
         <div class="center-store-title">अजय वेजिटेबल्स</div>
         <a href="tel:9997077062" class="help-btn-right">📞 Help</a>
     </div>
 
-    <!-- लाइव स्टेटस / नोटिफिकेशन चेक करने के लिए पॉप-अप बैनर -->
-    <div id="customerStatusBanner" style="background:#e8f5e9; border:1px solid #c8e6c9; padding:8px; border-radius:6px; font-size:11px; margin-bottom:10px; color:#1b5e20; font-weight:bold; display:none; text-align:center;"></div>
+    <!-- ✅ ग्राहक के लिए लाइव स्टेटस पॉप-अप (गुणा बटन के साथ) -->
+    <div id="customerStatusBanner" class="status-popup-banner">
+        <span id="statusMsgText">आर्डर स्थिति की जाँच हो रही है...</span>
+        <button class="close-popup-btn" onclick="dismissStatusBanner()">×</button>
+    </div>
 
     <div class="live-offer-banner" id="liveOfferBanner"></div>
 
@@ -114,7 +116,6 @@
         </div>
 
         <button class="pay-gpay-btn" onclick="openGPay()">📱 Google Pay / PhonePe से भुगतान करें</button>
-        <!-- शुरुआत में यह बटन लॉक रहेगा, भुगतान करने के बाद खुलेगा -->
         <button id="sendOrderBtn" class="send-order-btn" onclick="sendOrderToShop()" disabled>🔒 पहले भुगतान करें (दुकानदार को आर्डर भेजें)</button>
     </div>
 </div>
@@ -143,7 +144,7 @@
     const shopPhone = "9997077062";
     const shopLat = 27.1767; 
     const shopLng = 78.0081;
-    let paymentDone = false; // भुगतान की स्थिति
+    let paymentDone = false;
 
     const weightOptions = [
         { label: "50 ग्राम", value: 0.05 },
@@ -179,24 +180,31 @@
         if(localStorage.getItem("savedPhone")) {
             let phone = localStorage.getItem("savedPhone");
             document.getElementById('custPhone').value = phone;
-            checkCustomerOrderStatus(phone); // दुकानदार के स्वीकार/रद्द का स्टेटस चेक करने के लिए
+            checkCustomerOrderStatus(phone);
         }
         if(localStorage.getItem("savedAddress")) document.getElementById('custAddress').value = localStorage.getItem("savedAddress");
         
         fetchLiveShopData();
     };
 
+    // ✅ दुकानदार द्वारा स्वीकार या रद्द किए जाने पर लाइव नोटिफिकेशन चेक करना
     function checkCustomerOrderStatus(phone) {
         const notifRef = ref(db, 'customerNotification/' + phone);
         onValue(notifRef, (snapshot) => {
             const data = snapshot.val();
             if(data) {
                 let banner = document.getElementById('customerStatusBanner');
-                banner.innerText = data.msg;
+                let textEl = document.getElementById('statusMsgText');
+                textEl.innerText = data.msg;
                 banner.style.display = 'block';
             }
         });
     }
+
+    // ✅ गुणा (×) बटन दबाने पर नोटिफिकेशन बैनर को स्क्रीन से हटाना
+    window.dismissStatusBanner = function() {
+        document.getElementById('customerStatusBanner').style.display = 'none';
+    };
 
     function fetchLiveShopData() {
         const settingsRef = ref(db, 'shopSettings');
@@ -302,7 +310,7 @@
             subTotal += itemTotal;
             html += `
                 <div class="cart-row">
-                    <span><b>${item.name}</b> (${item.qtyText}) - ₹${itemTotal.toFixed(1)}</span>
+                    <span><b>${item.name}</b> (${item.qtyText}) - ₹${itemTotal.lift ? itemTotal.toFixed(1) : itemTotal.toFixed(1)}</span>
                     <button class="remove-cart" onclick="removeFromCart(${index})">हटाएं</button>
                 </div>
             `;
@@ -349,7 +357,6 @@
         let qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiLink)}`;
         document.getElementById('dynamicQrImg').src = qrApiUrl;
 
-        // पेमेंट होने से पहले आर्डर भेजने वाला बटन लॉक रहेगा
         paymentDone = false;
         let btn = document.getElementById('sendOrderBtn');
         btn.disabled = true;
@@ -360,12 +367,10 @@
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     };
 
-    // भुगतान करने पर क्लिक करने से बटन अनलॉक हो जाएगा
     window.openGPay = function() {
         let bill = calculateFinalBill();
         let upiLink = `upi://pay?pa=${dynamicUpi}&pn=AjayVegetables&am=${bill.grandTotal}&cu=INR`;
         
-        // पेमेंट एप खोलने के साथ ही आर्डर भेजने का बटन अनलॉक कर दें
         paymentDone = true;
         let btn = document.getElementById('sendOrderBtn');
         btn.disabled = false;
@@ -375,6 +380,7 @@
         window.location.href = upiLink;
     };
 
+    // ✅ लाइव GPS ट्रैकिंग और Google Maps लिंक के साथ आर्डर भेजना
     window.sendOrderToShop = function() {
         if (!paymentDone) {
             alert("कृपया पहले ऊपर दिए गए बटन से भुगतान करें, तभी आर्डर भेजा जा सकेगा!");
@@ -392,12 +398,18 @@
                 let custLng = position.coords.longitude;
                 let distanceKm = calculateDistance(shopLat, shopLng, custLat, custLng);
                 let distanceText = distanceKm < 1 ? `${Math.round(distanceKm * 1000)} मीटर` : `${distanceKm.toFixed(1)} किमी`;
-                saveOrderToFirebase(name, phone, address, distanceText, bill);
+                
+                // Google Maps लाइव लोकेशन लिंक
+                let mapLink = `https://www.google.com/maps?q=${custLat},${custLng}`;
+
+                saveOrderToFirebase(name, phone, address, distanceText, mapLink, bill);
             }, (error) => {
-                saveOrderToFirebase(name, phone, address, "0 मीटर (एक ही स्थान)", bill);
+                let defaultMapLink = `https://www.google.com/maps?q=${shopLat},${shopLng}`;
+                saveOrderToFirebase(name, phone, address, "0 मीटर (जीपीएस डिफ़ॉल्ट)", defaultMapLink, bill);
             });
         } else {
-            saveOrderToFirebase(name, phone, address, "0 मीटर", bill);
+            let defaultMapLink = `https://www.google.com/maps?q=${shopLat},${shopLng}`;
+            saveOrderToFirebase(name, phone, address, "0 मीटर", defaultMapLink, bill);
         }
     };
 
@@ -416,12 +428,13 @@
         return deg * (Math.PI/180);
     }
 
-    function saveOrderToFirebase(name, phone, address, distanceText, bill) {
+    function saveOrderToFirebase(name, phone, address, distanceText, mapLink, bill) {
         let orderData = {
             customerName: name,
             customerPhone: phone,
             customerAddress: address,
             distance: distanceText,
+            mapLocationUrl: mapLink, // गूगल मैप्स लाइव लिंक
             items: cart,
             subTotal: bill.subTotal,
             deliveryCharge: bill.deliveryCharge,
