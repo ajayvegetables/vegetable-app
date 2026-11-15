@@ -4,30 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>अजय वेजिटेबल्स - ऑनलाइन स्टोर</title>
-    <!-- PWA Manifest -->
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%85%E0%A4%9C%E0%A4%AF%20%E0%A4%B5%E0%A5%87%E0%A4%9C%E0%A4%BF%E0%A4%AB%E0%A4%9F%E0%A4%AC%E0%A4%B2%20%28%E0%A4%95%E0%A4%B8%E0%A5%8D%E0%A4%9F%E0%A4%AE%E0%A4%B0%29%22%2C%22short_name%22%3A%22VegStore%22%2C%22start_url%22%3A%22.%2Fcustomer.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%232e7d32%22%2C%22theme_color%22%3A%22%232e7d32%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F2331%2F2331970.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any maskable%22%7D%5D%7D">
     <meta name="theme-color" content="#2e7d32">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2331/2331970.png">
     
     <style>
         body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; color: #333; }
-        
-        /* टॉप हेडर - टोकरी और नाम बिल्कुल बीच में */
         .top-header { background: #2e7d32; color: white; padding: 10px 12px; text-align: center; font-weight: bold; font-size: 15px; display: flex; justify-content: center; align-items: center; gap: 6px; }
-        
         .container { max-width: 500px; margin: auto; background: white; padding: 10px; min-height: 100vh; box-sizing: border-box; }
         
-        /* दुकान और हेल्प वाली लाइन (एक ही लाइन में, दुकान बाईं तरफ, हेल्प दाईं तरफ) */
         .middle-action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        
         .shop-card-left { display: flex; align-items: center; gap: 6px; background: #e8f5e9; border: 1px solid #c8e6c9; padding: 6px 12px; border-radius: 6px; text-decoration: none; color: #1b5e20; font-weight: bold; font-size: 12px; }
-        .shop-card-left span { font-size: 18px; }
-
         .help-btn-right { background: #c62828; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 4px; }
 
-        .section-title { font-weight: bold; font-size: 13px; color: #2e7d32; margin: 10px 0 6px 0; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; }
+        /* लाइव ऑफर बैनर */
+        .live-offer-banner { background: #fffde7; border: 1px solid #ffee58; padding: 8px; border-radius: 6px; font-size: 11px; margin-bottom: 10px; color: #d32f2f; font-weight: bold; line-height: 1.4; display: none; }
 
-        /* कैटलॉग कार्ड (हर सब्जी का अलग फोटो/इमोजी) */
+        .section-title { font-weight: bold; font-size: 13px; color: #2e7d32; margin: 10px 0 6px 0; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; }
+        
         .product-card { display: flex; align-items: center; background: #fff; border: 1px solid #e0e0e0; padding: 8px; border-radius: 6px; margin-bottom: 8px; gap: 10px; }
         .product-img { width: 38px; height: 38px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .product-info { flex: 1; }
@@ -37,7 +31,6 @@
         .product-action select { padding: 4px; font-size: 11px; border: 1px solid #ccc; border-radius: 4px; }
         .add-btn { background: #2e7d32; color: white; border: none; padding: 5px 9px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer; }
 
-        /* कार्ट समरी */
         .cart-box { background: #fafafa; border: 1px solid #ddd; padding: 8px; border-radius: 6px; margin-bottom: 10px; font-size: 11px; }
         .cart-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px dotted #ccc; padding-bottom: 2px; }
         .remove-cart { background: #c62828; color: white; border: none; padding: 2px 5px; border-radius: 3px; font-size: 10px; cursor: pointer; }
@@ -45,10 +38,8 @@
         .form-group { margin-bottom: 8px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 2px; font-size: 11px; color: #555; }
         .form-group input, .form-group textarea { width: 100%; padding: 7px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 11px; }
-
         .btn-proceed { background: #2e7d32; color: white; border: none; width: 100%; padding: 10px; border-radius: 5px; font-size: 13px; font-weight: bold; cursor: pointer; text-align: center; margin-top: 8px; }
 
-        /* QR बिल बॉक्स */
         .qr-section { background: #fff; border: 1px dashed #2e7d32; padding: 10px; border-radius: 6px; margin-top: 12px; display: none; text-align: center; }
         .qr-box { width: 150px; height: 150px; margin: 8px auto; background: #eee; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; }
         .qr-box img { width: 100%; height: 100%; object-fit: contain; }
@@ -58,32 +49,25 @@
 </head>
 <body>
 
-<!-- टॉप हेडर - टोकरी और नाम बिल्कुल बीच में -->
 <div class="top-header">
     <span>🛒</span>
     <span>अजय वेजिटेबल्स</span>
 </div>
 
 <div class="container">
-    
-    <!-- दुकान (बाईं तरफ) और Help बटन (दाईं तरफ) एक ही लाइन में -->
     <div class="middle-action-bar">
-        <a href="tel:9997077062" class="shop-card-left">
-            <span>🏪</span> दुकान
-        </a>
-        <a href="tel:9997077062" class="help-btn-right">
-            📞 Help
-        </a>
+        <a href="tel:9997077062" class="shop-card-left"><span>🏪</span> दुकान</a>
+        <a href="tel:9997077062" class="help-btn-right">📞 Help</a>
     </div>
 
-    <div class="section-title">सब्जी कैटलॉग (अपनी पसंद चुनें)</div>
-    
-    <!-- ओरिजिनल लाइव कैटलॉग (हर सब्जी के सामने उसका सही फोटो/इमोजी) -->
+    <!-- लाइव ऑफर और शर्तें बैनर (दुकानदार द्वारा अपडेटेड) -->
+    <div class="live-offer-banner" id="liveOfferBanner"></div>
+
+    <div class="section-title">सब्जी कैटलॉग (लाइव अपडेटेड)</div>
     <div id="catalogContainer">
-        <p style="text-align: center; color: #777; font-size: 12px;">कैटलॉग लोड हो रही है...</p>
+        <p style="text-align: center; color: #777; font-size: 12px;">लाइव कैटलॉग लोड हो रही है...</p>
     </div>
 
-    <!-- कार्ट समरी -->
     <div class="section-title">आपका कार्ट (Cart Summary)</div>
     <div class="cart-box" id="cartContainer">
         <p style="text-align: center; color: #777; margin: 4px 0;">कार्ट खाली है।</p>
@@ -91,7 +75,6 @@
 
     <div style="font-size:12px; font-weight:bold; margin-bottom:8px;" id="subTotalDisplay">सब्जी का कुल मूल्य: ₹0</div>
 
-    <!-- ग्राहक जानकारियां (ऑटो-सेव) -->
     <div class="section-title">ग्राहक की जानकारियां (ऑटो-सेव):</div>
     <div class="form-group">
         <label>नाम:</label>
@@ -108,7 +91,6 @@
 
     <button class="btn-proceed" onclick="proceedToPayment()">ऑर्डर आगे बढ़ाएं और भुगतान करें</button>
 
-    <!-- QR कोड और पेमेंट सेक्शन -->
     <div class="qr-section" id="qrSection">
         <div style="font-weight: bold; font-size: 12px; color: #2e7d32; margin-bottom: 4px;">ऑर्डर का लाइन विवरण</div>
         <div id="billBreakdown" style="font-size: 11px; color: #555; line-height: 1.4; margin-bottom: 6px;"></div>
@@ -123,13 +105,11 @@
         <button class="pay-gpay-btn" onclick="openGPay()">📱 Google Pay / PhonePe से भुगतान करें</button>
         <button class="send-order-btn" onclick="sendOrderToShop()">🚀 दुकानदार को आर्डर भेजें</button>
     </div>
-
 </div>
 
-<!-- Firebase और लाइव कैटलॉग लॉजिक -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
@@ -147,7 +127,7 @@
 
     let cart = [];
     let liveCatalog = [];
-    const shopUpi = "9997077062@paytm";
+    let dynamicUpi = "9997077062@paytm"; // डेटाबेस से लाइव UPI
     const shopPhone = "9997077062";
 
     const weightOptions = [
@@ -164,7 +144,6 @@
         { label: "10 किलो", value: 10.0 }
     ];
 
-    // सब्जी के नाम के अनुसार सही फोटो/इमोजी चुनने का फंक्शन
     function getVegEmoji(name) {
         let n = name.trim().toLowerCase();
         if (n.includes('टमाटर')) return '🍅';
@@ -177,7 +156,7 @@
         if (n.includes('नींबू')) return '🍋';
         if (n.includes('धनिया')) return '🌿';
         if (n.includes('गाजर')) return '🥕';
-        return '🥗'; // डिफ़ॉल्ट सब्जी आइकन
+        return '🥗';
     }
 
     window.onload = function() {
@@ -185,18 +164,49 @@
         if(localStorage.getItem("savedPhone")) document.getElementById('custPhone').value = localStorage.getItem("savedPhone");
         if(localStorage.getItem("savedAddress")) document.getElementById('custAddress').value = localStorage.getItem("savedAddress");
         
-        loadLiveCatalog();
+        // Firebase से लाइव सेटिंग्स (कैटलॉग, UPI और ऑफर) एक साथ लोड करें
+        fetchLiveShopData();
     };
 
-    function loadLiveCatalog() {
-        const container = document.getElementById('catalogContainer');
-        // ओरिजिनल कैटलॉग (टमाटर, आलू, प्याज)
-        liveCatalog = [
-            { name: "टमाटर", price: 40 },
-            { name: "आलू", price: 30 },
-            { name: "प्याज़", price: 50 }
-        ];
+    function fetchLiveShopData() {
+        const settingsRef = ref(db, 'shopSettings');
+        onValue(settingsRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // 1. लाइव UPI अपडेट
+                if (data.upi) dynamicUpi = data.upi;
 
+                // 2. लाइव ऑफर और शर्तें अपडेट
+                if (data.offerText && data.offerText.trim() !== "") {
+                    document.getElementById('liveOfferBanner').innerHTML = `<b>विशेष ऑफर / सूचना:</b><br>${data.offerText}`;
+                    document.getElementById('liveOfferBanner').style.display = 'block';
+                } else {
+                    document.getElementById('liveOfferBanner').style.display = 'none';
+                }
+
+                // 3. लाइव कैटलॉग अपडेट
+                if (data.catalog && Array.isArray(data.catalog)) {
+                    liveCatalog = data.catalog;
+                } else {
+                    liveCatalog = [
+                        { name: "टमाटर", price: 40 },
+                        { name: "आलू", price: 30 },
+                        { name: "प्याज़", price: 50 }
+                    ];
+                }
+            } else {
+                liveCatalog = [
+                    { name: "टमाटर", price: 40 },
+                    { name: "आलू", price: 30 },
+                    { name: "प्याज़", price: 50 }
+                ];
+            }
+            renderCustomerCatalog();
+        });
+    }
+
+    function renderCustomerCatalog() {
+        const container = document.getElementById('catalogContainer');
         container.innerHTML = "";
         liveCatalog.forEach((item, index) => {
             let optionsHtml = '';
@@ -310,7 +320,8 @@
         document.getElementById('billBreakdown').innerHTML = breakdownHtml;
         document.getElementById('finalPayableText').innerText = `कुल भुगतान योग्य राशि: ₹${bill.grandTotal}`;
 
-        let upiLink = `upi://pay?pa=${shopUpi}&pn=AjayVegetables&am=${bill.grandTotal}&cu=INR`;
+        // लाइव अपडेटेड UPI ID और ऑटोमैटिक लॉक अमाउंट के साथ QR कोड
+        let upiLink = `upi://pay?pa=${dynamicUpi}&pn=AjayVegetables&am=${bill.grandTotal}&cu=INR`;
         let qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiLink)}`;
         document.getElementById('dynamicQrImg').src = qrApiUrl;
 
@@ -320,7 +331,7 @@
 
     window.openGPay = function() {
         let bill = calculateFinalBill();
-        let upiLink = `upi://pay?pa=${shopUpi}&pn=AjayVegetables&am=${bill.grandTotal}&cu=INR`;
+        let upiLink = `upi://pay?pa=${dynamicUpi}&pn=AjayVegetables&am=${bill.grandTotal}&cu=INR`;
         window.location.href = upiLink;
     };
 
@@ -345,7 +356,7 @@
 
         const ordersRef = ref(db, 'orders');
         push(ordersRef, orderData).then(() => {
-            alert("ऑर्डर दुकानदार के पास सफलतापर्वक भेज दिया गया है! दुकानदार के ऐप में घंटी बज गई है।");
+            alert("ऑर्डर दुकानदार के पास सफलतापर्वक भेज दिया गया है!");
             location.reload();
         }).catch((error) => {
             alert("त्रुटि: " + error.message);
