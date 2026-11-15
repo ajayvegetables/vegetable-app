@@ -19,11 +19,14 @@
         .form-group input, .form-group textarea { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 11px; }
         .btn-main { background: #e65100; color: white; border: none; width: 100%; padding: 8px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; box-sizing: border-box; }
         
-        /* ✅ सबसे ऊपर फिक्स बार जिसमें गोल लॉग आउट आइकॉन भी है */
+        /* ✅ शीर्ष बार फिक्स (लॉगआउट, हिस्ट्री, घंटी और हेल्प बटन एक लाइन में) */
         .top-bar-fixed { position: fixed; top: 5px; right: 8px; display: flex; gap: 4px; z-index: 999; align-items: center; }
         .top-left-fixed { position: fixed; top: 5px; left: 8px; display: flex; gap: 4px; z-index: 999; }
-        .logout-circle-btn { background: #c62828; color: white; width: 26px; height: 26px; border-radius: 50%; border: none; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         
+        /* गोल लॉगआउट बटन जिसके अंदर साफ़-साफ़ 'लॉगआउट' लिखा है */
+        .logout-circle-btn { background: #c62828; color: white; padding: 3px 6px; border-radius: 12px; border: none; font-size: 9px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        
+        .history-top-icon-btn { background: #37474f; color: white; padding: 3px 7px; border-radius: 10px; font-weight: bold; font-size: 10px; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); text-decoration: none; display: flex; align-items: center; gap: 2px; }
         .help-btn { background: #2e7d32; color: white; padding: 3px 7px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .notif-badge-btn { background: #c62828; color: white; padding: 3px 7px; border-radius: 10px; font-weight: bold; font-size: 10px; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
@@ -51,8 +54,6 @@
         .item-row span { font-size: 10px; color: #666; }
         .item-row button.remove-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 10px; margin-left: auto; }
 
-        .history-floating-btn { background: #37474f; color: white; border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); margin: 10px auto 4px auto; }
-
         /* मॉडल पॉप-अप */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 5px; box-sizing: border-box; }
         .modal-content { background: white; padding: 10px; width: 92%; max-width: 360px; border-radius: 6px; max-height: 80vh; overflow-y: auto; box-sizing: border-box; position: relative; margin: auto; }
@@ -76,12 +77,14 @@
 </head>
 <body>
 
-<!-- शीर्ष बाएं कोने में गोल लॉग आउट बटन -->
+<!-- शीर्ष बाएं कोने में 'लॉगआउट' लिखा हुआ गोल बटन -->
 <div class="top-left-fixed">
-    <button class="logout-circle-btn" onclick="logout()" title="लॉग आउट">🚪</button>
+    <button class="logout-circle-btn" onclick="logout()">🚪 लॉगआउट</button>
 </div>
 
+<!-- शीर्ष दाएं कोने में हिस्ट्री, घंटी और हेल्प बटन -->
 <div class="top-bar-fixed">
+    <button class="history-top-icon-btn" onclick="openHistoryModal()">📜 हिस्ट्री</button>
     <button class="notif-badge-btn" onclick="openNotifications()">🔔 <span id="notifCount">0</span></button>
     <a href="tel:9997077062" class="help-btn">📞 Help</a>
 </div>
@@ -192,8 +195,6 @@
         <div id="orders-container">
             <p style="text-align: center; color: #777; font-size:10px;">नया ऑर्डर आने का इंतज़ार है...</p>
         </div>
-
-        <button class="history-floating-btn" onclick="openHistoryModal()" title="आर्डर हिस्ट्री">📜</button>
     </div>
 
 </div>
@@ -273,7 +274,6 @@
         loadHistoryData();
     }
 
-    // ✅ लॉग आउट करने पर केवल सत्र (Session) हटेगा, कैटलॉग और सेटिंग्स सुरक्षित रहेंगी
     window.logout = function() {
         if(confirm("क्या आप वाकई लॉग आउट करना चाहते हैं?")) {
             localStorage.removeItem("partnerPhone");
@@ -544,9 +544,8 @@
         });
     }
 
-    // ✅ आर्डर पर क्लिक करते ही हिस्ट्री पॉप-अप छिप जाएगा और पूरी डिटेल का बॉक्स सामने आ जाएगा
     window.showOrderDetails = function(event, key) {
-        closeHistoryModal(); // हिस्ट्री विंडो को बंद/छिपायें ताकि डिटेल दिखे
+        closeHistoryModal();
         const historyRef = ref(db, 'orderHistory/' + key);
         get(historyRef).then((snapshot) => {
             if (snapshot.exists()) {
@@ -689,7 +688,7 @@
                         timestamp: Date.now()
                     }).then(() => {
                         push(ref(db, 'orderHistory'), historyData).then(() => {
-                            alert('ऑर्डर रद्द कर दिया गया है।');
+                            alert('ऑर्डर रद्द कर दिया गया है। मैदान साफ़ है।');
                             remove(orderRef);
                         });
                     });
