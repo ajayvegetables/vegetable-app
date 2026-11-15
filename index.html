@@ -64,20 +64,20 @@
             </div>
         </div>
 
-        <!-- 2. मंथली सब्सक्रिप्शन पेमेंट सेक्शन (₹30 हर महीने) -->
+        <!-- 2. व्यक्तिगत सब्सक्रिप्शन पेमेंट सेक्शन (₹30 हर महीने - केवल उसी नंबर के लिए जिसका खत्म हुआ है) -->
         <div id="subscriptionSection" class="hidden">
-            <div class="section-title" style="color: #d32f2f;">🔒 मासिक सब्सक्रिप्शन समाप्त / आवश्यक</div>
-            <p style="font-size: 14px; line-height: 1.5;" id="subMsg">पार्टनर ऐप का इस महीने का उपयोग जारी रखने के लिए <b>₹30 (₹1 प्रतिदिन)</b> का मासिक शुल्क भुगतान करें।</p>
+            <div class="section-title" style="color: #d32f2f;">🔒 आपका मासिक सब्सक्रिप्शन समाप्त हो गया है</div>
+            <p style="font-size: 14px; line-height: 1.5;" id="subMsg">ऐप का उपयोग जारी रखने के लिए <b>₹30 (₹1 प्रतिदिन)</b> का मासिक शुल्क भुगतान करें। भुगतान के बाद ही ऐप खुलेगा।</p>
             
             <div class="pay-box">
                 <p style="margin:5px 0; font-weight:bold; color:#0d47a1;">UPI ID: <span style="color:#d32f2f;">8218231811@nyes</span></p>
-                <p style="margin:5px 0; font-size:13px; color:#555;">किसी भी UPI ऐप से भुगतान करें और नीचे ट्रांजैक्शन आईडी डालें।</p>
+                <p style="margin:5px 0; font-size:13px; color:#555;">किसी भी UPI ऐप से ₹30 भेजें और नीचे ट्रांजैक्शन आईडी दर्ज करें।</p>
                 <a id="upiPayLink" href="#" class="btn" style="background:#ff9800; text-decoration:none; display:inline-block; margin-top:10px; padding:10px 20px;">📲 ₹30 भुगतान करने के लिए क्लिक करें</a>
             </div>
 
             <label style="margin-top: 15px;">UPI Transaction ID दर्ज करें:</label>
             <input type="text" id="txIdInput" placeholder="UPI Transaction ID दर्ज करें">
-            <button class="btn" onclick="verifyMonthlySubscription()">मासिक सब्सक्रिप्शन एक्टिवेट करें</button>
+            <button class="btn" onclick="verifyMonthlySubscription()">सब्जी पार्टनर ऐप एक्टिवेट करें</button>
         </div>
 
         <!-- 3. मुख्य डैशबोर्ड -->
@@ -87,9 +87,9 @@
                 <button onclick="logout()" style="background: #d32f2f; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">लॉग आउट</button>
             </div>
 
-            <!-- सब्सक्रिप्शन वैधता स्टेटस -->
+            <!-- व्यक्तिगत सब्सक्रिप्शन वैधता स्टेटस -->
             <div style="background: #e8f5e9; border: 1px solid #a5d6a7; padding: 8px; margin-top: 10px; border-radius: 4px; font-size: 13px; color: #2e7d32; text-align: center;" id="subExpiryStatus">
-                🟢 सब्सक्रिप्शन वैध है (शेष दिन: गणना हो रही है...)
+                🟢 सब्सक्रिप्शन वैध है
             </div>
 
             <!-- नए ऑर्डर्स और अलार्म सेक्शन -->
@@ -158,18 +158,13 @@
         let activeOrdersCount = 0;
         let otpTimer = null;
 
-        // आपका मास्टर नंबर
         const MASTER_ADMIN_MOBILE = "9997077062"; 
-        
-        // एक गुप्त मास्टर डिवाइस कोड (यह केवल आपके फोन में ही सेट रहेगा)
-        // जब आप पहली बार अपने फोन में खोलेंगे, यह आईडी आपके फोन के साथ लॉक हो जाएगी।
         const MASTER_DEVICE_KEY = "ajay_master_device_secure_id_9997";
 
         window.onload = function() {
             let savedMobile = localStorage.getItem('vendor_mobile');
             let myDeviceToken = localStorage.getItem('app_device_token');
 
-            // यदि इस डिवाइस पर पहली बार आ रहे हैं, तो इसके लिए एक टोकन बना लो
             if (!myDeviceToken) {
                 myDeviceToken = 'dev_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
                 localStorage.setItem('app_device_token', myDeviceToken);
@@ -177,29 +172,24 @@
 
             if(savedMobile) {
                 if(savedMobile === MASTER_ADMIN_MOBILE) {
-                    // सुरक्षा जांच: अगर कोई दूसरा यूजर अपने फोन में आपका मास्टर नंबर डालने की कोशिश करे
-                    // तो हम चेक करेंगे कि क्या उसके फोन का डिवाइस टोकन आपका मास्टर टोकन है?
                     let registeredMasterDevice = localStorage.getItem('master_device_lock');
-                    
                     if (!registeredMasterDevice) {
-                        // अगर यह आपका असली फोन है जहाँ पहली बार खुला है, तो इसे मास्टर डिवाइस के रूप में लॉक कर लो
                         localStorage.setItem('master_device_lock', myDeviceToken);
                         registeredMasterDevice = myDeviceToken;
                     }
 
                     if (myDeviceToken === registeredMasterDevice) {
-                        // यह आपका खुद का फोन है - बिल्कुल फ्री और डायरेक्ट खुलेगा
                         document.getElementById('userMobileDisplay').innerText = savedMobile;
                         document.getElementById('loginSection').classList.add('hidden');
                         document.getElementById('dashboardSection').classList.remove('hidden');
                         document.getElementById('subExpiryStatus').innerText = "🟢 मास्टर एडमिन अकाउंट (आजीवन फ्री)";
                     } else {
-                        // यदि कोई दूसरा चोर/दुकानदार किसी और फोन में आपका नंबर डालने की कोशिश करे
-                        alert('⚠️ सुरक्षा चेतावनी: यह मास्टर मोबाइल नंबर केवल अधिकृत एडमिन डिवाइस पर ही चल सकता है! अन्य उपयोगकर्ताओं को अपना स्वयं का मोबाइल नंबर उपयोग करना होगा।');
-                        localStorage.removeItem('vendor_mobile'); // उसका लॉगिन हटा दो
+                        alert('⚠️ सुरक्षा चेतावनी: यह मास्टर मोबाइल नंबर केवल अधिकृत एडमिन डिवाइस पर ही चल सकता है!');
+                        localStorage.removeItem('vendor_mobile');
                         document.getElementById('loginSection').classList.remove('hidden');
                     }
                 } else {
+                    // हर विशिष्ट मोबाइल नंबर का अपना व्यक्तिगत सब्सक्रिप्शन चेक होगा
                     checkMonthlySubscription(savedMobile);
                 }
             } else {
@@ -208,6 +198,7 @@
         };
 
         function checkMonthlySubscription(mobile) {
+            // हर मोबाइल नंबर की अलग एक्सपायरी की जांच (जैसे sub_expiry_9876543210)
             let expiryTime = localStorage.getItem('sub_expiry_' + mobile);
             let currentTime = new Date().getTime();
 
@@ -219,10 +210,11 @@
                 document.getElementById('dashboardSection').classList.remove('hidden');
                 document.getElementById('subExpiryStatus').innerText = `🟢 सब्सक्रिप्शन वैध है (शेष: ${remainingDays} दिन)`;
             } else {
+                // अगर इस विशिष्ट नंबर का समय खत्म हो गया है, तो सिर्फ इसका ऐप लॉक होगा
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('dashboardSection').classList.add('hidden');
                 document.getElementById('subscriptionSection').classList.remove('hidden');
-                document.getElementById('subMsg').innerHTML = `पार्टनर ऐप की 30 दिन की अवधि समाप्त हो गई है। आगे इस्तेमाल करने के लिए <b>₹30 (₹1 प्रतिदिन)</b> का भुगतान करें।`;
+                document.getElementById('subMsg').innerHTML = `दुकानदार <b>(${mobile})</b> की 30 दिन की अवधि समाप्त हो गई है। ऐप का उपयोग जारी रखने के लिए <b>₹30</b> का भुगतान करें।`;
                 setupUpiPaymentLink(mobile);
             }
         }
@@ -230,7 +222,6 @@
         function sendOTP() {
             var mobile = document.getElementById('loginMobile').value;
             
-            // यदि कोई दूसरा यूजर आपके नंबर को लॉगिन करने की कोशिश करे, तो उसे यही रोक दें
             if (mobile === MASTER_ADMIN_MOBILE) {
                 let myDeviceToken = localStorage.getItem('app_device_token');
                 let registeredMasterDevice = localStorage.getItem('master_device_lock');
@@ -290,7 +281,6 @@
             if(otp === generatedOTP && otp !== "") {
                 var mobile = document.getElementById('loginMobile').value;
                 
-                // अगर कोई दूसरा यूजर आपका नंबर डालने की कोशिश करे
                 if (mobile === MASTER_ADMIN_MOBILE) {
                     let myDeviceToken = localStorage.getItem('app_device_token');
                     let registeredMasterDevice = localStorage.getItem('master_device_lock');
@@ -333,6 +323,7 @@
             let mobile = localStorage.getItem('vendor_mobile');
             
             if(txId.length >= 5) {
+                // ठीक 30 दिन आगे की एक्सपायरी उस विशेष मोबाइल नंबर के लिए सेट करें
                 let thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000;
                 let expiryTime = new Date().getTime() + thirtyDaysInMillis;
                 
@@ -341,9 +332,9 @@
                 document.getElementById('subscriptionSection').classList.add('hidden');
                 document.getElementById('userMobileDisplay').innerText = mobile;
                 document.getElementById('dashboardSection').classList.remove('hidden');
-                document.getElementById('subExpiryStatus').innerText = "🟢 सब्सक्रिप्शन वैध है (शेष दिन: 30 दिन)";
+                document.getElementById('subExpiryStatus').innerText = `🟢 सब्सक्रिप्शन वैध है (शेष दिन: 30 दिन)`;
                 
-                alert('सफल! ₹30 का मासिक सब्सक्रिप्शन 30 दिनों के लिए एक्टिवेट हो गया है।');
+                alert('सफल! इस मोबाइल नंबर का ₹30 का मासिक सब्सक्रिप्शन 30 दिनों के लिए एक्टिवेट हो गया है।');
             } else {
                 alert('कृपया सही UPI Transaction ID दर्ज करें।');
             }
@@ -502,7 +493,7 @@
                 var newItem = document.createElement('div');
                 newItem.className = 'veg-item';
                 newItem.style.display = 'flex';
-                newItem.style.justifyContent, 'space-between';
+                newItem.style.justifyContent = 'space-between';
                 newItem.style.alignItems = 'center';
                 newItem.innerHTML = `<span><b>${name}</b> - ₹${price}/किग्रा (उपलब्ध: हाँ)</span> <button onclick="toggleStock(this)" style="background: green; color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer;">चालू</button>`;
                 container.appendChild(newItem);
