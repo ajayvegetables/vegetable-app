@@ -17,10 +17,12 @@
         .help-btn:hover { background-color: #01579b; }
         .sound-btn { background-color: #ff9800; margin-top: 10px; }
         .sound-btn:hover { background-color: #f57c00; }
+        .stop-sound-btn { background-color: #d32f2f; margin-top: 5px; display: none; }
         .hidden { display: none; }
-        .veg-item, .order-item { background: #f9f9f9; padding: 12px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
-        .order-item { background: #fff3e0; border-left: 5px solid #ff9800; display: block; }
+        .veg-item, .order-item { background: #f9f9f9; padding: 12px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; }
+        .order-item { background: #fff3e0; border-left: 5px solid #ff9800; }
         .otp-msg { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 10px; margin-top: 10px; border-radius: 4px; color: #2e7d32; font-weight: bold; text-align: center; }
+        .badge-success { background: #4caf50; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -53,14 +55,22 @@
                 <button onclick="logout()" style="background: #d32f2f; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">लॉग आउट</button>
             </div>
 
-            <!-- नए ऑर्डर्स और रिंगटोन सेक्शन -->
+            <!-- नए ऑर्डर्स और तेज रिंगटोन सेक्शन -->
             <div class="section-title">🚨 नए कस्टमर ऑर्डर्स (लाइव)</div>
-            <button class="btn sound-btn" onclick="playOrderRingtone()">🔔 रिंगटोन टेस्ट करें (ऑर्डर साउंड)</button>
+            <button class="btn sound-btn" onclick="simulateNewOrderWithAlarm()">🔔 टेस्ट ऑर्डर & जोर से रिंगटोन बजाएं</button>
+            <button id="stopSoundBtn" class="btn stop-sound-btn" onclick="stopAlarm()">🔇 रिंगटोन बंद करें</button>
+            
             <div id="orderListContainer">
                 <div class="order-item">
-                    <b>नया आर्डर #101</b><br>
-                    <span>ग्राहक: राहुल (आलू 2kg, टमाटर 1kg)</span><br>
-                    <small style="color: #d32f2f; font-weight: bold;">कुल: ₹90 | UPI भुगतान हो चुका है</small>
+                    <div style="display: flex; justify-content: space-between;">
+                        <b>नया आर्डर #101</b>
+                        <span class="badge-success">UPI भुगतान सफल (₹90)</span>
+                    </div>
+                    <hr style="border:0; border-top:1px solid #ddd; margin:8px 0;">
+                    <p style="margin: 4px 0;"><b>ग्राहक:</b> राहुल कुमार</p>
+                    <p style="margin: 4px 0;"><b>सामग्री:</b> आलू 2kg, टमाटर 1kg</p>
+                    <p style="margin: 4px 0;"><b>पत्ता/पता:</b> मकान नंबर 45, मेन मार्केट रोड, सिविल लाइन्स</p>
+                    <p style="margin: 4px 0; color: #d32f2f;"><b>दूरी:</b> दुकान से 2.5 किलोमीटर दूर</p>
                 </div>
             </div>
 
@@ -102,7 +112,7 @@
 
             <div class="section-title">📋 वर्तमान सब्जी सूची (स्टॉक मैनेजमेंट)</div>
             <div id="vegListContainer">
-                <div class="veg-item">
+                <div class="veg-item" style="display: flex; justify-content: space-between; align-items: center;">
                     <span><b>आलू</b> - ₹30/किग्रा (उपलब्ध: हाँ)</span>
                     <button onclick="toggleStock(this)" style="background: green; color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer;">चालू</button>
                 </div>
@@ -115,11 +125,14 @@
 
     <script>
         let generatedOTP = "";
+        let alarmInterval = null;
+        let audioCtx = null;
 
-        // पेज लोड होते ही चेक करें कि क्या यूजर पहले से लॉग इन है (Persistent Login)
+        // पेज लोड होते ही चेक करें कि क्या इस डिवाइस पर पहले से लॉगिन किया हुआ है[span_0](start_span)[span_0](end_span)
         window.onload = function() {
             let savedMobile = localStorage.getItem('vendor_mobile');
             if(savedMobile) {
+                // अगर पहले से नंबर सेव है, तो सीधा डैशबोर्ड दिखाओ (OTP नहीं मांगेगा)
                 document.getElementById('userMobileDisplay').innerText = savedMobile;
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('dashboardSection').classList.remove('hidden');
@@ -144,7 +157,8 @@
             var otp = document.getElementById('otpInput').value;
             if(otp === generatedOTP && otp !== "") {
                 var mobile = document.getElementById('loginMobile').value;
-                // मोबाइल नंबर को ब्राउज़र में सेव करें ताकि दोबारा लॉगिन न मांगें
+                
+                // इस डिवाइस और ब्राउज़र के लिए मोबाइल नंबर सेव कर लें ताकि अगली बार सीधे खुले
                 localStorage.setItem('vendor_mobile', mobile);
                 
                 document.getElementById('userMobileDisplay').innerText = mobile;
@@ -157,8 +171,9 @@
         }
 
         function logout() {
-            // लॉग आउट पर सेव किया हुआ मोबाइल हटा दें
+            // लॉग आउट करने पर सेव किया हुआ मोबाइल हटा दें ताकि अगली बार फिर OTP मांगे
             localStorage.removeItem('vendor_mobile');
+            stopAlarm();
             document.getElementById('dashboardSection').classList.add('hidden');
             document.getElementById('loginSection').classList.remove('hidden');
             document.getElementById('loginMobile').value = '';
@@ -167,31 +182,58 @@
             document.getElementById('otpDisplayBox').classList.add('hidden');
         }
 
-        // Swiggy/Zomato जैसी तेज ऑर्डर रिंगटोन (Web Audio API का उपयोग)
-        function playOrderRingtone() {
+        // तेज और जोरदार अलार्म रिंगटोन (जो तब तक बजेगी जब तक बंद न की जाए)
+        function playLoudAlarm() {
             try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // तीन बार लगातार बीप बजेगी (जैसे आर्डर आने पर बजती है)
-                let playBeep = (time, freq) => {
-                    let osc = audioCtx.createOscillator();
-                    let gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.value = freq;
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start(audioCtx.currentTime + time);
-                    osc.stop(audioCtx.currentTime + time + 0.25);
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                // बार-बार तेज बीप बजाने का फंक्शन
+                if(alarmInterval) clearInterval(alarmInterval);
+
+                let playPattern = () => {
+                    let now = audioCtx.currentTime;
+                    // दो तेज सायरन टोन
+                    let osc1 = audioCtx.createOscillator();
+                    let gain1 = audioCtx.createGain();
+                    osc1.type = 'sawtooth'; // तेज चुभने वाली आवाज के लिए
+                    osc1.frequency.setValueAtTime(900, now);
+                    osc1.frequency.setValueAtTime(1400, now + 0.15);
+                    
+                    gain1.gain.setValueAtTime(0.5, now);
+                    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+                    osc1.connect(gain1);
+                    gain1.connect(audioCtx.destination);
+                    
+                    osc1.start(now);
+                    osc1.stop(now + 0.3);
                 };
 
-                playBeep(0.0, 587.33); // D5
-                playBeep(0.3, 880.00); // A5
-                playBeep(0.6, 1174.66); // D6
+                playPattern();
+                alarmInterval = setInterval(playPattern, 400); // हर 0.4 सेकंड में लगातार बजेगा
                 
-                alert('🔔 नया आर्डर रिंगटोन बज रही है!');
+                document.getElementById('stopSoundBtn').style.display = 'block';
             } catch (e) {
-                alert('रिंगटोन बजने में त्रुटि: ' + e);
+                console.log(e);
             }
+        }
+
+        function stopAlarm() {
+            if(alarmInterval) {
+                clearInterval(alarmInterval);
+                alarmInterval = null;
+            }
+            document.getElementById('stopSoundBtn').style.display = 'none';
+        }
+
+        function simulateNewOrderWithAlarm() {
+            playLoudAlarm();
+            alert('🚨 नया आर्डर प्राप्त हुआ! तेज रिंगटोन बज रही है, कृपया चेक करें।');
         }
 
         function saveSettings() {
@@ -213,6 +255,9 @@
                 var container = document.getElementById('vegListContainer');
                 var newItem = document.createElement('div');
                 newItem.className = 'veg-item';
+                newItem.style.display = 'flex';
+                newItem.style.justifyContent = 'space-between';
+                newItem.style.alignItems = 'center';
                 newItem.innerHTML = `<span><b>${name}</b> - ₹${price}/किग्रा (उपलब्ध: हाँ)</span> <button onclick="toggleStock(this)" style="background: green; color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer;">चालू</button>`;
                 container.appendChild(newItem);
                 document.getElementById('vegName').value = '';
