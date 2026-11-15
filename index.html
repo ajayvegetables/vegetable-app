@@ -158,26 +158,48 @@
         let activeOrdersCount = 0;
         let otpTimer = null;
 
+        // आपका मास्टर नंबर
         const MASTER_ADMIN_MOBILE = "9997077062"; 
+        
+        // एक गुप्त मास्टर डिवाइस कोड (यह केवल आपके फोन में ही सेट रहेगा)
+        // जब आप पहली बार अपने फोन में खोलेंगे, यह आईडी आपके फोन के साथ लॉक हो जाएगी।
+        const MASTER_DEVICE_KEY = "ajay_master_device_secure_id_9997";
 
         window.onload = function() {
             let savedMobile = localStorage.getItem('vendor_mobile');
-            let currentDeviceId = localStorage.getItem('device_unique_id');
+            let myDeviceToken = localStorage.getItem('app_device_token');
 
-            if (!currentDeviceId) {
-                currentDeviceId = 'dev_' + Math.random().toString(36).substring(2, 15);
-                localStorage.setItem('device_unique_id', currentDeviceId);
+            // यदि इस डिवाइस पर पहली बार आ रहे हैं, तो इसके लिए एक टोकन बना लो
+            if (!myDeviceToken) {
+                myDeviceToken = 'dev_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                localStorage.setItem('app_device_token', myDeviceToken);
             }
 
             if(savedMobile) {
                 if(savedMobile === MASTER_ADMIN_MOBILE) {
-                    // आपका नंबर हमेशा फ्री चलेगा
-                    document.getElementById('userMobileDisplay').innerText = savedMobile;
-                    document.getElementById('loginSection').classList.add('hidden');
-                    document.getElementById('dashboardSection').classList.remove('hidden');
-                    document.getElementById('subExpiryStatus').innerText = "🟢 मास्टर एडमिन अकाउंट (आजीवन फ्री)";
+                    // सुरक्षा जांच: अगर कोई दूसरा यूजर अपने फोन में आपका मास्टर नंबर डालने की कोशिश करे
+                    // तो हम चेक करेंगे कि क्या उसके फोन का डिवाइस टोकन आपका मास्टर टोकन है?
+                    let registeredMasterDevice = localStorage.getItem('master_device_lock');
+                    
+                    if (!registeredMasterDevice) {
+                        // अगर यह आपका असली फोन है जहाँ पहली बार खुला है, तो इसे मास्टर डिवाइस के रूप में लॉक कर लो
+                        localStorage.setItem('master_device_lock', myDeviceToken);
+                        registeredMasterDevice = myDeviceToken;
+                    }
+
+                    if (myDeviceToken === registeredMasterDevice) {
+                        // यह आपका खुद का फोन है - बिल्कुल फ्री और डायरेक्ट खुलेगा
+                        document.getElementById('userMobileDisplay').innerText = savedMobile;
+                        document.getElementById('loginSection').classList.add('hidden');
+                        document.getElementById('dashboardSection').classList.remove('hidden');
+                        document.getElementById('subExpiryStatus').innerText = "🟢 मास्टर एडमिन अकाउंट (आजीवन फ्री)";
+                    } else {
+                        // यदि कोई दूसरा चोर/दुकानदार किसी और फोन में आपका नंबर डालने की कोशिश करे
+                        alert('⚠️ सुरक्षा चेतावनी: यह मास्टर मोबाइल नंबर केवल अधिकृत एडमिन डिवाइस पर ही चल सकता है! अन्य उपयोगकर्ताओं को अपना स्वयं का मोबाइल नंबर उपयोग करना होगा।');
+                        localStorage.removeItem('vendor_mobile'); // उसका लॉगिन हटा दो
+                        document.getElementById('loginSection').classList.remove('hidden');
+                    }
                 } else {
-                    // दूसरे दुकानदारों के लिए 30 दिन की समय सीमा चेक करें
                     checkMonthlySubscription(savedMobile);
                 }
             } else {
@@ -190,7 +212,6 @@
             let currentTime = new Date().getTime();
 
             if (expiryTime && currentTime < parseInt(expiryTime)) {
-                // सब्सक्रिप्शन अभी चालू है
                 let remainingDays = Math.ceil((parseInt(expiryTime) - currentTime) / (1000 * 60 * 60 * 24));
                 document.getElementById('userMobileDisplay').innerText = mobile;
                 document.getElementById('loginSection').classList.add('hidden');
@@ -198,7 +219,6 @@
                 document.getElementById('dashboardSection').classList.remove('hidden');
                 document.getElementById('subExpiryStatus').innerText = `🟢 सब्सक्रिप्शन वैध है (शेष: ${remainingDays} दिन)`;
             } else {
-                // सब्सक्रिप्शन खत्म हो गया है या कभी नहीं लिया
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('dashboardSection').classList.add('hidden');
                 document.getElementById('subscriptionSection').classList.remove('hidden');
@@ -209,6 +229,17 @@
 
         function sendOTP() {
             var mobile = document.getElementById('loginMobile').value;
+            
+            // यदि कोई दूसरा यूजर आपके नंबर को लॉगिन करने की कोशिश करे, तो उसे यही रोक दें
+            if (mobile === MASTER_ADMIN_MOBILE) {
+                let myDeviceToken = localStorage.getItem('app_device_token');
+                let registeredMasterDevice = localStorage.getItem('master_device_lock');
+                if (registeredMasterDevice && registeredMasterDevice !== myDeviceToken) {
+                    alert('❌ यह मास्टर मोबाइल नंबर इस डिवाइस पर उपयोग नहीं किया जा सकता!');
+                    return;
+                }
+            }
+
             if(mobile.length === 10) {
                 generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
                 
@@ -258,6 +289,19 @@
 
             if(otp === generatedOTP && otp !== "") {
                 var mobile = document.getElementById('loginMobile').value;
+                
+                // अगर कोई दूसरा यूजर आपका नंबर डालने की कोशिश करे
+                if (mobile === MASTER_ADMIN_MOBILE) {
+                    let myDeviceToken = localStorage.getItem('app_device_token');
+                    let registeredMasterDevice = localStorage.getItem('master_device_lock');
+                    if (!registeredMasterDevice) {
+                        localStorage.setItem('master_device_lock', myDeviceToken);
+                    } else if (registeredMasterDevice !== myDeviceToken) {
+                        alert('❌ सुरक्षा त्रुटि: यह मास्टर नंबर केवल आपके मुख्य फोन पर ही चल सकता है!');
+                        return;
+                    }
+                }
+
                 localStorage.setItem('vendor_mobile', mobile);
                 if (otpTimer) clearInterval(otpTimer);
 
@@ -289,7 +333,6 @@
             let mobile = localStorage.getItem('vendor_mobile');
             
             if(txId.length >= 5) {
-                // वर्तमान समय से ठीक 30 दिन आगे की एक्सपायरी सेट करें (30 दिन = 30 * 24 * 60 * 60 * 1000 मिलीसेकंड)
                 let thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000;
                 let expiryTime = new Date().getTime() + thirtyDaysInMillis;
                 
@@ -459,7 +502,7 @@
                 var newItem = document.createElement('div');
                 newItem.className = 'veg-item';
                 newItem.style.display = 'flex';
-                newItem.style.justifyContent = 'space-between';
+                newItem.style.justifyContent, 'space-between';
                 newItem.style.alignItems = 'center';
                 newItem.innerHTML = `<span><b>${name}</b> - ₹${price}/किग्रा (उपलब्ध: हाँ)</span> <button onclick="toggleStock(this)" style="background: green; color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer;">चालू</button>`;
                 container.appendChild(newItem);
