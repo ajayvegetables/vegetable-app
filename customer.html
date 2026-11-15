@@ -3,208 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>अजय कुमार वेजिटेबल्स - ऑनलाइन सब्जी ऑर्डर करें</title>
+    <title>अजय कुमार वेजिटेबल्स - ऑनलाइन स्टोर</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 0; color: #333; }
         .header { background-color: #1b5e20; color: white; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; }
-        .container { max-width: 500px; margin: 15px auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .section-title { font-size: 16px; font-weight: bold; color: #1b5e20; margin-top: 15px; margin-bottom: 10px; border-bottom: 2px solid #c8e6c9; padding-bottom: 5px; }
-        .shop-select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; font-size: 15px; }
-        .item-card { background: #f9f9f9; padding: 10px; margin-top: 8px; border-radius: 4px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
-        .btn { background-color: #2e7d32; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: bold; }
+        .container { max-width: 500px; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .section-title { font-size: 16px; font-weight: bold; color: #1b5e20; margin-top: 20px; margin-bottom: 10px; border-bottom: 2px solid #c8e6c9; padding-bottom: 5px; }
+        label { display: block; margin-top: 10px; font-size: 14px; font-weight: bold; }
+        input[type="text"], select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn { background-color: #2e7d32; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 15px; font-weight: bold; }
         .btn:hover { background-color: #1b5e20; }
-        .cart-box { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 12px; margin-top: 15px; border-radius: 6px; }
-        .qr-box { text-align: center; background: #fff; padding: 15px; border: 2px dashed #2e7d32; margin-top: 15px; border-radius: 8px; }
         .help-btn { background-color: #0288d1; margin-top: 15px; text-decoration: none; display: block; text-align: center; color: white; padding: 12px; border-radius: 4px; font-size: 16px; font-weight: bold; }
+        .help-btn:hover { background-color: #01579b; }
         .hidden { display: none; }
+        .vendor-card { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 15px; margin-top: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
+        .veg-item-box { background: #f9f9f9; padding: 12px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        .info-box { background: #fff3e0; border: 1px solid #ffe0b2; padding: 12px; margin-top: 15px; border-radius: 6px; font-size: 14px; color: #e65100; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        🛒 ऑनलाइन सब्जी बाजार (कस्टमर ऐप)
+        अजय कुमार वेजिटेबल्स - ऑनलाइन स्टोर
     </div>
 
     <div class="container">
-        <!-- दुकान चुनने का ऑप्शन -->
-        <label>अपनी नज़दीकी दुकान चुनें:</label>
-        <select id="shopSelector" class="shop-select" onchange="changeShop()">
-            <option value="ajay">अजय कुमार वेजिटेबल्स (सिविल लाइन्स)</option>
-            <option value="rahul">राहुल फ्रूट्स एंड वेजिटेबल्स (मेन मार्केट)</option>
-        </select>
-
-        <div class="section-title">📦 उपलब्ध सब्जियां (ताज़ा स्टॉक)</div>
-        <div id="customerVegList">
-            <!-- सब्जियां यहाँ दिखेंगी -->
-        </div>
-
-        <!-- कार्ट / आर्डर समरी -->
-        <div class="cart-box">
-            <div style="font-weight: bold; color: #1b5e20; margin-bottom: 5px;">🛍️ आपकी आर्डर टोकरी (Cart)</div>
-            <div id="cartItemsList">कोई सामान नहीं चुना गया है।</div>
-            <hr style="border:0; border-top:1px solid #ccc; margin:8px 0;">
-            <div style="font-size: 16px; font-weight: bold;">कुल देय राशि: ₹<span id="cartTotal">0</span></div>
-        </div>
-
-        <label style="margin-top: 15px;">आपका पूरा पता (डिलीवरी के लिए):</label>
-        <input type="text" id="custAddress" placeholder="मकान नंबर, गली, मोहल्ला / एरिया" style="width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
-
-        <button class="btn" style="width:100%; margin-top:15px; background:#ff9800; font-size:16px;" onclick="proceedToPayment()">💳 UPI पेमेंट करें और आर्डर भेजें</button>
-
-        <!-- UPI QR कोड दिखाने का बॉक्स -->
-        <div id="qrSection" class="hidden qr-box">
-            <h3 style="margin:5px 0; color:#1b5e20;">स्कैन करके भुगतान करें</h3>
-            <p style="font-size:13px; color:#555;">नीचे दिए गए QR कोड पर अपने PhonePe/Google Pay से स्कैन करें:</p>
-            <div style="background:#ddd; width:150px; height:150px; margin:0 auto; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#555; border-radius:8px;">
-                [ दुकानदार का QR Code ]
-            </div>
-            <p style="font-weight:bold; margin:10px 0;">UPI ID: <span id="displayUpi" style="color:#d32f2f;">8218231811@nyes</span></p>
+        <!-- 1. दुकानदार चुनने का सेक्शन (Vendor Selection) -->
+        <div id="selectVendorSection">
+            <div class="section-title">🛒 अपने नजदीकी सब्जी विक्रेता चुनें</div>
+            <p style="font-size: 14px; color: #555;">नीचे सूची में से चुनें कि आप किससे सब्ज़ी खरीदना चाहते हैं:</p>
             
-            <button class="btn" style="background:#25d366; width:100%;" onclick="sendOrderToWhatsApp()">💬 WhatsApp पर आर्डर भेजें और पक्का करें</button>
+            <div id="vendorListContainer">
+                <!-- दुकानदारों की लिस्ट यहाँ लोड होगी -->
+            </div>
         </div>
 
-        <!-- तकनीकी सहायता / कॉल बटन -->
-        <a href="tel:9997077062" class="help-btn">📞 समस्या आने पर दुकानदार को कॉल करें</a>
+        <!-- 2. चुने गए दुकानदार का कैटलॉग और आर्डर फॉर्म -->
+        <div id="customerOrderSection" class="hidden">
+            <button onclick="goBackToVendors()" style="background: #757575; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-bottom: 10px;">← दूसरे विक्रेता की सूची देखें</button>
+            
+            <div class="section-title" id="activeVendorTitle">दुकानदार का कैटलॉग</div>
+            
+            <div class="info-box" id="vendorContactBox">
+                <!-- चुने हुए दुकानदार का मोबाइल नंबर और UPI दिखेगा -->
+            </div>
+
+            <div class="section-title">📋 उपलब्ध सब्जियां</div>
+            <div id="customerVegList">
+                <!-- दुकानदार की जोड़ी गई सब्जियां यहाँ दिखेंगी -->
+            </div>
+
+            <div class="section-title">👤 आपका विवरण (ग्राहक)</div>
+            <label>आपका नाम:</label>
+            <input type="text" id="custName" placeholder="अपना नाम दर्ज करें">
+
+            <label>आपका मोबाइल नंबर:</label>
+            <input type="text" id="custMobile" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10">
+
+            <label>डिलीवरी का पूरा पता:</label>
+            <input type="text" id="custAddress" placeholder="घर का पता / कॉलोनी / मार्ग">
+
+            <button class="btn" onclick="placeOrderToVendor()">🚀 आर्डर भेजें</button>
+        </div>
+
+        <!-- मास्टर हेल्प बटन (हर जगह दिखेगा) -->
+        <a href="tel:9997077062" class="help-btn">📞 मास्टर हेल्प (तकनीकी सहायता: 9997077062)</a>
     </div>
 
     <script>
-        const shopsData = {
-            ajay: {
-                name: "अजय कुमार वेजिटेबल्स",
-                upi: "8218231811@nyes",
-                whatsapp: "919997077062",
-                items: [
-                    { id: 1, name: "आलू (नया)", price: 30 },
-                    { id: 2, name: "टमाटर (देशी)", price: 40 },
-                    { id: 3, name: "प्याज़", price: 35 },
-                    { id: 4, name: "हरी मिर्च", price: 60 }
-                ]
-            },
-            rahul: {
-                name: "राहुल फ्रूट्स एंड वेजिटेबल्स",
-                upi: "9997077062@paytm",
-                whatsapp: "919997077062",
-                items: [
-                    { id: 1, name: "केला (दर्जन)", price: 60 },
-                    { id: 2, name: "सेब", price: 120 },
-                    { id: 3, name: "हरा धनिया", price: 20 }
-                ]
-            }
-        };
-
-        let cart = {};
+        let selectedVendorMobile = "";
 
         window.onload = function() {
-            loadShopCatalog();
+            loadVendorsList();
         };
 
-        function changeShop() {
-            cart = {};
-            loadShopCatalog();
-            document.getElementById('qrSection').classList.add('hidden');
-        }
-
-        function loadShopCatalog() {
-            let shopKey = document.getElementById('shopSelector').value;
-            let shop = shopsData[shopKey];
-            let container = document.getElementById('customerVegList');
+        function loadVendorsList() {
+            let container = document.getElementById('vendorListContainer');
             container.innerHTML = "";
 
-            shop.items.forEach(item => {
+            let sampleVendors = [
+                { name: "शिवम (सब्जी विक्रेता)", mobile: "919997077062", upi: "8218231811@nyes" },
+                { name: "राहुल (सब्जी विक्रेता)", mobile: "9876543210", upi: "rahulveg@paytm" }
+            ];
+
+            sampleVendors.forEach(vendor => {
                 let div = document.createElement('div');
-                div.className = 'item-card';
+                div.className = 'vendor-card';
                 div.innerHTML = `
-                    <span><b>${item.name}</b> - ₹${item.price}/किग्रा</span>
                     <div>
-                        <button class="btn" style="padding:5px 10px; background:#d32f2f;" onclick="updateCart('${shopKey}', ${item.id}, '${item.name}', ${item.price}, -1)">-</button>
-                        <span id="qty_${shopKey}_${item.id}" style="margin:0 8px; font-weight:bold;">0</span>
-                        <button class="btn" style="padding:5px 10px;" onclick="updateCart('${shopKey}', ${item.id}, '${item.name}', ${item.price}, 1)">+</button>
+                        <b>${vendor.name}</b><br>
+                        <span style="font-size: 13px; color: #555;">मोबाइल: ${vendor.mobile}</span>
                     </div>
+                    <button class="btn" style="margin:0; width:auto; padding:8px 15px;" onclick="selectVendor('${vendor.mobile}', '${vendor.name}', '${vendor.upi}')">दुकान देखें</button>
                 `;
                 container.appendChild(div);
             });
-            updateCartDisplay();
         }
 
-        function updateCart(shopKey, itemId, itemName, itemPrice, change) {
-            if (!cart[itemId]) {
-                cart[itemId] = { name: itemName, price: itemPrice, qty: 0 };
-            }
-            cart[itemId].qty += change;
-            if (cart[itemId].qty < 0) cart[itemId].qty = 0;
-
-            document.getElementById(`qty_${shopKey}_${itemId}`).innerText = cart[itemId].qty;
-            updateCartDisplay();
-        }
-
-        function updateCartDisplay() {
-            let cartList = document.getElementById('cartItemsList');
-            let totalSpan = document.getElementById('cartTotal');
-            let total = 0;
-            let html = "";
-
-            let hasItems = false;
-            for (let id in cart) {
-                if (cart[id].qty > 0) {
-                    hasItems = true;
-                    let cost = cart[id].qty * cart[id].price;
-                    total += cost;
-                    html += `<div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                        <span>${cart[id].name} x ${cart[id].qty} किग्रा</span>
-                        <span>₹${cost}</span>
-                    </div>`;
-                }
-            }
-
-            if (!hasItems) {
-                cartList.innerHTML = "कोई सामान नहीं चुना गया है।";
-            } else {
-                cartList.innerHTML = html;
-            }
-            totalSpan.innerText = total;
-        }
-
-        function proceedToPayment() {
-            let total = parseInt(document.getElementById('cartTotal').innerText);
-            let address = document.getElementById('custAddress').value;
-
-            if (total <= 0) {
-                alert('कृपया पहले कम से कम एक सब्जी चुनें!');
-                return;
-            }
-            if (address.trim() === "") {
-                alert('कृपया डिलीवरी के लिए अपना पता (Address) दर्ज करें!');
-                return;
-            }
-
-            let shopKey = document.getElementById('shopSelector').value;
-            let shop = shopsData[shopKey];
-            document.getElementById('displayUpi').innerText = shop.upi;
-
-            document.getElementById('qrSection').classList.remove('hidden');
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
-
-        function sendOrderToWhatsApp() {
-            let shopKey = document.getElementById('shopSelector').value;
-            let shop = shopsData[shopKey];
-            let address = document.getElementById('custAddress').value;
-            let total = document.getElementById('cartTotal').innerText;
-
-            let orderText = `🛒 *नया ऑनलाइन ऑर्डर (सब्जी ऐप)*\n\n`;
-            for (let id in cart) {
-                if (cart[id].qty > 0) {
-                    orderText += `- ${cart[id].name}: ${cart[id].qty} किग्रा (₹${cart[id].qty * cart[id].price})\n`;
-                }
-            }
-            orderText += `\n💰 *कुल राशि:* ₹${total}`;
-            orderText += `\n📍 *पता:* ${address}`;
-            orderText += `\n✅ *भुगतान:* UPI द्वारा कर दिया गया है।`;
-
-            let encodedText = encodeURIComponent(orderText);
-            let whatsappUrl = `https://wa.me/${shop.whatsapp}?text=${encodedText}`;
+        function selectVendor(mobile, name, upi) {
+            selectedVendorMobile = mobile;
+            document.getElementById('selectVendorSection').classList.add('hidden');
+            document.getElementById('customerOrderSection').classList.remove('hidden');
             
-            window.open(whatsappUrl, '_blank');
+            document.getElementById('activeVendorTitle').innerText = `${name} का कैटलॉग`;
+            document.getElementById('vendorContactBox').innerHTML = `
+                <b>विक्रेता मोबाइल:</b> <a href="tel:${mobile}" style="color:#d32f2f; font-weight:bold;">${mobile}</a><br>
+                <b>UPI ID (भुगतान हेतु):</b> <span style="color:#2e7d32; font-weight:bold;">${upi}</span>
+            `;
+
+            loadVendorVegetables(mobile);
+        }
+
+        function loadVendorVegetables(mobile) {
+            let vegContainer = document.getElementById('customerVegList');
+            vegContainer.innerHTML = `
+                <div class="veg-item-box">
+                    <span><b>आलू</b> - ₹30 / किग्रा <span style="color:green; font-size:12px;">(उपलब्ध)</span></span>
+                    <input type="number" placeholder="किग्रा" style="width:70px; padding:5px;" id="qty_aloo" value="0">
+                </div>
+                <div class="veg-item-box">
+                    <span><b>टमाटर</b> - ₹40 / किग्रा <span style="color:green; font-size:12px;">(उपलब्ध)</span></span>
+                    <input type="number" placeholder="किग्रा" style="width:70px; padding:5px;" id="qty_tamatar" value="0">
+                </div>
+            `;
+        }
+
+        function goBackToVendors() {
+            document.getElementById('customerOrderSection').classList.add('hidden');
+            document.getElementById('selectVendorSection').classList.remove('hidden');
+        }
+
+        function placeOrderToVendor() {
+            let name = document.getElementById('custName').value;
+            let mobile = document.getElementById('custMobile').value;
+            let address = document.getElementById('custAddress').value;
+
+            if(name && mobile.length === 10 && address) {
+                alert(`सफलतापूर्वक आर्डर दर्ज हो गया! विक्रेता (${selectedVendorMobile}) को आपका आर्डर भेज दिया गया है।`);
+            } else {
+                alert('कृपया अपना नाम, सही 10 अंकों का मोबाइल नंबर और पूरा पता दर्ज करें।');
+            }
         }
     </script>
 </body>
