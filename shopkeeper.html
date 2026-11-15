@@ -44,7 +44,6 @@
         .btn-reject { background: #c62828; }
         .btn-call { background: #0288d1; text-decoration: none; text-align: center; display: inline-block; padding: 5px 8px; border-radius: 3px; color: white; font-weight: bold; margin-top: 5px; font-size: 11px; width: 100%; box-sizing: border-box; }
 
-        /* कैटलॉग आइटम रो और स्टॉक टॉगल बटन */
         .item-row { display: flex; flex-direction: column; background: #fff; border: 1px solid #eee; padding: 6px; border-radius: 5px; margin-bottom: 6px; box-sizing: border-box; }
         .item-top { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 4px; }
         .item-row input.item-name { width: 50%; border: none; background: transparent; font-size: 12px; font-weight: bold; color: #333; outline: none; }
@@ -166,6 +165,7 @@
         <h2>🔔 वेजिटेबल पार्टनर डैशबोर्ड</h2>
         <div class="status-bar" id="connectionStatus">लाइव डेटाबेस से जुड़ रहा है...</div>
 
+        <!-- ✅ नए ऑर्डर्स की सूची सबसे ऊपर -->
         <h3 style="font-size:12px; margin-top:0; color:#d32f2f;">🚨 नए आर्डर्स की सूची:</h3>
         <div id="orders-container">
             <p style="text-align: center; color: #777; font-size:10px;">नया ऑर्डर आने का इंतज़ार है...</p>
@@ -186,11 +186,12 @@
                 <textarea id="shopOfferText" rows="2" placeholder="जैसे: ₹200 से अधिक के ऑर्डर पर फ्री डिलीवरी!"></textarea>
             </div>
 
+            <!-- ✅ नया आइटम जोड़ें और सेटिंग्स सेव करें बटन सब्जियों की सूची के ऊपर -->
+            <button class="btn-main" style="background:#2e7d32; font-size:10px; padding:5px; margin-bottom:6px;" onclick="addNewItemRow()">+ नया आइटम जोड़ें</button>
+            <button class="btn-main" style="font-size:11px; padding:7px; margin-bottom:8px;" onclick="saveCatalogSettings()">कैटलॉग व सेटिंग्स सेव करें</button>
+
             <h4 style="margin: 6px 0 3px 0; color:#e65100; font-size:11px;">सब्जी / फल और रेट (क्लिक करके बदलें):</h4>
             <div id="catalog-items-container"></div>
-            
-            <button class="btn-main" style="background:#2e7d32; font-size:10px; padding:5px; margin-top:4px;" onclick="addNewItemRow()">+ नया आइटम जोड़ें</button>
-            <button class="btn-main" style="font-size:11px; padding:7px; margin-top:6px;" onclick="saveCatalogSettings()">कैटलॉग व सेटिंग्स सेव करें</button>
         </div>
     </div>
 
@@ -306,7 +307,6 @@
         });
     }
 
-    // ✅ कैटलॉग रेंडर करते समय 'स्टॉक नहीं है' बटन जोड़ना
     function renderCatalog(items) {
         let container = document.getElementById('catalog-items-container');
         container.innerHTML = "";
@@ -331,7 +331,7 @@
         });
     }
 
-    // ✅ स्टॉक टॉगल करने का फंक्शन (जैसे ही क्लिक हो, स्थिति बदलकर तुरंत सेव हो जाएगी)
+    // ✅ तुरंत क्लिक करते ही स्टॉक डेटाबेस में सेव होने का फंक्शन
     window.toggleStock = function(index) {
         let rows = document.querySelectorAll('.item-row');
         let catalog = [];
