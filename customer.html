@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>अजय वेजिटेबल्स - ऑनलाइन स्टोर</title>
+    <title>अजय कुमार वेजिटेबल्स - ऑनलाइन स्टोर</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -12,7 +12,7 @@
     <!-- टॉप हेडर -->
     <header class="bg-emerald-700 text-white p-3 shadow-md flex justify-between items-center sticky top-0 z-50">
         <h1 class="text-sm font-bold flex items-center gap-1.5">
-            <i class="fa-solid fa-store"></i> अजय वेजिटेबल्स - ऑनलाइन स्टोर
+            <i class="fa-solid fa-store"></i> अजय कुमार वेजिटेबल्स - ऑनलाइन स्टोर
         </h1>
         <div class="flex items-center gap-2">
             <!-- मास्टर हेल्प बटन -->
@@ -37,7 +37,7 @@
                 <p class="text-xs text-gray-500 mb-3">सूची में से चुनें कि आप किससे सब्ज़ी खरीदना चाहते हैं:</p>
                 
                 <div id="shopListContainer" class="space-y-2">
-                    <!-- दुकानदारों की लिस्ट यहाँ ऑटोमैटिक आएगी -->
+                    <!-- दुकानदारों की लिस्ट यहाँ आएगी -->
                 </div>
             </div>
         </div>
@@ -49,6 +49,17 @@
                     <i class="fa-solid fa-arrow-left"></i> दूसरी दुकान देखें
                 </button>
                 <span id="selectedShopTitle" class="font-bold text-gray-800 text-xs"></span>
+            </div>
+
+            <!-- दुकान की शर्तें और नियम बॉक्स -->
+            <div class="bg-amber-50 p-2.5 rounded-lg border border-amber-200 text-[11px] text-amber-900 space-y-1">
+                <p class="font-bold"><i class="fa-solid fa-circle-info"></i> दुकान के नियम व शर्तें:</p>
+                <ul class="list-disc list-inside space-y-0.5 text-gray-700">
+                    <li>न्यूनतम आर्डर राशि: <span class="font-bold">₹200</span></li>
+                    <li>कम आर्डर पर अतिरिक्त फिक्स चार्ज: <span class="font-bold">₹50</span></li>
+                    <li>₹200 से अधिक पर प्रति किलो चार्ज: <span class="font-bold">₹10</span></li>
+                    <li>अधिकतम डिलीवरी दूरी: <span class="font-bold">5 किमी</span></li>
+                </ul>
             </div>
 
             <!-- उपलब्ध सब्जियां व वजन चयन -->
@@ -65,6 +76,12 @@
             <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-200 space-y-2">
                 <h3 class="font-bold text-emerald-900 text-xs">🛒 आपकी आर्डर टोकरी (ऑटोमैटिक बिल)</h3>
                 <div id="cartSummary" class="text-xs text-gray-700 space-y-1">कोई सामान नहीं चुना गया है।</div>
+                
+                <!-- शर्तों के हिसाब से चार्ज दिखाने के लिए -->
+                <div id="extraChargesInfo" class="text-[11px] text-gray-600 space-y-0.5 pt-1 border-t border-emerald-200 hidden">
+                    <!-- चार्ज डिटेल्स यहाँ दिखेंगी -->
+                </div>
+
                 <div class="text-xs font-bold text-gray-900 pt-2 border-t border-emerald-200 flex justify-between">
                     <span>कुल देय राशि (ऑटोमैटिक):</span>
                     <span id="totalPrice" class="text-emerald-700 text-sm">₹0</span>
@@ -113,20 +130,21 @@
     </main>
 
     <script>
-        // आपकी अपनी दुकान 'अजय वेजिटेबल्स'
+        // आपके पार्टनर ऐप के अनुसार ओरिजिनल दुकान का डेटा और शर्तें
         const shopsData = [
             {
                 id: 1,
-                name: "अजय वेजिटेबल्स",
+                name: "अजय कुमार वेजिटेबल्स",
                 phone: "919997077062",
-                upi: "919997077062@paytm",
+                upi: "8218231811@nyes", // आपके स्क्रीनशॉट वाली UPI ID
+                rules: {
+                    minOrder: 200,
+                    lowOrderFee: 50,
+                    perKgExtra: 10,
+                    maxDistanceKm: 5
+                },
                 vegetables: [
-                    { name: "आलू (नया)", price: 30 },
-                    { name: "टमाटर (देशी)", price: 40 },
-                    { name: "प्याज़", price: 35 },
-                    { name: "हरी मिर्च", price: 60 },
-                    { name: "गोभी", price: 45 },
-                    { name: "मटर", price: 50 }
+                    { name: "आलू (नया)", price: 30 } // आपके स्क्रीनशॉट के अनुसार केवल चालू सब्जी
                 ]
             }
         ];
@@ -226,22 +244,42 @@
 
         function updateBillSummary() {
             const summaryDiv = document.getElementById('cartSummary');
+            const extraInfoDiv = document.getElementById('extraChargesInfo');
             let htmlText = "";
-            grandTotalAmount = 0;
+            let baseTotal = 0;
             let hasItems = false;
 
             for (let idx in customerCart) {
                 hasItems = true;
                 let item = customerCart[idx];
-                grandTotalAmount += item.cost;
+                baseTotal += item.cost;
                 htmlText += `<div class="flex justify-between"><span>• ${item.name} (${item.qtyText})</span> <span class="font-bold">₹${item.cost}</span></div>`;
             }
 
             if (!hasItems) {
                 summaryDiv.innerHTML = "कोई सामान नहीं चुना गया है।";
+                extraInfoDiv.classList.add('hidden');
+                grandTotalAmount = 0;
             } else {
                 summaryDiv.innerHTML = htmlText;
+                
+                // आपके नियमों के अनुसार चार्जेस कैलकुलेशन
+                let finalTotal = baseTotal;
+                let extraText = "";
+
+                if (baseTotal < currentShop.rules.minOrder) {
+                    finalTotal += currentShop.rules.lowOrderFee;
+                    extraText += `<div>⚠️ न्यूनतम आर्डर (₹${currentShop.rules.minOrder}) से कम है, अतः ₹${currentShop.rules.lowOrderFee} अतिरिक्त फिक्स चार्ज जुड़ा है।</div>`;
+                } else {
+                    finalTotal += currentShop.rules.perKgExtra;
+                    extraText += `<div>📦 ₹200 से अधिक आर्डर पर प्रति किलो चार्ज: +₹${currentShop.rules.perKgExtra} जुड़ा है।</div>`;
+                }
+
+                extraInfoDiv.innerHTML = extraText;
+                extraInfoDiv.classList.remove('hidden');
+                grandTotalAmount = finalTotal;
             }
+
             document.getElementById('totalPrice').innerText = `₹${grandTotalAmount}`;
 
             let upiLink = `upi://pay?pa=${currentShop.upi}&pn=${encodeURIComponent(currentShop.name)}&am=${grandTotalAmount}&cu=INR`;
