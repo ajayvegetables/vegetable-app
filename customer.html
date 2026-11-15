@@ -3,106 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>वेजिटेबल ऐप</title>
-    <!-- Tailwind CSS CDN -->
+    <title>वेजिटेबल ऐप - ऑनलाइन स्टोर</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 font-sans pb-12">
 
-    <!-- टॉप हेडर (हर जगह दिखेगा) -->
-    <header class="bg-emerald-600 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-50">
-        <h1 class="text-lg font-bold flex items-center gap-2">
-            <i class="fa-solid fa-basket-shopping"></i> वेजिटेबल ऐप
+    <!-- टॉप हेडर -->
+    <header class="bg-emerald-700 text-white p-3 shadow-md flex justify-between items-center sticky top-0 z-50">
+        <h1 class="text-sm font-bold flex items-center gap-1.5">
+            <i class="fa-solid fa-store"></i> अजय कुमार वेजिटेबल्स - ऑनलाइन स्टोर
         </h1>
-        <div class="flex items-center gap-3">
-            <!-- ऐप ओनर हेल्प बटन -->
-            <a href="tel:YOUR_ADMIN_PHONE_NUMBER" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1.5 shadow">
+        <div class="flex items-center gap-2">
+            <!-- मास्टर हेल्प बटन (सिर्फ आइकॉन और 'Help', कोई नंबर नहीं) -->
+            <a href="tel:YOUR_MASTER_PHONE_NUMBER" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow">
                 <i class="fa-solid fa-phone"></i> Help
             </a>
-            <!-- दुकानदार कॉल बटन (जब कैटलॉग खुलेगा तब दिखेगा) -->
-            <a id="shopCallBtn" href="#" class="hidden bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-1.5 shadow">
-                <i class="fa-solid fa-phone"></i> <span id="shopkeeperNameHeader">दुकानदार</span>
+            <!-- दुकानदार कॉल बटन (कैटलॉग में दिखने के लिए) -->
+            <a id="shopCallBtn" href="#" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow">
+                <i class="fa-solid fa-phone"></i> <span id="shopkeeperHeaderLabel">दुकानदार</span>
             </a>
         </div>
     </header>
 
-    <main class="max-w-md mx-auto p-4 pb-20">
+    <main class="max-w-md mx-auto p-3 space-y-4">
         
-        <!-- व्यू 1: दुकान चयन और एड्रेस फॉर्म (पहला पेज) -->
-        <div id="shopSelectionView" class="space-y-4">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                <h2 class="text-md font-semibold text-gray-800 mb-3">अपनी नज़दीकी दुकान चुनें:</h2>
+        <!-- व्यू 1: दुकानदारों की लिस्ट (होम पेज) -->
+        <div id="shopSelectionView" class="space-y-3">
+            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                <h2 class="text-sm font-bold text-gray-800 mb-1 flex items-center gap-1.5">
+                    <i class="fa-solid fa-basket-shopping text-emerald-600"></i> अपने नज़दीकी सब्जी विक्रेता चुनें:
+                </h2>
+                <p class="text-xs text-gray-500 mb-3">नीचे सूची में से चुनें कि आप किससे सब्ज़ी खरीदना चाहते हैं:</p>
+                
                 <div id="shopListContainer" class="space-y-2">
-                    <!-- दुकानदारों की लिस्ट यहाँ JavaScript से आएगी -->
+                    <!-- दुकानदारों की लिस्ट यहाँ ऑटोमैटिक आएगी -->
                 </div>
             </div>
-
-            <!-- अलग-अलग एड्रेस बॉक्स -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-3">
-                <h2 class="text-md font-semibold text-gray-800">डिलीवरी का पता और विवरण:</h2>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">आपका नाम</label>
-                    <input type="text" id="custName" placeholder="अपना नाम लिखें" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">मोबाइल नंबर</label>
-                    <input type="tel" id="custPhone" placeholder="10 अंकों का मोबाइल नंबर" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">पूरा पता (मकान नंबर, गली, मोहल्ला / एरिया)</label>
-                    <textarea id="custAddress" rows="2" placeholder="मकान नंबर, गली, मोहल्ला / एरिया" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
-                </div>
-            </div>
-
-            <button onclick="proceedToCatalog()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl shadow transition">
-                आगे बढ़ें और कैटलॉग देखें
-            </button>
         </div>
 
-        <!-- व्यू 2: कैटलॉग पेज (दुकान चुनने के बाद खुलेगा) -->
-        <div id="catalogView" class="hidden space-y-4">
-            <div class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm border border-gray-200">
-                <button onclick="goBackToShops()" class="text-emerald-600 text-sm font-semibold flex items-center gap-1">
-                    <i class="fa-solid fa-arrow-left">3</i> दूसरी दुकान चुनें
+        <!-- व्यू 2: कैटलॉग और आर्डर पेज -->
+        <div id="catalogView" class="hidden space-y-3">
+            <div class="flex items-center justify-between bg-white p-2.5 rounded-lg shadow-sm border border-gray-200">
+                <button onclick="goBackToShops()" class="text-emerald-700 text-xs font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-left"></i> दूसरी विक्रेता की सूची देखें
                 </button>
-                <span id="selectedShopTitle" class="font-bold text-gray-800 text-sm"></span>
+                <span id="selectedShopTitle" class="font-bold text-gray-800 text-xs"></span>
             </div>
 
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                <h2 class="text-md font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-box text-amber-600"></i> उपलब्ध सब्जियां (ताज़ा स्टॉक)
+            <!-- उपलब्ध सब्जियां -->
+            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 space-y-2">
+                <h2 class="text-xs font-bold text-gray-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-box text-amber-600"></i> उपलब्ध सब्ज़ियां व वजन चुनें
                 </h2>
-                <div id="vegetableListContainer" class="space-y-3">
-                    <!-- सब्जियों की लिस्ट -->
+                <div id="vegetableListContainer" class="space-y-2">
+                    <!-- सब्जियों की लिस्ट और वजन के ऑप्शन -->
                 </div>
             </div>
 
-            <!-- आर्डर टोकरी (Cart) -->
-            <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 space-y-2">
-                <h3 class="font-semibold text-emerald-900 text-sm">🛒 आपकी आर्डर टोकरी (Cart)</h3>
-                <p id="cartSummary" class="text-xs text-gray-600">कोई सामान नहीं चुना गया है।</p>
-                <div class="text-sm font-bold text-gray-800 pt-2 border-t border-emerald-200 flex justify-between">
-                    <span>कुल देय राशि:</span>
-                    <span id="totalPrice">₹0</span>
+            <!-- ग्राहक का विवरण (अलग-अलग बॉक्स) -->
+            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 space-y-2.5">
+                <h2 class="text-xs font-bold text-gray-800 flex items-center gap-1">
+                    <i class="fa-solid fa-user text-emerald-600"></i> आपका विवरण (ग्राहक)
+                </h2>
+                <div>
+                    <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">आपका नाम:</label>
+                    <input type="text" id="custName" placeholder="अपना नाम दर्ज करें" class="w-full p-2 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">आपका मोबाइल नंबर:</label>
+                    <input type="tel" id="custPhone" placeholder="10 अंकों का मोबाइल नंबर" class="w-full p-2 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">डिलीवरी का पूरा पता:</label>
+                    <textarea id="custAddress" rows="2" placeholder="मकान नंबर, गली, मोहल्ला / एरिया" class="w-full p-2 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-emerald-500"></textarea>
                 </div>
             </div>
 
-            <button onclick="sendOrder()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl shadow transition flex items-center justify-center gap-2">
-                <i class="fa-brands fa-whatsapp"></i> UPI पेमेंट करें और आर्डर भेजें
+            <!-- आर्डर टोकरी और ऑटोमैटिक बिल -->
+            <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-200 space-y-2">
+                <h3 class="font-bold text-emerald-900 text-xs">🛒 आपकी आर्डर टोकरी (ऑटोमैटिक बिल)</h3>
+                <div id="cartSummary" class="text-xs text-gray-700 space-y-1">कोई सामान नहीं चुना गया है।</div>
+                <div class="text-xs font-bold text-gray-900 pt-2 border-t border-emerald-200 flex justify-between">
+                    <span>कुल देय राशि (ऑटोमैटिक):</span>
+                    <span id="totalPrice" class="text-emerald-700 text-sm">₹0</span>
+                </div>
+            </div>
+
+            <!-- पेमेंट और QR कोड सेक्शन -->
+            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 space-y-2 text-center">
+                <p id="paymentInstructionText" class="text-xs font-bold text-red-600">
+                    भुगतान करने के लिए QR कोड स्कैन करें (भुगतान के बाद ही आर्डर आगे बढ़ेगा)
+                </p>
+                <button onclick="toggleQRCode()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded text-xs shadow transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-qrcode"></i> QR कोड देखें और भुगतान करें
+                </button>
+                
+                <!-- QR कोड इमेज बॉक्स (शुरू में छुपा रहेगा) -->
+                <div id="qrCodeContainer" class="hidden pt-2 space-y-2 border-t border-gray-200">
+                    <div class="bg-gray-100 p-2 inline-block rounded border border-gray-300">
+                        <!-- यहाँ दुकानदार का UPI QR कोड दिखेगा -->
+                        <img id="shopQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=shop@paytm&pn=VegetableStore" alt="UPI QR Code" class="mx-auto w-32 h-32">
+                    </div>
+                    <p class="text-[11px] text-gray-600">इस QR कोड को अपने PhonePe/Paytm से स्कैन करके पूरा बिल भुगतान करें।</p>
+                </div>
+            </div>
+
+            <button onclick="submitOrderToShop()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded text-xs shadow transition flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-paper-plane"></i> भुगतान हो गया, दुकानदार को आर्डर भेजें (घंटी बजाएं)
             </button>
         </div>
 
     </main>
 
     <script>
-        // दुकानदारों और उनकी सब्जियों का डेटा (आप इसमें नए दुकानदार और सब्जियां आसानी से जोड़ सकते हैं)
+        // दुकानदारों का डेटा (नए दुकानदार जुड़ने पर यहाँ स्वतः अपडेट होंगे)
         const shopsData = [
             {
                 id: 1,
-                name: "शिवम वेजिटेबल्स (सिविल लाइन्स)",
-                phone: "9876543210",
+                name: "शिवम (सब्जी विक्रेता)",
+                phone: "919997077062",
+                upi: "shivamveg@paytm",
                 vegetables: [
                     { name: "आलू (नया)", price: 30 },
                     { name: "टमाटर (देशी)", price: 40 },
@@ -112,10 +133,11 @@
             },
             {
                 id: 2,
-                name: "राहुल वेजिटेबल्स (मंडी रोड)",
-                phone: "9123456789",
+                name: "राहुल (सब्जी विक्रेता)",
+                phone: "9876543210",
+                upi: "rahulveg@ybl",
                 vegetables: [
-                    { name: "आलू (नया)", price: 28 },
+                    { name: "आलू", price: 28 },
                     { name: "टमाटर", price: 38 },
                     { name: "गोभी", price: 45 },
                     { name: "मटर", price: 50 }
@@ -124,123 +146,164 @@
         ];
 
         let currentShop = null;
-        let cart = {};
+        let customerCart = {}; // चुनी गई सब्जियां और वजन ट्रैक करने के लिए
 
-        // पेज लोड होने पर दुकानदारों की लिस्ट दिखाना
+        // होम पेज पर दुकानदारों की लिस्ट लोड करना (मोबाइल नंबर छुपा कर सिर्फ 'दुकान देखें' बटन)
         function loadShops() {
             const container = document.getElementById('shopListContainer');
             container.innerHTML = '';
             shopsData.forEach(shop => {
                 container.innerHTML += `
-                    <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-emerald-50 transition">
-                        <input type="radio" name="selectedShop" value="${shop.id}" class="w-4 h-4 text-emerald-600">
-                        <span class="text-sm font-medium text-gray-700">${shop.name}</span>
-                    </label>
+                    <div class="flex items-center justify-between p-2.5 bg-emerald-50/50 border border-emerald-100 rounded-lg">
+                        <div>
+                            <h3 class="text-xs font-bold text-gray-800">${shop.name}</h3>
+                        </div>
+                        <button onclick="openCatalog(${shop.id})" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded text-xs font-bold shadow">
+                            दुकान देखें
+                        </button>
+                    </div>
                 `;
             });
         }
 
-        // कैटलॉग पर आगे बढ़ना
-        function proceedToCatalog() {
-            const selectedRadio = document.querySelector('input[name="selectedShop"]:checked');
+        // कैटलॉग खोलना
+        function openCatalog(shopId) {
+            currentShop = shopsData.find(s => s.id === shopId);
+            
+            // टॉप हेडर में दुकानदार का कॉल आइकॉन सेट करना (बिना नंबर दिखाए सिर्फ आइकॉन)
+            document.getElementById('shopkeeperHeaderLabel').innerText = "दुकानदार";
+            document.getElementById('shopCallBtn').href = `tel:${currentShop.phone}`;
+            document.getElementById('shopCallBtn').classList.remove('hidden');
+
+            document.getElementById('selectedShopTitle').innerText = `${currentShop.name} का कैटलॉग`;
+            
+            // QR कोड अपडेट करना
+            document.getElementById('shopQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=${currentShop.upi}&pn=${encodeURIComponent(currentShop.name)}`;
+
+            renderVegetablesCatalog();
+
+            document.getElementById('shopSelectionView').classList.add('hidden');
+            document.getElementById('catalogView').classList.remove('hidden');
+        }
+
+        // कैटलॉग में वजन चुनने के विकल्प (50g से लेकर 10kg तक) और हटाने का बटन
+        function renderVegetablesCatalog() {
+            const container = document.getElementById('vegetableListContainer');
+            container.innerHTML = '';
+            customerCart = {};
+
+            currentShop.vegetables.forEach((veg, index) => {
+                container.innerHTML += `
+                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200 text-xs">
+                        <span class="font-semibold text-gray-800 w-28">${veg.name} - ₹${veg.price}/किग्रा</span>
+                        <div class="flex items-center gap-1.5">
+                            <select id="weight-${index}" onchange="updateCartItem(${index}, '${veg.name}', ${veg.price})" class="p-1 border border-gray-300 rounded bg-white text-[11px] font-semibold text-emerald-800 focus:ring-1 focus:ring-emerald-500">
+                                <option value="0">मात्रा चुनें</option>
+                                <option value="0.05">50 ग्राम</option>
+                                <option value="0.1">100 ग्राम</option>
+                                <option value="0.2">200 ग्राम</option>
+                                <option value="0.25">250 ग्राम</option>
+                                <option value="0.5">500 ग्राम (1/2 kg)</option>
+                                <option value="0.75">750 ग्राम</option>
+                                <option value="1">1 किग्रा (1 kg)</option>
+                                <option value="2">2 किग्रा</option>
+                                <option value="3">3 किग्रा</option>
+                                <option value="5">5 किग्रा</option>
+                                <option value="10">10 किग्रा</option>
+                            </select>
+                            <button onclick="removeVegItem(${index})" title="सब्जी हटाएं" class="bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded text-xs font-bold">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            updateBillSummary();
+        }
+
+        // वजन बदलने पर कार्ट और ऑटोमैटिक बिल अपडेट करना
+        function updateCartItem(index, name, pricePerKg) {
+            const selectElement = document.getElementById(`weight-${index}`);
+            const qtyKg = parseFloat(selectElement.value);
+
+            if (qtyKg > 0) {
+                let calculatedCost = Math.round(pricePerKg * qtyKg);
+                customerCart[index] = { name: name, qtyText: selectElement.options[selectElement.selectedIndex].text, cost: calculatedCost };
+            } else {
+                delete customerCart[index];
+            }
+            updateBillSummary();
+        }
+
+        // गलती से जुड़ी सब्जी को पूरी तरह हटाने का फंक्शन
+        function removeVegItem(index) {
+            document.getElementById(`weight-${index}`).value = "0";
+            delete customerCart[index];
+            updateBillSummary();
+        }
+
+        // ऑटोमैटिक बिल समरी और टोटल कैलकुलेशन
+        function updateBillSummary() {
+            const summaryDiv = document.getElementById('cartSummary');
+            let htmlText = "";
+            let grandTotal = 0;
+            let hasItems = false;
+
+            for (let idx in customerCart) {
+                hasItems = true;
+                let item = customerCart[idx];
+                grandTotal += item.cost;
+                htmlText += `<div class="flex justify-between"><span>• ${item.name} (${item.qtyText})</span> <span class="font-bold">₹${item.cost}</span></div>`;
+            }
+
+            if (!hasItems) {
+                summaryDiv.innerHTML = "कोई सामान नहीं चुना गया है।";
+            } else {
+                summaryDiv.innerHTML = htmlText;
+            }
+            document.getElementById('totalPrice.innerText` = `₹${grandTotal}`;
+            document.getElementById('totalPrice').innerText = `₹${grandTotal}`;
+        }
+
+        // QR कोड दिखाने/छिपाने का टॉगल
+        function toggleQRCode() {
+            const qrBox = document.getElementById('qrCodeContainer');
+            const instructionText = document.getElementById('paymentInstructionText');
+            if (qrBox.classList.contains('hidden')) {
+                qrBox.classList.remove('hidden');
+                instructionText.innerText = "नीचे दिए गए QR कोड को स्कैन करके भुगतान पूरा करें:";
+            } else {
+                qrBox.classList.add('hidden');
+            }
+        }
+
+        // दुकानदार को नोटिफिकेशन भेजना (घंटी बजाने वाला सिम्युलेशन)
+        function submitOrderToShop() {
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
 
-            if (!selectedRadio) {
-                alert("कृपया पहले सूची में से कोई एक दुकान चुनें!");
-                return;
-            }
             if (!name || !phone || !address) {
                 alert("कृपया अपना नाम, मोबाइल नंबर और पूरा पता सही से भरें!");
                 return;
             }
 
-            const shopId = selectedRadio.value;
-            currentShop = shopsData.find(s => s.id == shopId);
-
-            // टॉप हेडर में दुकानदार का कॉल बटन सेट करना
-            document.getElementById('shopkeeperNameHeader').innerText = "Shopkeeper";
-            document.getElementById('shopCallBtn').href = `tel:${currentShop.phone}`;
-            document.getElementById('shopCallBtn').classList.remove('hidden');
-
-            // शीर्षक सेट करना
-            document.getElementById('selectedShopTitle').innerText = currentShop.name;
-
-            // सब्जियां रेंडर करना
-            renderVegetables();
-
-            // व्यू बदलना
-            document.getElementById('shopSelectionView').classList.add('hidden');
-            document.getElementById('catalogView').classList.remove('hidden');
-        }
-
-        // सब्जियां दिखाना
-        function renderVegetables() {
-            const container = document.getElementById('vegetableListContainer');
-            container.innerHTML = '';
-            cart = {};
-
-            currentShop.vegetables.forEach((veg, index) => {
-                cart[index] = { name: veg.name, price: veg.price, qty: 0 };
-                container.innerHTML += `
-                    <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-200">
-                        <span class="text-sm font-medium text-gray-800">${veg.name} - ₹${veg.price}/किग्रा</span>
-                        <div class="flex items-center gap-2">
-                            <button onclick="updateQty(${index}, -1)" class="w-7 h-7 bg-red-500 text-white rounded font-bold flex items-center justify-center">-</button>
-                            <span id="qty-${index}" class="w-6 text-center text-sm font-bold">0</span>
-                            <button onclick="updateQty(${index}, 1)" class="w-7 h-7 bg-emerald-600 text-white rounded font-bold flex items-center justify-center">+</button>
-                        </div>
-                    </div>
-                `;
-            });
-            updateCartSummary();
-        }
-
-        // मात्रा (Quantity) घटाना-बढ़ाना
-        function updateQty(index, change) {
-            if (cart[index].qty + change >= 0) {
-                cart[index].qty += change;
-                document.getElementById(`qty-${index}`).innerText = cart[index].qty;
-                updateCartSummary();
-            }
-        }
-
-        // कार्ट समरी अपडेट करना
-        function updateCartSummary() {
-            let summaryText = "";
-            let total = 0;
-            let hasItems = false;
-
-            for (let index in cart) {
-                if (cart[index].qty > 0) {
-                    hasItems = true;
-                    let cost = cart[index].qty * cart[index].price;
-                    total += cost;
-                    summaryText += `${cart[index].name} (${cart[index].qty} किग्रा) - ₹${cost}<br>`;
-                }
+            if (Object.keys(customerCart).length === 0) {
+                alert("कृपया कैटलॉग में से कम से कम एक सब्जी और उसका वजन चुनें!");
+                return;
             }
 
-            if (!hasItems) {
-                document.getElementById('cartSummary').innerText = "कोई सामान नहीं चुना गया है।";
-            } else {
-                document.getElementById('cartSummary').innerHTML = summaryText;
-            }
-            document.getElementById('totalPrice').innerText = `₹${total}`;
+            // सफलता का संदेश और दुकानदार के पास घंटी बजने का संकेत
+            alert(`✅ आर्डर सफलताપૂર્વक ${currentShop.name} के पास भेज दिया गया है!\n\n🔔 दुकानदार के ऐप पर घंटी बज रही है। भुगतान सत्यापित होते ही वे आपका आर्डर पैक करके भेज देंगे।`);
         }
 
-        // वापस दुकान चयन पर जाना
+        // वापस दुकान सूची पर जाना
         function goBackToShops() {
             document.getElementById('shopCallBtn').classList.add('hidden');
             document.getElementById('catalogView').classList.add('hidden');
             document.getElementById('shopSelectionView').classList.remove('hidden');
         }
 
-        function sendOrder() {
-            alert("आर्डर की प्रक्रिया पूरी हुई! इसे व्हाट्सएप या यूपीआई से जोड़ा जा सकता है।");
-        }
-
-        // लोड होने पर फंक्शन कॉल करें
         window.onload = loadShops;
     </script>
 </body>
