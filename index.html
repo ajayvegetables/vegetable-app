@@ -15,7 +15,7 @@
         .btn:hover { background-color: #1b5e20; }
         .help-btn { background-color: #0288d1; margin-top: 10px; text-decoration: none; display: block; text-align: center; color: white; padding: 12px; border-radius: 4px; font-size: 16px; font-weight: bold; }
         .help-btn:hover { background-color: #01579b; }
-        .sound-btn { background-color: #ff9800; margin-top: 10px; }
+        .sound-btn { background-color: #ff9800; margin-top: 10px; font-size: 14px; padding: 8px; }
         .sound-btn:hover { background-color: #f57c00; }
         
         .action-btns { display: flex; gap: 10px; margin-top: 10px; }
@@ -33,6 +33,7 @@
         }
         .otp-msg { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 10px; margin-top: 10px; border-radius: 4px; color: #2e7d32; font-weight: bold; text-align: center; }
         .badge-success { background: #4caf50; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        .no-order { text-align: center; color: #777; font-size: 14px; padding: 15px; background: #f9f9f9; border-radius: 4px; border: 1px dashed #ccc; }
     </style>
 </head>
 <body>
@@ -66,11 +67,13 @@
             </div>
 
             <!-- नए ऑर्डर्स और अलार्म सेक्शन -->
-            <div class="section-title">🚨 नए कस्टमर ऑर्डर्स (लाइव)</div>
-            <button class="btn sound-btn" onclick="simulateNewOrder()">🔔 टेस्ट नया ऑर्डर मंगाएं (अलार्म चेक करें)</button>
+            <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>🚨 नए कस्टमर ऑर्डर्स (लाइव)</span>
+                <button class="btn sound-btn" onclick="simulateNewOrder()" style="margin:0; width:auto;">+ टेस्ट ऑर्डर मंगाएं</button>
+            </div>
             
             <div id="orderListContainer">
-                <!-- यहाँ नए ऑर्डर लगातार अलार्म के साथ आएंगे -->
+                <div class="no-order" id="noOrderText">अभी कोई नया आर्डर नहीं है। (ग्राहक के आर्डर करते ही यहाँ बजेगा)</div>
             </div>
 
             <!-- दुकान की सेटिंग्स -->
@@ -177,7 +180,7 @@
             document.getElementById('otpDisplayBox').classList.add('hidden');
         }
 
-        // लगातार तेज बजने वाला सायरन अलार्म
+        // लगातार तेज बजने वाला सायरन अलार्म (जो तब तक नहीं रुकेगा जब तक आप एक्शन न लें)
         function startContinuousAlarm() {
             if (alarmInterval) return;
 
@@ -222,9 +225,13 @@
             }
         }
 
-        // नया टेस्ट ऑर्डर जोड़ने का फंक्शन
+        // जब ग्राहक ऑर्डर करेगा (या टेस्ट बटन दबेगा), तब यह चलेगा
         function simulateNewOrder() {
             var container = document.getElementById('orderListContainer');
+            var noOrderText = document.getElementById('noOrderText');
+            if (noOrderText) {
+                noOrderText.style.display = 'none';
+            }
             
             var orderId = Math.floor(100 + Math.random() * 900);
             var newDiv = document.createElement('div');
@@ -233,13 +240,13 @@
             newDiv.innerHTML = `
                 <div style="display: flex; justify-content: space-between;">
                     <b>नया आर्डर #${orderId}</b>
-                    <span class="badge-success">UPI भुगतान सफल (₹240)</span>
+                    <span class="badge-success">UPI भुगतान सफल (₹90)</span>
                 </div>
                 <hr style="border:0; border-top:1px solid #ddd; margin:8px 0;">
-                <p style="margin: 4px 0;"><b>ग्राहक:</b> अमित कुमार</p>
-                <p style="margin: 4px 0;"><b>सामग्री:</b> टमाटर 3kg, प्याज़ 2kg</p>
-                <p style="margin: 4px 0;"><b>पत्ता/पता:</b> मकान नं. 12, गांधी नगर चौराहा</p>
-                <p style="margin: 4px 0; color: #d32f2f;"><b>दूरी:</b> दुकान से 1.8 किलोमीटर दूर</p>
+                <p style="margin: 4px 0;"><b>ग्राहक:</b> राहुल</p>
+                <p style="margin: 4px 0;"><b>सामग्री:</b> आलू 2kg, टमाटर 1kg</p>
+                <p style="margin: 4px 0;"><b>पता:</b> मेन मार्केट रोड, सिविल लाइन्स</p>
+                <p style="margin: 4px 0; color: #d32f2f;"><b>दूरी:</b> दुकान से 2.1 किलोमीटर दूर</p>
                 
                 <div class="action-btns">
                     <button class="accept-btn" onclick="acceptOrder('${orderId}')">✅ स्वीकार करें</button>
@@ -250,8 +257,8 @@
             container.prepend(newDiv);
             activeOrdersCount++;
             
+            // जैसे ही ऑर्डर आएगा, लगातार तेज अलार्म बजना शुरू हो जाएगा
             startContinuousAlarm();
-            alert('🚨 नया आर्डर आ गया है! लगातार तेज घंटी बज रही है।');
         }
 
         // आर्डर स्वीकार करने पर
@@ -272,10 +279,9 @@
 
             activeOrdersCount--;
             if (activeOrdersCount <= 0) {
-                stopAlarm();
+                stopAlarm(); // घंटी बंद हो जाएगी
                 activeOrdersCount = 0;
             }
-            alert('ऑर्डर स्वीकार कर लिया गया है!');
         }
 
         // आर्डर रिजेक्ट करने पर
@@ -296,10 +302,9 @@
 
             activeOrdersCount--;
             if (activeOrdersCount <= 0) {
-                stopAlarm();
+                stopAlarm(); // घंटी बंद हो जाएगी
                 activeOrdersCount = 0;
             }
-            alert('ऑर्डर रिजेक्ट कर दिया गया है!');
         }
 
         function saveSettings() {
@@ -323,7 +328,7 @@
                 newItem.className = 'veg-item';
                 newItem.style.display = 'flex';
                 newItem.style.justifyContent = 'space-between';
-                newItem.style.alignItems = 'center';
+                newItem.style.alignItems: 'center';
                 newItem.innerHTML = `<span><b>${name}</b> - ₹${price}/किग्रा (उपलब्ध: हाँ)</span> <button onclick="toggleStock(this)" style="background: green; color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer;">चालू</button>`;
                 container.appendChild(newItem);
                 document.getElementById('vegName').value = '';
