@@ -3,329 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>अजय कुमार वेजिटेबल्स - पार्टनर ऐप</title>
+    <title>अजय कुमार वेजिटेबल्स - पार्टनर ऐप (दुकानदार)</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 10px; color: #333; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .header-box { background: #1b5e20; color: white; padding: 10px; border-radius: 5px; text-align: center; }
-        .header-box h2 { margin: 0 0 8px 0; font-size: 18px; }
-        .help-btn { background: #ff9800; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block; font-size: 13px; }
-        .section { background: #fafafa; border: 1px solid #ddd; padding: 10px; margin-top: 15px; border-radius: 5px; }
-        .section h3 { margin-top: 0; font-size: 15px; color: #1b5e20; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
-        input, select, button { width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        button { background: #2e7d32; color: white; border: none; font-weight: bold; cursor: pointer; }
-        button:disabled { background: #cccccc; cursor: not-allowed; }
-        button:hover:not(:disabled) { background: #1b5e20; }
-        
-        .catalog-item { display: flex; justify-content: space-between; align-items: center; background: white; border: 1px solid #e0e0e0; padding: 8px 10px; margin-bottom: 8px; border-radius: 6px; }
-        .catalog-info { font-size: 14px; }
-        .catalog-info b { color: #2e7d32; }
-        .catalog-action { display: flex; gap: 5px; align-items: center; width: 55%; }
-        .catalog-action select { margin: 0; padding: 5px; font-size: 12px; }
-        .add-btn { background: #388e3c; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; width: auto; margin: 0; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; }
-        th, td { border: 1px solid #ddd; padding: 6px; text-align: center; }
-        th { background: #388e3c; color: white; }
-        .del-btn { background: #d32f2f; color: white; border: none; padding: 3px 6px; border-radius: 3px; cursor: pointer; }
-        .total-box { font-weight: bold; text-align: right; margin-top: 5px; font-size: 15px; }
-        
-        #lockScreen { display: none; text-align: center; padding: 20px; background: #fff3f3; border: 2px solid #d32f2f; border-radius: 8px; margin-top: 20px; }
-        #lockScreen h3 { color: #d32f2f; }
-        
-        /* QR कोड दिखने का बॉक्स */
-        #qrDisplayArea { display: none; text-align: center; background: white; border: 2px solid #7b1fa2; padding: 15px; margin-top: 10px; border-radius: 6px; }
+        body { font-family: Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 0; color: #333; }
+        .header { background-color: #1b5e20; color: white; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; }
+        .container { max-width: 500px; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .section-title { font-size: 16px; font-weight: bold; color: #1b5e20; margin-top: 20px; margin-bottom: 10px; border-bottom: 2px solid #c8e6c9; padding-bottom: 5px; }
+        label { display: block; margin-top: 10px; font-size: 14px; font-weight: bold; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn { background-color: #2e7d32; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 15px; font-weight: bold; }
+        .btn:hover { background-color: #1b5e20; }
+        .help-btn { background-color: #0288d1; margin-top: 10px; }
+        .help-btn:hover { background-color: #01579b; }
+        .hidden { display: none; }
+        .veg-item { background: #f9f9f9; padding: 10px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- लॉगिन स्क्रीन -->
-    <div id="loginSection" class="section">
-        <h3>🔐 दुकानदार लॉगिन</h3>
-        <label>अपना मोबाइल नंबर दर्ज करें:</label>
-        <input type="text" id="loginPhone" placeholder="मोबाइल नंबर लिखें">
-        <button onclick="checkLogin()">आगे बढ़ें</button>
+    <div class="header">
+        अजय कुमार वेजिटेबल्स - पार्टनर ऐप
     </div>
 
-    <!-- मुख्य ऐप स्क्रीन -->
-    <div id="mainAppContent" style="display:none;">
-        <div class="header-box">
-            <h2>अजय कुमार वेजिटेबल्स - पार्टनर ऐप</h2>
-            <a href="tel:+919997077062" class="help-btn">📞 हेल्प / कॉल करें</a>
-        </div>
-        
-        <div style="text-align: right; font-size: 12px; margin-top: 8px; margin-bottom: 10px;">
-            यूजर: <span id="userRoleDisplay"><b>दुकानदार</b></span> | प्लान स्थिति: <span id="planStatusDisplay" style="color:green; font-weight:bold;">सक्रिय (Active)</span>
-        </div>
-
-        <!-- 30 दिन खत्म होने पर दिखने वाला लॉक और QR कोड बॉक्स -->
-        <div id="lockScreen">
-            <h3>⚠️ आपका सब्सक्रिप्शन समाप्त हो गया है!</h3>
-            <p>ऐप का इस्तेमाल जारी रखने के लिए Master Owner को ₹30 का भुगतान करें।</p>
-            <p><b>मास्टर ओनर का भुगतान QR कोड / UPI:</b></p>
-            <div style="background: white; padding: 10px; display: inline-block; border-radius: 4px; border: 1px solid #ddd;">
-                <img id="masterQrImg" src="" alt="Master QR" width="140" height="140">
+    <div class="container">
+        <!-- लॉगिन सेक्शन -->
+        <div id="loginSection">
+            <div class="section-title">दुकानदार लॉगिन (OTP द्वारा)</div>
+            <label>मोबाइल नंबर दर्ज करें:</label>
+            <input type="text" id="loginMobile" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10">
+            <button class="btn" onclick="sendOTP()">ओटीपी भेजें</button>
+            
+            <div id="otpBox" class="hidden">
+                <label>OTP दर्ज करें (डिफ़ॉल्ट: 1234):</label>
+                <input type="text" id="otpInput" placeholder="4 अंकों का ओटीपी" maxlength="4">
+                <button class="btn" onclick="verifyOTP()">लॉगिन करें</button>
             </div>
-            <p style="font-weight: bold; margin-top: 5px;" id="masterUpiText">UPI ID: 8218231811@nyes</p>
-            <p style="font-size: 13px; color: #555;">भुगतान करने के बाद ओनर को कॉल करें ताकि वे आपका प्लान चालू कर सकें।</p>
         </div>
 
-        <!-- दुकान का काम -->
-        <div id="appWorkingArea">
-            <div class="section">
-                <h3>⚙️ दुकान की सेटिंग्स & QR कोड (आपके ग्राहक के लिए):</h3>
-                <label>आपकी दुकान की UPI ID:</label>
-                <input type="text" id="upiId" value="8218231811@nyes">
-                <label>आपका WhatsApp नंबर:</label>
-                <input type="text" id="whatsappNum" value="9997077062">
-                <button onclick="saveSettings()">सेटिंग्स सेव करें</button>
+        <!-- मुख्य डैशबोर्ड (लॉगिन के बाद दिखेगा) -->
+        <div id="dashboardSection" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 14px; color: #555;">स्थिति: <b>लाइफटाइम (Owner)</b></span>
+                <button onclick="logout()" style="background: #d32f2f; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">लॉग आउट</button>
             </div>
 
-            <div class="section">
-                <h3>➕ नई सब्जी कैटालॉग में जोड़ें:</h3>
-                <input type="text" id="vegName" placeholder="सब्जी का नाम (जैसे: आलू, टमाटर)">
-                <input type="number" id="vegPrice" placeholder="प्रति किलो मूल्य (₹)">
-                <button onclick="addVegetableToCatalog()">सब्जी सूची में जोड़ें</button>
-            </div>
+            <!-- दुकान की सेटिंग्स -->
+            <div class="section-title">⚙️ दुकान की सेटिंग्स & QR कोड</div>
+            <label>आपकी दुकान की UPI ID:</label>
+            <input type="text" id="shopUpi" value="8218231811@nyes">
 
-            <div class="section">
-                <h3>🛒 सब्जी कैटालॉग (रेट लिस्ट):</h3>
-                <div id="catalogListContainer"></div>
-            </div>
+            <label>आपका WhatsApp नंबर:</label>
+            <input type="text" id="shopWhatsapp" value="9997077062">
 
-            <div class="section">
-                <h3>📦 आपका कार्ट (Cart Summary):</h3>
-                <table>
-                    <thead>
-                        <tr><th>आइटम</th><th>वजन</th><th>मूल्य (₹)</th><th>हटाएं</th></tr>
-                    </thead>
-                    <tbody id="billTable"></tbody>
-                </table>
-                <div class="total-box">कुल योग: ₹<span id="grandTotal">0</span></div>
+            <button class="btn" onclick="saveSettings()">सेटिंग्स सेव करें</button>
 
-                <button id="qrBtn" onclick="generateQR()" disabled style="background:#7b1fa2; margin-top:10px;">भुगतान QR कोड तैयार करें (लॉक्ड)</button>
-                
-                <!-- यहाँ असली QR कोड दिखेगा -->
-                <div id="qrDisplayArea">
-                    <h4 style="margin:0 0 5px 0; color:#7b1fa2;">📱 स्कैन करके भुगतान करें</h4>
-                    <img id="dynamicQrImg" src="" alt="Payment QR" width="160" height="160">
-                    <p id="qrDetailsText" style="font-size: 13px; font-weight: bold; margin: 5px 0 0 0;"></p>
+            <!-- नियम और शर्तें (Terms) -->
+            <div class="section-title">📜 डिलीवरी नियम और शर्तें</div>
+            <label>न्यूनतम ऑर्डर राशि (₹):</label>
+            <input type="number" id="minOrderAmt" value="200">
+
+            <label>कम ऑर्डर पर अतिरिक्त चार्ज (₹):</label>
+            <input type="number" id="extraCharge" value="50">
+
+            <button class="btn" onclick="saveRules()">नियम सेव करें</button>
+
+            <!-- सब्जी कैटलॉग मैनेजमेंट -->
+            <div class="section-title">➕ नई सब्जी कैटलॉग में जोड़ें</div>
+            <label>सब्जी का नाम:</label>
+            <input type="text" id="vegName" placeholder="जैसे: आलू, टमाटर">
+
+            <label>प्रति किलो मूल्य (₹):</label>
+            <input type="number" id="vegPrice" placeholder="मूल्य प्रति किलो">
+
+            <button class="btn" onclick="addVegetable()">सब्जी सूची में जोड़ें</button>
+
+            <div class="section-title">📋 वर्तमान सब्जी सूची (स्टॉक मैनेजमेंट)</div>
+            <div id="vegListContainer">
+                <!-- यहाँ सब्जियां दिखेंगी -->
+                <div class="veg-item">
+                    <span><b>आलू</b> - ₹30/किग्रा (उपलब्ध: हाँ)</span>
+                    <button onclick="toggleStock(this)" style="background: green; color: white; border: none; padding: 5px; border-radius: 3px;">चालू</button>
                 </div>
-
-                <button id="whatsappBtn" onclick="sendWhatsApp()" disabled style="background:#00c853;">WhatsApp पर पर्ची भेजें (लॉक्ड)</button>
             </div>
-        </div>
 
-        <!-- ओनर (Admin) पैनल -->
-        <div id="adminPanel" class="section" style="display:none; background: #e8f5e9; border: 2px dashed #2e7d32;">
-            <h3>🛠️ मास्टर ओनर (Admin) पैनल</h3>
-            <p style="font-size: 12px; color: #555;">किसी भी दुकानदार से ₹30 मिलने पर उसका मोबाइल नंबर यहाँ लिखकर 30 दिन का प्लान एक्टिव करें।</p>
-            <input type="text" id="targetPhone" placeholder="दुकानदार का मोबाइल नंबर लिखें">
-            <button onclick="activateSubscription(30)" style="background: #d81b60;">इस नंबर का 30 दिन का प्लान चालू करें</button>
+            <!-- हेल्प बटन -->
+            <button class="btn help-btn" onclick="openHelp()">💬 सहायता / हेल्प (ततकनीकी मदद)</button>
         </div>
     </div>
-</div>
 
-<script>
-    let catalog = [
-        { name: "आलू (Potato)", price: 50 },
-        { name: "टमाटर (Tomato)", price: 80 }
-    ];
-
-    const MASTER_PHONE = "9997077062"; 
-    const MASTER_UPI = "8218231811@nyes";
-
-    function checkLogin() {
-        let phone = document.getElementById("loginPhone").value.trim();
-        if(!phone || phone.length < 10) { alert("कृपया सही मोबाइल नंबर दर्ज करें!"); return; }
-
-        localStorage.setItem("user_phone", phone);
-        if(!localStorage.getItem("expiry_" + phone)) {
-            let expiryDate = new Date().getTime() + (30 * 24 * 60 * 60 * 1000);
-            localStorage.setItem("expiry_" + phone, expiryDate);
-        }
-
-        loadAppSession();
-    }
-
-    function loadAppSession() {
-        let phone = localStorage.getItem("user_phone");
-        if(!phone) return;
-
-        document.getElementById("loginSection").style.display = "none";
-        document.getElementById("mainAppContent").style.display = "block";
-
-        let now = new Date().getTime();
-        let expiry = localStorage.getItem("expiry_" + phone);
-
-        // मास्टर QR कोड सेट करें
-        let masterUpiLink = `upi://pay?pa=${MASTER_UPI}&pn=MasterOwner&am=30&cu=INR`;
-        document.getElementById("masterQrImg").src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(masterUpiLink)}`;
-
-        if(phone === MASTER_PHONE) {
-            document.getElementById("userRoleDisplay").innerHTML = "<b>Master Owner</b>";
-            document.getElementById("planStatusDisplay").innerText = "लाइफटाइम (Owner)";
-            document.getElementById("planStatusDisplay").style.color = "purple";
-            document.getElementById("adminPanel").style.display = "block";
-            document.getElementById("lockScreen").style.display = "none";
-            document.getElementById("appWorkingArea").style.display = "block";
-        } else if(now < expiry) {
-            let daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
-            document.getElementById("planStatusDisplay").innerText = `सक्रिय (${daysLeft} दिन शेष)`;
-            document.getElementById("lockScreen").style.display = "none";
-            document.getElementById("appWorkingArea").style.display = "block";
-        } else {
-            document.getElementById("planStatusDisplay").innerText = "समाप्त (Expired)";
-            document.getElementById("planStatusDisplay").style.color = "red";
-            document.getElementById("lockScreen").style.display = "block";
-            document.getElementById("appWorkingArea").style.display = "none";
-        }
-
-        renderCatalog();
-    }
-
-    function activateSubscription(days) {
-        let target = document.getElementById("targetPhone").value.trim();
-        if(!target || target.length < 10) { alert("कृपया सही मोबाइल नंबर दर्ज करें!"); return; }
-
-        let newExpiry = new Date().getTime() + (days * 24 * 60 * 60 * 1000);
-        localStorage.setItem("expiry_" + target, newExpiry);
-        alert("सफलतापूर्वक नंबर " + target + " का " + days + " दिन का प्लान चालू कर दिया गया है!");
-        document.getElementById("targetPhone").value = "";
-    }
-
-    function renderCatalog() {
-        let container = document.getElementById("catalogListContainer");
-        container.innerHTML = "";
-        
-        catalog.forEach((veg, index) => {
-            let itemDiv = document.createElement("div");
-            itemDiv.className = "catalog-item";
-            itemDiv.innerHTML = `
-                <div class="catalog-info">
-                    <b>${veg.name}</b><br>
-                    <span style="color:#d32f2f; font-weight:bold;">₹${veg.price} / किलो</span>
-                </div>
-                <div class="catalog-action">
-                    <select id="weight_${index}">
-                        <option value="0.05">50 ग्राम</option>
-                        <option value="0.1">100 ग्राम</option>
-                        <option value="0.2">200 ग्राम</option>
-                        <option value="0.25">250 ग्राम</option>
-                        <option value="0.5">500 ग्राम</option>
-                        <option value="0.75">750 ग्राम</option>
-                        <option value="1" selected>1 किलो</option>
-                        <option value="2">2 किलो</option>
-                        <option value="3">3 किलो</option>
-                        <option value="5">5 किलो</option>
-                        <option value="10">10 किलो</option>
-                    </select>
-                    <button class="add-btn" onclick="addToBill('${veg.name}', ${veg.price}, ${index})">जोड़ें</button>
-                </div>
-            `;
-            container.appendChild(itemDiv);
-        });
-    }
-
-    function addVegetableToCatalog() {
-        let name = document.getElementById("vegName").value.trim();
-        let price = parseFloat(document.getElementById("vegPrice").value);
-        if(!name || !price) { alert("कृपया सब्जी का नाम और सही मूल्य भरें!"); return; }
-
-        catalog.push({ name: name, price: price });
-        document.getElementById("vegName").value = "";
-        document.getElementById("vegPrice").value = "";
-        renderCatalog();
-    }
-
-    function saveSettings() { alert("सेटिंग्स सुरक्षित हो गई हैं!"); }
-
-    function addToBill(vegName, pricePerKg, index) {
-        let weightSelect = document.getElementById(`weight_${index}`);
-        let weightKg = parseFloat(weightSelect.value);
-        
-        let weightText = "";
-        if(weightKg == 0.05) weightText = "50 ग्राम";
-        else if(weightKg == 0.1) weightText = "100 ग्राम";
-        else if(weightKg == 0.2) weightText = "200 ग्राम";
-        else if(weightKg == 0.25) weightText = "250 ग्राम";
-        else if(weightKg == 0.5) weightText = "500 ग्राम";
-        else if(weightKg == 0.75) weightText = "750 ग्राम";
-        else if(weightKg == 1) weightText = "1 किलो";
-        else weightText = weightKg + " किलो";
-
-        let totalPrice = Math.round(weightKg * pricePerKg);
-
-        let billTable = document.getElementById("billTable");
-        let row = billTable.insertRow();
-        row.innerHTML = `<td>${vegName}</td><td>${weightText}</td><td>${totalPrice}</td><td><button class="del-btn" onclick="this.parentElement.parentElement.remove(); calculateTotal();">हटाएं</button></td>`;
-
-        calculateTotal();
-    }
-
-    function calculateTotal() {
-        let billTable = document.getElementById("billTable");
-        let rows = billTable.getElementsByTagName("tr");
-        let total = 0;
-        for(let i=0; i<rows.length; i++) {
-            let priceCell = rows[i].getElementsByTagName("td")[2];
-            if(priceCell) {
-                total += parseFloat(priceCell.innerText);
+    <script>
+        function sendOTP() {
+            var mobile = document.getElementById('loginMobile').value;
+            if(mobile.length === 10) {
+                alert('OTP भेज दिया गया है। परीक्षण के लिए OTP "1234" दर्ज करें।');
+                document.getElementById('otpBox').classList.remove('hidden');
+            } else {
+                alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।');
             }
         }
-        document.getElementById("grandTotal").innerText = total;
 
-        let qrBtn = document.getElementById("qrBtn");
-        let whatsappBtn = document.getElementById("whatsappBtn");
-        if(total > 0) {
-            qrBtn.disabled = false;
-            qrBtn.style.background = "#7b1fa2";
-            qrBtn.innerText = "भुगतान QR कोड तैयार करें";
-
-            whatsappBtn.disabled = false;
-            whatsappBtn.style.background = "#00c853";
-            whatsappBtn.innerText = "WhatsApp पर पर्ची भेजें";
-        } else {
-            qrBtn.disabled = true;
-            qrBtn.style.background = "#cccccc";
-            qrBtn.innerText = "भुगतान QR कोड तैयार करें (लॉक्ड)";
-
-            whatsappBtn.disabled = true;
-            whatsappBtn.style.background = "#cccccc";
-            whatsappBtn.innerText = "WhatsApp पर पर्ची भेजें (लॉक्ड)";
-            
-            // अगर बिल जीरो है तो QR छिपा दें
-            document.getElementById("qrDisplayArea").style.display = "none";
+        function verifyOTP() {
+            var otp = document.getElementById('otpInput').value;
+            if(otp === '1234') {
+                alert('लॉगिन सफल रहा!');
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+            } else {
+                alert('गलत OTP! कृपया "1234" दर्ज करें।');
+            }
         }
-    }
 
-    function generateQR() {
-        let total = document.getElementById("grandTotal").innerText;
-        let upi = document.getElementById("upiId").value;
-        if(total == 0) return;
-
-        let upiLink = `upi://pay?pa=${upi}&pn=VegetableShop&am=${total}&cu=INR`;
-        let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiLink)}`;
-        
-        document.getElementById("dynamicQrImg").src = qrUrl;
-        document.getElementById("qrDetailsText").innerText = `UPI: ${upi} | राशि: ₹${total}`;
-        document.getElementById("qrDisplayArea").style.display = "block";
-    }
-
-    function sendWhatsApp() {
-        let total = document.getElementById("grandTotal").innerText;
-        let num = document.getElementById("whatsappNum").value;
-        if(total == 0) { alert("बिल खाली है!"); return; }
-        window.open(`https://wa.me/${num}?text=नमस्ते, आपका सब्जी का कुल बिल ₹${total} है। कृपया भुगतान करें।`);
-    }
-
-    window.onload = function() {
-        if(localStorage.getItem("user_phone")) {
-            loadAppSession();
+        function logout() {
+            document.getElementById('dashboardSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('loginMobile').value = '';
+            document.getElementById('otpInput').value = '';
+            document.getElementById('otpBox').classList.add('hidden');
         }
-    };
-</script>
 
+        function saveSettings() {
+            alert('दुकान की सेटिंग्स सफलतापूर्वक सेव हो गई हैं!');
+        }
+
+        function saveRules() {
+            alert('डिलीवरी नियम सफलतापूर्वक सेव हो गए हैं!');
+        }
+
+        function addVegetable() {
+            var name = document.getElementById('vegName').value;
+            var price = document.getElementById('vegPrice').value;
+            if(name && price) {
+                var container = document.getElementById('vegListContainer');
+                var newItem = document.createElement('div');
+                newItem.className = 'veg-item';
+                newItem.innerHTML = `<span><b>${name}</b> - ₹${price}/किग्रा (उपलब्ध: हाँ)</span> <button onclick="toggleStock(this)" style="background: green; color: white; border: none; padding: 5px; border-radius: 3px;">चालू</button>`;
+                container.appendChild(newItem);
+                document.getElementById('vegName').value = '';
+                document.getElementById('vegPrice').value = '';
+                alert('सब्जी सफलतापूर्वक जोड़ दी गई है!');
+            } else {
+                alert('कृपया सब्जी का नाम और मूल्य दोनों भरें।');
+            }
+        }
+
+        function toggleStock(btn) {
+            if(btn.innerText === 'चालू') {
+                btn.innerText = 'बंद';
+                btn.style.backgroundColor = 'red';
+            } else {
+                btn.innerText = 'चालू';
+                btn.style.backgroundColor = 'green';
+            }
+        }
+
+        function openHelp() {
+            window.open('https://wa.me/9997077062?text=नमस्ते%20अजय,%20मुझे%20पार्टनर%20ऐप%20में%20सहायता%20चाहिए।', '_blank');
+        }
+    </script>
 </body>
 </html>
