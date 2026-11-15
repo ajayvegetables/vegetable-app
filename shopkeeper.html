@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>वेजिटेबल पार्टनर - दुकानदार डैशबोर्ड</title>
+    <title>वेजिटेबल पार्टनर</title>
+    <!-- PWA / ऐप मेनिफेस्ट और लोगो सेटिंग्स -->
+    <meta name="theme-color" content="#e65100">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3081/3081559.png">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3081/3081559.png">
+    
     <style>
         body { font-family: Arial, sans-serif; background: #fff3e0; margin: 0; padding: 15px; color: #333; padding-bottom: 60px; }
         .container { max-width: 650px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
@@ -15,10 +20,11 @@
         .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         .btn-main { background: #e65100; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
         
-        /* टॉप हेल्प और नोटिफिकेशन बटन */
-        .top-bar-fixed { position: fixed; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 100; }
-        .help-btn { background: #2e7d32; color: white; padding: 6px 10px; border-radius: 15px; text-decoration: none; font-weight: bold; font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .notif-badge-btn { background: #c62828; color: white; padding: 6px 10px; border-radius: 15px; font-weight: bold; font-size: 13px; cursor: pointer; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        /* टॉप फिक्सड बटन (हेल्प, हिस्ट्री और नोटिफिकेशन) */
+        .top-bar-fixed { position: fixed; top: 10px; right: 10px; display: flex; gap: 6px; z-index: 100; }
+        .help-btn { background: #2e7d32; color: white; padding: 6px 10px; border-radius: 15px; text-decoration: none; font-weight: bold; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .history-icon-btn { background: #e65100; color: white; padding: 6px 10px; border-radius: 15px; font-weight: bold; font-size: 12px; cursor: pointer; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .notif-badge-btn { background: #c62828; color: white; padding: 6px 10px; border-radius: 15px; font-weight: bold; font-size: 12px; cursor: pointer; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
         .status-bar { text-align: center; background: #ffe0b2; padding: 10px; border-radius: 6px; font-weight: bold; margin-bottom: 15px; color: #bf360c; }
         .section-box { background: #fafafa; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
@@ -26,9 +32,6 @@
         
         .order-card { background: #ffebee; border: 1px solid #ffcdd2; border-left: 5px solid #d32f2f; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .location-info { font-size: 13px; color: #d32f2f; font-weight: bold; margin: 4px 0; background: #fff; padding: 4px 8px; border-radius: 4px; display: inline-block; border: 1px solid #ffcdd2; }
-        
-        .history-card { background: #f1f8e9; border: 1px solid #c8e6c9; border-left: 5px solid #2e7d32; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 13px; }
-        .rejected-card { background: #fafafa; border: 1px solid #ddd; border-left: 5px solid #757575; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 13px; color: #555; }
         
         .btn-group { display: flex; gap: 10px; margin-top: 10px; }
         .btn { flex: 1; padding: 10px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
@@ -38,19 +41,41 @@
         .item-list { font-size: 14px; margin: 6px 0; padding-left: 20px; }
         .error-msg { color: red; font-size: 14px; text-align: center; margin-top: 10px; }
         .item-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-        
-        /* टैब नेविगेशन बटन */
-        .tab-menu { display: flex; gap: 5px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 8px; background: #ddd; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; font-size: 13px; }
-        .tab-btn.active-tab { background: #e65100; color: white; }
+
+        /* पॉप-अप मॉडल (हिस्ट्री और नोटिफिकेशन के लिए) */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 15% auto; padding: 20px; width: 85%; max-width: 500px; border-radius: 10px; max-height: 70vh; overflow-y: auto; }
+        .close-modal { float: right; font-size: 24px; font-weight: bold; cursor: pointer; color: #777; }
+        .history-item-box { background: #f1f8e9; border-left: 4px solid #2e7d32; padding: 10px; margin-bottom: 8px; font-size: 13px; border-radius: 4px; }
+        .rejected-item-box { background: #fafafa; border-left: 4px solid #757575; padding: 10px; margin-bottom: 8px; font-size: 13px; border-radius: 4px; color: #555; }
     </style>
 </head>
 <body>
 
-<!-- टॉप फिक्सड बटन (हेल्प और नोटिफिकेशन बेल) -->
+<!-- टॉप फिक्सड बटन -->
 <div class="top-bar-fixed">
     <button class="notif-badge-btn" onclick="openNotifications()">🔔 <span id="notifCount">0</span></button>
+    <button class="history-icon-btn" onclick="openHistoryModal()">📜 हिस्ट्री</button>
     <a href="tel:9997077062" class="help-btn">📞 Help</a>
+</div>
+
+<!-- हिस्ट्री पॉप-अप विंडो -->
+<div id="historyModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
+        <h3 style="color:#e65100; margin-top:0;">📊 आर्डर का इतिहास (History)</h3>
+        <hr style="border:0; border-top:1px solid #ddd; margin-bottom:15px;">
+        
+        <h4 style="color:#2e7d32; margin:5px 0;">✅ स्वीकृत आर्डर्स:</h4>
+        <div id="accepted-history-container">
+            <p style="font-size: 12px; color: #777;">कोई स्वीकृत आर्डर नहीं है।</p>
+        </div>
+
+        <h4 style="color:#c62828; margin:15px 0 5px 0;">❌ रद्द किए गए आर्डर्स:</h4>
+        <div id="rejected-history-container">
+            <p style="font-size: 12px; color: #777;">कोई रद्द किया गया आर्डर नहीं है।</p>
+        </div>
+    </div>
 </div>
 
 <div class="container">
@@ -94,7 +119,7 @@
         <h2>🔔 वेजिटेबल पार्टनर डैशबोर्ड</h2>
         <div class="status-bar" id="connectionStatus">लाइव डेटाबेस से जुड़ रहा है...</div>
 
-        <!-- दुकान की सेटिंग्स, यूपीआई और कैटलॉग -->
+        <!-- दुकान की सेटिंग्स व कैटलॉग -->
         <div class="section-box">
             <h3>⚙️ दुकान की सेटिंग्स व कैटलॉग (आइटम मैनेजर)</h3>
             <div class="form-group">
@@ -132,29 +157,6 @@
         <h3>🛍️ नए ऑर्डर्स की सूची:</h3>
         <div id="orders-container">
             <p style="text-align: center; color: #777;">नया ऑर्डर आने का इंतज़ार है...</p>
-        </div>
-
-        <!-- मॉडर्न हिस्ट्री टैब मेनू -->
-        <div class="section-box" style="margin-top: 25px;">
-            <h3>📊 ऑर्डर रिकॉर्ड (हिस्ट्री)</h3>
-            <div class="tab-menu">
-                <button class="tab-btn active-tab" id="btnAcceptedTab" onclick="switchHistoryTab('accepted')">स्वीकृत ऑर्डर्स</button>
-                <button class="tab-btn" id="btnRejectedTab" onclick="switchHistoryTab('rejected')">रद्द ऑर्डर्स</button>
-            </div>
-
-            <!-- स्वीकृत हिस्ट्री व्यू -->
-            <div id="acceptedHistoryView">
-                <div id="accepted-history-container">
-                    <p style="font-size: 13px; color: #777;">कोई पुराना स्वीकृत ऑर्डर नहीं है।</p>
-                </div>
-            </div>
-
-            <!-- रद्द हिस्ट्री व्यू -->
-            <div id="rejectedHistoryView" style="display: none;">
-                <div id="rejected-history-container">
-                    <p style="font-size: 13px; color: #777;">कोई रद्द किया गया ऑर्डर नहीं है।</p>
-                </div>
-            </div>
         </div>
         
         <button style="background: #c62828; color: white; border: none; width: 100%; padding: 10px; border-radius: 6px; margin-top: 20px; cursor: pointer; font-weight: bold;" onclick="logout()">लॉग आउट</button>
@@ -260,18 +262,12 @@
         alert("कैटलॉग और दुकान की सेटिंग्स सफलताપर्वक सेव कर दी गईं हैं!");
     };
 
-    window.switchHistoryTab = function(type) {
-        if(type === 'accepted') {
-            document.getElementById('acceptedHistoryView').style.display = 'block';
-            document.getElementById('rejectedHistoryView').style.display = 'none';
-            document.getElementById('btnAcceptedTab').classList.add('active-tab');
-            document.getElementById('btnRejectedTab').classList.remove('active-tab');
-        } else {
-            document.getElementById('acceptedHistoryView').style.display = 'none';
-            document.getElementById('rejectedHistoryView').style.display = 'block';
-            document.getElementById('btnRejectedTab').classList.add('active-tab');
-            document.getElementById('btnAcceptedTab').classList.remove('active-tab');
-        }
+    // हिस्ट्री पॉप-अप कंट्रोल
+    window.openHistoryModal = function() {
+        document.getElementById('historyModal').style.display = 'block';
+    };
+    window.closeHistoryModal = function() {
+        document.getElementById('historyModal').style.display = 'none';
     };
 
     window.openNotifications = function() {
@@ -359,10 +355,10 @@
         window.acceptOrder = function(orderId, name, amount, items) {
             let timeString = new Date().toLocaleString('hi-IN');
             let historyItem = document.createElement('div');
-            historyItem.className = "history-card";
+            historyItem.className = "history-item-box";
             historyItem.innerHTML = `<strong>👤 ${name}</strong> (₹${amount})<br>🛒 ${items}<br><span style="color:#555; font-size:11px;">⏰ समय: ${timeString}</span>`;
             
-            if(acceptedContainer.innerHTML.includes('कोई पुराना')) acceptedContainer.innerHTML = "";
+            if(acceptedContainer.innerHTML.includes('कोई स्वीकृत')) acceptedContainer.innerHTML = "";
             acceptedContainer.prepend(historyItem);
 
             alert('ऑर्डर स्वीकार कर लिया गया है!');
@@ -373,7 +369,7 @@
             if(confirm('क्या आप वाकई इस ऑर्डर को रद्द करना चाहते हैं?')) {
                 let timeString = new Date().toLocaleString('hi-IN');
                 let rejectItem = document.createElement('div');
-                rejectItem.className = "rejected-card";
+                rejectItem.className = "rejected-item-box";
                 rejectItem.innerHTML = `<strong>👤 ${name}</strong><br>🛒 ${items}<br><span style="color:#777; font-size:11px;">⏰ रद्द समय: ${timeString}</span>`;
                 
                 if(rejectedContainer.innerHTML.includes('कोई रद्द')) rejectedContainer.innerHTML = "";
