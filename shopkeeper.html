@@ -29,6 +29,7 @@
         
         .order-card { background: #ffebee; border: 1px solid #ffcdd2; border-left: 4px solid #d32f2f; padding: 8px; border-radius: 5px; margin-bottom: 8px; font-size: 11px; box-sizing: border-box; }
         .location-info { font-size: 10px; color: #d32f2f; font-weight: bold; margin: 2px 0; background: #fff; padding: 2px 4px; border-radius: 3px; display: inline-block; border: 1px solid #ffcdd2; }
+        .map-link-btn { background: #1976d2; color: white; padding: 2px 6px; border-radius: 3px; text-decoration: none; font-size: 9px; font-weight: bold; display: inline-block; margin-top: 2px; }
         
         .btn-group { display: flex; gap: 4px; margin-top: 5px; }
         .btn { flex: 1; padding: 5px; border: none; border-radius: 3px; font-weight: bold; cursor: pointer; color: white; font-size: 10px; }
@@ -57,8 +58,8 @@
         .clear-all-btn { background: #c62828; color: white; border: none; padding: 4px 6px; font-size: 9px; border-radius: 3px; cursor: pointer; font-weight: bold; }
         .restore-btn { background: #2e7d32; color: white; border: none; padding: 4px 6px; font-size: 9px; border-radius: 3px; cursor: pointer; font-weight: bold; }
 
-        .history-item-box { background: #f1f8e9; border-left: 2px solid #2e7d32; padding: 6px; margin-bottom: 6px; font-size: 10px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; }
-        .rejected-item-box { background: #fafafa; border-left: 2px solid #757575; padding: 6px; margin-bottom: 6px; font-size: 10px; border-radius: 3px; color: #555; display: flex; justify-content: space-between; align-items: center; }
+        .history-item-box { background: #f1f8e9; border-left: 2px solid #2e7d32; padding: 6px; margin-bottom: 6px; font-size: 10px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .rejected-item-box { background: #fafafa; border-left: 2px solid #757575; padding: 6px; margin-bottom: 6px; font-size: 10px; border-radius: 3px; color: #555; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         
         .history-actions { display: flex; gap: 4px; align-items: center; }
         .action-icon-btn { background: #ddd; border: none; padding: 4px 6px; border-radius: 3px; font-size: 11px; cursor: pointer; text-decoration: none; display: inline-block; }
@@ -83,8 +84,19 @@
     </div>
 </div>
 
+<!-- आर्डर की पूरी डिटेल देखने के लिए पॉप-अप -->
+<div id="detailModal" class="modal" onclick="closeDetailModalOutside(event)">
+    <div class="modal-content" id="detailModalContent">
+        <span class="close-modal" onclick="closeDetailModal()">&times;</span>
+        <h3 style="color:#e65100; margin-top:0; font-size:13px;">📋 आर्डर की पूरी जानकारी</h3>
+        <hr style="border:0; border-top:1px solid #ddd; margin-bottom:6px;">
+        <div id="orderDetailsBody" style="font-size: 11px; line-height: 1.5; color: #333;"></div>
+    </div>
+</div>
+
+<!-- हिस्ट्री पॉप-अप विंडो -->
 <div id="historyModal" class="modal" onclick="checkOutsideClick(event)">
-    <div class="modal-content">
+    <div class="modal-content" id="historyModalContent">
         <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
             <h3 style="color:#e65100; margin:0; font-size:13px;">📊 आर्डर का इतिहास</h3>
@@ -181,7 +193,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
@@ -199,7 +211,7 @@
 
     let customerNotifications = [];
     let alarmInterval = null;
-    let lastDeletedHistory = null;
+    let lastDeletedHistory = {}; // सभी डिलीट किए गए ऑर्डर्स का बैकअप (Accepted और Rejected दोनों के लिए)
 
     window.onload = function() {
         let savedPhone = localStorage.getItem("partnerPhone");
@@ -449,19 +461,21 @@
                     });
                 }
 
+                let mapButtonHtml = order.mapLocationUrl ? `<a href="${order.mapLocationUrl}" target="_blank" class="map-link-btn">🗺️ लाइव मैप देखें</a>` : '';
+
                 let card = document.createElement('div');
                 card.className = "order-card";
                 card.innerHTML = `
                     <strong>ग्राहक: ${order.customerName}</strong><br>
                     📞 फोन: <a href="tel:${order.customerPhone}">${order.customerPhone}</a><br>
                     📍 पता: ${order.customerAddress}<br>
-                    <div class="location-info">📍 जीपीएस दूरी: ${order.distance || '0 मीटर'}</div><br>
+                    <div class="location-info">📍 जीपीएस दूरी: ${order.distance || '0 मीटर'}</div> ${mapButtonHtml}<br>
                     <strong>कुल राशि: ₹${order.totalAmount}</strong>
                     <div class="item-list"><ul>${itemsHtml}</ul></div>
                     <a href="tel:${order.customerPhone}" class="btn-call">📞 ग्राहक को कॉल करें</a>
                     <div class="btn-group">
-                        <button class="btn btn-accept" onclick="acceptOrder('${order.id}', '${order.customerName}', '${order.totalAmount}', '${order.customerPhone}', '${order.customerAddress}')">✅ स्वीकार करें</button>
-                        <button class="btn btn-reject" onclick="rejectOrder('${order.id}', '${order.customerName}', '${order.totalAmount}', '${order.customerPhone}', '${order.customerAddress}')">❌ रद्द करें</button>
+                        <button class="btn btn-accept" onclick="acceptOrder('${order.id}', event)">✅ स्वीकार करें</button>
+                        <button class="btn btn-reject" onclick="rejectOrder('${order.id}', event)">❌ रद्द करें</button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -492,29 +506,27 @@
                 let waShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
 
                 if(h.status === 'accepted') {
-                    // ✅ स्वीकृत आर्डर्स से डिलीट बटन हटा दिया गया है, सिर्फ शेयर बटन रहेगा
                     acceptedHtml += `
-                        <div class="history-item-box">
+                        <div class="history-item-box" onclick="showOrderDetails(event, '${key}')">
                             <div>
                                 <b>👤 ${h.name}</b> (₹${h.amount})<br>
                                 📞 ${h.phone} | 📍 ${h.address}<br>
                                 <span style="color:#555; font-size:8px;">⏰ समय: ${timeStr}</span>
                             </div>
-                            <div class="history-actions">
+                            <div class="history-actions" onclick="event.stopPropagation()">
                                 <a href="${waShareUrl}" target="_blank" class="action-icon-btn share-btn" title="WhatsApp पर शेयर करें">📤</a>
                             </div>
                         </div>
                     `;
                 } else if(h.status === 'rejected') {
-                    // ✅ रद्द किए गए आर्डर्स के सामने पूरी डिटेल और शेयर + डिलीट दोनों बटन
                     rejectedHtml += `
-                        <div class="rejected-item-box">
+                        <div class="rejected-item-box" onclick="showOrderDetails(event, '${key}')">
                             <div>
                                 <b>👤 ${h.name}</b> (रद्द)<br>
                                 📞 ${h.phone} | 📍 ${h.address || 'लागू नहीं'}<br>
                                 <span style="color:#555; font-size:8px;">⏰ रद्द समय: ${timeStr}</span>
                             </div>
-                            <div class="history-actions">
+                            <div class="history-actions" onclick="event.stopPropagation()">
                                 <a href="${waShareUrl}" target="_blank" class="action-icon-btn share-btn" title="WhatsApp पर शेयर करें">📤</a>
                                 <button class="action-icon-btn delete-btn" onclick="deleteHistoryItem('${key}')" title="डिलीट करें">🗑️</button>
                             </div>
@@ -528,89 +540,158 @@
         });
     }
 
+    // ✅ आर्डर पर क्लिक करते ही उसकी पूरी डिटेल (आइटम, नाम, नंबर, पता, समय) दिखाने वाला फंक्शन
+    window.showOrderDetails = function(event, key) {
+        const historyRef = ref(db, 'orderHistory/' + key);
+        get(historyRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                let h = snapshot.val();
+                let timeStr = new Date(h.timestamp).toLocaleString('hi-IN');
+                let itemsListHtml = "";
+                if (h.items && Array.isArray(h.items)) {
+                    h.items.forEach(i => {
+                        itemsListHtml += `<li>${i.name} - ${i.qtyText || i.qty + ' kg'} (₹${i.price}/kg)</li>`;
+                    });
+                }
+
+                let detailsHtml = `
+                    <b>👤 ग्राहक का नाम:</b> ${h.name}<br>
+                    <b>📞 मोबाइल नंबर:</b> ${h.phone}<br>
+                    <b>📍 पूरा पता:</b> ${h.address || 'लागू नहीं'}<br>
+                    <b>📍 जीपीएस दूरी:</b> ${h.distance || 'लागू नहीं'}<br>
+                    <b>⏰ दिनांक व समय:</b> ${timeStr}<br>
+                    <b>📌 स्थिति:</b> <span style="color:${h.status === 'accepted' ? '#2e7d32' : '#c62828'}; font-weight:bold;">${h.status === 'accepted' ? 'स्वीकृत (Accepted)' : 'रद्द (Rejected)'}</span><br>
+                    <b>💰 कुल राशि:</b> ₹${h.amount || '0'}<br>
+                    <hr style="border:0; border-top:1px dashed #ccc; margin:6px 0;">
+                    <b>🛒 आर्डर की गई सब्जियां:</b>
+                    <ul style="margin:4px 0; padding-left:15px; font-size:10px;">${itemsListHtml}</ul>
+                `;
+                document.getElementById('orderDetailsBody').innerHTML = detailsHtml;
+                document.getElementById('detailModal').style.display = 'flex';
+            }
+        });
+    };
+
+    window.closeDetailModal = function() {
+        document.getElementById('detailModal').style.display = 'none';
+    };
+
+    window.closeDetailModalOutside = function(event) {
+        let content = document.getElementById('detailModalContent');
+        if (!content.contains(event.target)) {
+            closeDetailModal();
+        }
+    };
+
+    // ✅ सिंगल हिस्ट्री डिलीट करने पर पॉप-अप बंद नहीं होगा
     window.deleteHistoryItem = function(key) {
         if(confirm("क्या आप वाकई इस आर्डर को हिस्ट्री से हटाना चाहते हैं?")) {
             const itemRef = ref(db, 'orderHistory/' + key);
-            onValue(itemRef, (snapshot) => {
-                lastDeletedHistory = { key: key, data: snapshot.val() };
-            }, { onlyOnce: true });
-            remove(itemRef);
+            get(itemRef).then((snapshot) => {
+                if(snapshot.exists()) {
+                    lastDeletedHistory[key] = snapshot.val(); // बैकअप में सेव करें
+                }
+                remove(itemRef);
+            });
         }
     };
 
+    // ✅ सभी हिस्ट्री डिलीट करने पर बैकअप लेना
     window.clearAllHistory = function() {
         if(confirm("क्या आप वाकई सभी आर्डर हिस्ट्री को साफ़ करना चाहते हैं?")) {
             const historyRef = ref(db, 'orderHistory');
-            onValue(historyRef, (snapshot) => {
-                lastDeletedHistory = { all: true, data: snapshot.val() };
-            }, { onlyOnce: true });
-            remove(historyRef);
+            get(historyRef).then((snapshot) => {
+                if(snapshot.exists()) {
+                    lastDeletedHistory = snapshot.val(); // सभी का बैकअप
+                }
+                remove(historyRef);
+            });
         }
     };
 
+    // ✅ सभी या डिलीट किए गए ऑर्डर्स को वापस लाने (Restore) का फंक्शन
     window.restoreAllHistory = function() {
-        if (!lastDeletedHistory) {
+        if (Object.keys(lastDeletedHistory).length === 0) {
             alert("वापस लाने के लिए कोई हालिया डिलीट किया गया डेटा नहीं है!");
             return;
         }
-        if (lastDeletedHistory.all) {
-            set(ref(db, 'orderHistory'), lastDeletedHistory.data).then(() => {
-                alert("सभी हिस्ट्री सफलतापूर्वक वापस आ गई है!");
-                lastDeletedHistory = null;
-            });
-        } else if (lastDeletedHistory.key) {
-            set(ref(db, 'orderHistory/' + lastDeletedHistory.key), lastDeletedHistory.data).then(() => {
-                alert("आर्डर सफलतापूर्वक वापस आ गया है!");
-                lastDeletedHistory = null;
-            });
-        }
-    };
-
-    window.acceptOrder = function(orderId, name, amount, phone, address) {
-        stopContinuousAlarm();
-        let historyData = {
-            name: name,
-            amount: amount,
-            phone: phone,
-            address: address,
-            status: 'accepted',
-            timestamp: Date.now()
-        };
-
-        set(ref(db, 'customerNotification/' + phone), {
-            status: 'accepted',
-            msg: `आपका ऑर्डर स्वीकार कर लिया गया है! (₹${amount})`,
-            timestamp: Date.now()
-        }).then(() => {
-            push(ref(db, 'orderHistory'), historyData).then(() => {
-                alert('ऑर्डर स्वीकार कर लिया गया है!');
-                remove(ref(db, 'orders/' + orderId));
+        
+        let historyRef = ref(db, 'orderHistory');
+        get(historyRef).then((snapshot) => {
+            let existingData = snapshot.val() || {};
+            let mergedData = { ...existingData, ...lastDeletedHistory };
+            
+            set(historyRef, mergedData).then(() => {
+                alert("सभी डिलीट किए गए आर्डर्स सफलतापर्वक वापस आ गए हैं!");
+                lastDeletedHistory = {};
             });
         });
     };
 
-    // ✅ रद्द किए गए आर्डर के साथ पूरी डिटेल हिस्ट्री में सेव होगी
-    window.rejectOrder = function(orderId, name, amount, phone, address) {
+    window.acceptOrder = function(orderId, event) {
+        event.stopPropagation();
+        stopContinuousAlarm();
+        const orderRef = ref(db, 'orders/' + orderId);
+        
+        get(orderRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                let order = snapshot.val();
+                let historyData = {
+                    name: order.customerName,
+                    amount: order.totalAmount,
+                    phone: order.customerPhone,
+                    address: order.customerAddress,
+                    distance: order.distance || '',
+                    items: order.items || [],
+                    status: 'accepted',
+                    timestamp: Date.now()
+                };
+
+                set(ref(db, 'customerNotification/' + order.customerPhone), {
+                    status: 'accepted',
+                    msg: `✅ आपका ऑर्डर स्वीकार कर लिया गया है! (₹${order.totalAmount})`,
+                    timestamp: Date.now()
+                }).then(() => {
+                    push(ref(db, 'orderHistory'), historyData).then(() => {
+                        alert('ऑर्डर स्वीकार कर लिया गया है!');
+                        remove(orderRef);
+                    });
+                });
+            }
+        });
+    };
+
+    window.rejectOrder = function(orderId, event) {
+        event.stopPropagation();
         if(confirm('क्या आप वाकई इस ऑर्डर को रद्द करना चाहते हैं?')) {
             stopContinuousAlarm();
-            let historyData = {
-                name: name,
-                amount: amount,
-                phone: phone,
-                address: address,
-                status: 'rejected',
-                timestamp: Date.now()
-            };
+            const orderRef = ref(db, 'orders/' + orderId);
 
-            set(ref(db, 'customerNotification/' + phone), {
-                status: 'rejected',
-                msg: `माफ़ कीजिए, आपका ऑर्डर रद्द कर दिया गया है।`,
-                timestamp: Date.now()
-            }).then(() => {
-                push(ref(db, 'orderHistory'), historyData).then(() => {
-                    alert('ऑर्डर रद्द कर दिया गया है।');
-                    remove(ref(db, 'orders/' + orderId));
-                });
+            get(orderRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    let order = snapshot.val();
+                    let historyData = {
+                        name: order.customerName,
+                        amount: order.totalAmount,
+                        phone: order.customerPhone,
+                        address: order.customerAddress,
+                        distance: order.distance || '',
+                        items: order.items || [],
+                        status: 'rejected',
+                        timestamp: Date.now()
+                    };
+
+                    set(ref(db, 'customerNotification/' + order.customerPhone), {
+                        status: 'rejected',
+                        msg: `❌ माफ़ कीजिए, आपका ऑर्डर रद्द कर दिया गया है।`,
+                        timestamp: Date.now()
+                    }).then(() => {
+                        push(ref(db, 'orderHistory'), historyData).then(() => {
+                            alert('ऑर्डर रद्द कर दिया गया है।');
+                            remove(orderRef);
+                        });
+                    });
+                }
             });
         }
     };
@@ -624,7 +705,7 @@
     };
 
     window.checkOutsideClick = function(event) {
-        let modalContent = document.querySelector('.modal-content');
+        let modalContent = document.getElementById('historyModalContent');
         if (!modalContent.contains(event.target)) {
             closeHistoryModal();
         }
