@@ -12,7 +12,6 @@
     <style>
         body { font-family: Arial, sans-serif; background: #fff3e0; margin: 0; padding: 5px; color: #333; padding-top: 40px; box-sizing: border-box; }
         
-        /* ✅ पीछे का सफेद बैकग्राउंड (Container) बिल्कुल छोटा और स्क्रीन के अंदर फिट */
         .container { width: 94%; max-width: 420px; box-sizing: border-box; margin: auto; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         
         h2 { color: #e65100; text-align: center; margin-bottom: 5px; font-size: 16px; }
@@ -43,17 +42,18 @@
         .item-list { font-size: 10px; margin: 2px 0; padding-left: 10px; }
         .error-msg { color: red; font-size: 10px; text-align: center; margin-top: 4px; }
 
-        /* ✅ कैटलॉग - रेट के पीछे से बॉक्स पूरी तरह गायब, एकदम साफ़ टेक्स्ट और नाम के बिल्कुल पास */
-        .item-row { display: flex; gap: 6px; margin-bottom: 5px; align-items: center; width: 100%; box-sizing: border-box; border-bottom: 1px solid #eee; padding-bottom: 4px; }
-        .item-row input.item-name { flex: 1.5; border: none; background: transparent; font-size: 12px; font-weight: bold; color: #333; outline: none; box-sizing: border-box; }
-        .item-row input.item-price { flex: 0.6; border: none; border-bottom: 1px dashed #999; background: transparent; padding: 2px; font-size: 12px; text-align: center; outline: none; box-sizing: border-box; font-weight: bold; color: #e65100; }
+        /* ✅ कैटलॉग - अब नाम, रेट, ₹/kg और हटाए बटन बिल्कुल पास-पास होंगे */
+        .item-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; width: 100%; box-sizing: border-box; border-bottom: 1px solid #eee; padding-bottom: 4px; gap: 5px; }
+        .item-row input.item-name { width: 35%; border: none; background: transparent; font-size: 12px; font-weight: bold; color: #333; outline: none; }
+        .right-group { display: flex; align-items: center; gap: 4px; }
+        .item-row input.item-price { width: 40px; border: none; border-bottom: 1px dashed #999; background: transparent; padding: 2px; font-size: 12px; text-align: center; outline: none; font-weight: bold; color: #e65100; }
         .item-row span { font-size: 10px; color: #666; white-space: nowrap; }
-        .item-row button.remove-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 3px 5px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 9px; white-space: nowrap; }
+        .item-row button.remove-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 3px 6px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 9px; white-space: nowrap; }
 
         /* नीचे सिर्फ हिस्ट्री गोल आइकन */
         .history-floating-btn { background: #37474f; color: white; border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); margin: 10px auto 4px auto; }
 
-        /* ✅ हिस्ट्री पॉप-अप - अब बिल्कुल छोटा और स्क्रीन के अंदर फिट */
+        /* हिस्ट्री पॉप-अप */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 5px; box-sizing: border-box; }
         .modal-content { background: white; padding: 10px; width: 85%; max-width: 280px; border-radius: 6px; max-height: 65vh; overflow-y: auto; box-sizing: border-box; position: relative; margin: auto; }
         .close-modal { position: absolute; top: 5px; right: 6px; font-size: 12px; font-weight: bold; cursor: pointer; color: #fff; background: #c62828; padding: 1px 5px; border-radius: 50%; z-index: 10; }
@@ -74,7 +74,7 @@
         <h3 style="color:#e65100; margin-top:0; font-size:12px;">📊 आर्डर का इतिहास</h3>
         <hr style="border:0; border-top:1px solid #ddd; margin-bottom:4px;">
         
-        <h4 style="color:#2e7d32; margin:2px 0; font-size:10px;">✅ स्वीकृत आर्डर्स:</h4>
+        <h4 style="color:#2e7d32; margin:3px 0; font-size:10px;">✅ स्वीकृत आर्डर्स:</h4>
         <div id="accepted-history-container">
             <p style="font-size: 9px; color: #777;">कोई स्वीकृत आर्डर नहीं है।</p>
         </div>
@@ -139,21 +139,27 @@
             <div id="catalog-items-container">
                 <div class="item-row">
                     <input type="text" class="item-name" value="टमाटर">
-                    <input type="number" class="item-price" value="40">
-                    <span>₹/kg</span>
-                    <button class="remove-btn" onclick="this.parentElement.remove()">हटाएं</button>
+                    <div class="right-group">
+                        <input type="number" class="item-price" value="40">
+                        <span>₹/kg</span>
+                        <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
+                    </div>
                 </div>
                 <div class="item-row">
                     <input type="text" class="item-name" value="आलू">
-                    <input type="number" class="item-price" value="30">
-                    <span>₹/kg</span>
-                    <button class="remove-btn" onclick="this.parentElement.remove()">हटाएं</button>
+                    <div class="right-group">
+                        <input type="number" class="item-price" value="30">
+                        <span>₹/kg</span>
+                        <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
+                    </div>
                 </div>
                 <div class="item-row">
                     <input type="text" class="item-name" value="प्याज़">
-                    <input type="number" class="item-price" value="50">
-                    <span>₹/kg</span>
-                    <button class="remove-btn" onclick="this.parentElement.remove()">हटाएं</button>
+                    <div class="right-group">
+                        <input type="number" class="item-price" value="50">
+                        <span>₹/kg</span>
+                        <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
+                    </div>
                 </div>
             </div>
             
@@ -260,9 +266,11 @@
         div.className = "item-row";
         div.innerHTML = `
             <input type="text" class="item-name" placeholder="आइटम नाम">
-            <input type="number" class="item-price" placeholder="रेट">
-            <span>₹/kg</span>
-            <button class="remove-btn" onclick="this.parentElement.remove()">हटाएं</button>
+            <div class="right-group">
+                <input type="number" class="item-price" placeholder="रेट">
+                <span>₹/kg</span>
+                <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
+            </div>
         `;
         container.appendChild(div);
     };
