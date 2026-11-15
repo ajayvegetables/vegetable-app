@@ -19,13 +19,10 @@
         .form-group input, .form-group textarea { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 11px; }
         .btn-main { background: #e65100; color: white; border: none; width: 100%; padding: 8px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; box-sizing: border-box; }
         
-        /* ✅ शीर्ष बार फिक्स (लॉगआउट, हिस्ट्री, घंटी और हेल्प बटन एक लाइन में) */
         .top-bar-fixed { position: fixed; top: 5px; right: 8px; display: flex; gap: 4px; z-index: 999; align-items: center; }
         .top-left-fixed { position: fixed; top: 5px; left: 8px; display: flex; gap: 4px; z-index: 999; }
         
-        /* गोल लॉगआउट बटन जिसके अंदर साफ़-साफ़ 'लॉगआउट' लिखा है */
         .logout-circle-btn { background: #c62828; color: white; padding: 3px 6px; border-radius: 12px; border: none; font-size: 9px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        
         .history-top-icon-btn { background: #37474f; color: white; padding: 3px 7px; border-radius: 10px; font-weight: bold; font-size: 10px; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); text-decoration: none; display: flex; align-items: center; gap: 2px; }
         .help-btn { background: #2e7d32; color: white; padding: 3px 7px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .notif-badge-btn { background: #c62828; color: white; padding: 3px 7px; border-radius: 10px; font-weight: bold; font-size: 10px; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
@@ -77,12 +74,10 @@
 </head>
 <body>
 
-<!-- शीर्ष बाएं कोने में 'लॉगआउट' लिखा हुआ गोल बटन -->
 <div class="top-left-fixed">
     <button class="logout-circle-btn" onclick="logout()">🚪 लॉगआउट</button>
 </div>
 
-<!-- शीर्ष दाएं कोने में हिस्ट्री, घंटी और हेल्प बटन -->
 <div class="top-bar-fixed">
     <button class="history-top-icon-btn" onclick="openHistoryModal()">📜 हिस्ट्री</button>
     <button class="notif-badge-btn" onclick="openNotifications()">🔔 <span id="notifCount">0</span></button>
@@ -544,6 +539,7 @@
         });
     }
 
+    // ✅ आर्डर की पूरी जानकारी (सब्जियों की लिस्ट और वजन सहित) दिखने वाला फिक्स फंक्शन
     window.showOrderDetails = function(event, key) {
         closeHistoryModal();
         const historyRef = ref(db, 'orderHistory/' + key);
@@ -552,10 +548,15 @@
                 let h = snapshot.val();
                 let timeStr = new Date(h.timestamp).toLocaleString('hi-IN');
                 let itemsListHtml = "";
+                
+                // आर्डर में मौजूद सभी सब्जियों और उनके वजन को छोटे अक्षरों में साफ़ दिखाना
                 if (h.items && Array.isArray(h.items)) {
                     h.items.forEach(i => {
-                        itemsListHtml += `<li>${i.name} - ${i.qtyText || i.qty + ' kg'} (₹${i.price}/kg)</li>`;
+                        let qtyDisplay = i.qtyText || `${i.qty} कि.मी./kg`;
+                        itemsListHtml += `<li><b>${i.name}</b> - ${qtyDisplay} (₹${i.price}/kg)</li>`;
                     });
+                } else {
+                    itemsListHtml = `<li>कोई सब्जी डेटा उपलब्ध नहीं है।</li>`;
                 }
 
                 let detailsHtml = `
@@ -568,7 +569,7 @@
                     <b>💰 कुल राशि:</b> ₹${h.amount || '0'}<br>
                     <hr style="border:0; border-top:1px dashed #ccc; margin:6px 0;">
                     <b>🛒 आर्डर की गई सब्जियां:</b>
-                    <ul style="margin:4px 0; padding-left:15px; font-size:10px;">${itemsListHtml}</ul>
+                    <ul style="margin:4px 0; padding-left:15px; font-size:11px; color:#333;">${itemsListHtml}</ul>
                 `;
                 document.getElementById('orderDetailsBody').innerHTML = detailsHtml;
                 document.getElementById('detailModal').style.display = 'flex';
@@ -643,7 +644,7 @@
                     phone: order.customerPhone,
                     address: order.customerAddress,
                     distance: order.distance || '',
-                    items: order.items || [],
+                    items: order.items || [], // सब्जियों की लिस्ट सेव की जा रही है
                     status: 'accepted',
                     timestamp: Date.now()
                 };
@@ -677,7 +678,7 @@
                         phone: order.customerPhone,
                         address: order.customerAddress,
                         distance: order.distance || '',
-                        items: order.items || [],
+                        items: order.items || [], // सब्जियों की लिस्ट सेव की जा रही है
                         status: 'rejected',
                         timestamp: Date.now()
                     };
@@ -688,7 +689,7 @@
                         timestamp: Date.now()
                     }).then(() => {
                         push(ref(db, 'orderHistory'), historyData).then(() => {
-                            alert('ऑर्डर रद्द कर दिया गया है। मैदान साफ़ है।');
+                            alert('ऑर्डर रद्द कर दिया गया है।');
                             remove(orderRef);
                         });
                     });
