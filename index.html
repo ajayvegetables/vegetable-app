@@ -31,7 +31,8 @@
             from { border-left-color: #ff9800; background: #fff3e0; }
             to { border-left-color: #d32f2f; background: #ffebee; }
         }
-        .otp-msg { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 10px; margin-top: 10px; border-radius: 4px; color: #2e7d32; font-weight: bold; text-align: center; }
+        .otp-msg { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 15px; margin-top: 15px; border-radius: 6px; color: #1b5e20; font-weight: bold; text-align: center; font-size: 16px; }
+        .timer-text { color: #d32f2f; font-size: 14px; margin-top: 8px; }
         .badge-success { background: #4caf50; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
         .no-order { text-align: center; color: #777; font-size: 14px; padding: 15px; background: #f9f9f9; border-radius: 4px; border: 1px dashed #ccc; }
     </style>
@@ -48,9 +49,12 @@
             <div class="section-title">दुकानदार लॉगिन (OTP द्वारा)</div>
             <label>अपना 10 अंकों का मोबाइल नंबर दर्ज करें:</label>
             <input type="text" id="loginMobile" placeholder="मोबाइल नंबर" maxlength="10">
-            <button class="btn" onclick="sendOTP()">ओटीपी भेजें</button>
+            <button class="btn" id="sendOtpBtn" onclick="sendOTP()">ओटीपी भेजें</button>
             
-            <div id="otpDisplayBox" class="hidden otp-msg"></div>
+            <div id="otpDisplayBox" class="hidden otp-msg">
+                <div id="otpText"></div>
+                <div id="timerDisplay" class="timer-text"></div>
+            </div>
 
             <div id="otpBox" class="hidden">
                 <label>संदेश में प्राप्त 4 अंकों का OTP दर्ज करें:</label>
@@ -130,7 +134,9 @@
         let alarmInterval = null;
         let audioCtx = null;
         let activeOrdersCount = 0;
+        let otpTimer = null;
 
+        // पेज लोड होते ही चेक करें कि क्या पहले से लॉगिन हैं
         window.onload = function() {
             let savedMobile = localStorage.getItem('vendor_mobile');
             if(savedMobile) {
@@ -144,22 +150,60 @@
             var mobile = document.getElementById('loginMobile').value;
             if(mobile.length === 10) {
                 generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+                
                 var otpMsgBox = document.getElementById('otpDisplayBox');
-                otpMsgBox.innerText = `📩 नया संदेश (OTP): आपका वन-टाइम पासवर्ड है -> ${generatedOTP}`;
+                var otpText = document.getElementById('otpText');
+                otpText.innerHTML = `📩 आपका OTP है: <span style="font-size:22px; color:#d32f2f;">${generatedOTP}</span>`;
                 otpMsgBox.classList.remove('hidden');
                 document.getElementById('otpBox').classList.remove('hidden');
+
+                // 2 मिनट (120 सेकंड) का टाइमर शुरू करें[span_3](start_span)[span_3](end_span)
+                startOtpCountdown(120);
+                
                 alert('ओटीपी जनरेट हो गया है! नीचे बॉक्स में देखें।');
             } else {
                 alert('कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।');
             }
         }
 
+        // OTP एक्सपायरी टाइमर फंक्शन[span_4](start_span)[span_4](end_span)
+        function startOtpCountdown(duration) {
+            let timer = duration, minutes, seconds;
+            let display = document.getElementById('timerDisplay');
+            
+            if (otpTimer) clearInterval(otpTimer);
+
+            otpTimer = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.innerText = `⏱️ OTP एक्सपायरी समय: ${minutes}:${seconds} मिनट`;
+
+                if (--timer < 0) {
+                    clearInterval(otpTimer);
+                    generatedOTP = ""; // OTP एक्सपायर होने पर खाली कर दें[span_5](start_span)[span_5](end_span)
+                    display.innerHTML = `<span style="color:red;">❌ OTP एक्सपायर हो गया है! कृपया दोबारा 'ओटीपी भेजें' पर क्लिक करें।</span>[span_6](start_span)[span_6](end_span)`;
+                    document.getElementById('otpBox').classList.add('hidden');
+                }
+            }, 1000);
+        }
+
         function verifyOTP() {
             var otp = document.getElementById('otpInput').value;
+            if (generatedOTP === "") {
+                alert('OTP का समय समाप्त हो गया है! कृपया नया OTP मंगाएं।');
+                return;
+            }
+
             if(otp === generatedOTP && otp !== "") {
                 var mobile = document.getElementById('loginMobile').value;
                 localStorage.setItem('vendor_mobile', mobile);
                 
+                if (otpTimer) clearInterval(otpTimer); // टाइमर बंद करें
+
                 document.getElementById('userMobileDisplay').innerText = mobile;
                 alert('लॉगिन सफल रहा!');
                 document.getElementById('loginSection').classList.add('hidden');
@@ -172,6 +216,7 @@
         function logout() {
             localStorage.removeItem('vendor_mobile');
             stopAlarm();
+            if (otpTimer) clearInterval(otpTimer);
             document.getElementById('dashboardSection').classList.add('hidden');
             document.getElementById('loginSection').classList.remove('hidden');
             document.getElementById('loginMobile').value = '';
@@ -180,7 +225,7 @@
             document.getElementById('otpDisplayBox').classList.add('hidden');
         }
 
-        // लगातार तेज बजने वाला सायरन अलार्म (जो तब तक नहीं रुकेगा जब तक आप एक्शन न लें)
+        // लगातार तेज बजने वाला सायरन अलार्म
         function startContinuousAlarm() {
             if (alarmInterval) return;
 
@@ -225,7 +270,7 @@
             }
         }
 
-        // जब ग्राहक ऑर्डर करेगा (या टेस्ट बटन दबेगा), तब यह चलेगा
+        // टेस्ट नया ऑर्डर मंगाने पर
         function simulateNewOrder() {
             var container = document.getElementById('orderListContainer');
             var noOrderText = document.getElementById('noOrderText');
@@ -256,12 +301,9 @@
             
             container.prepend(newDiv);
             activeOrdersCount++;
-            
-            // जैसे ही ऑर्डर आएगा, लगातार तेज अलार्म बजना शुरू हो जाएगा
             startContinuousAlarm();
         }
 
-        // आर्डर स्वीकार करने पर
         function acceptOrder(orderId) {
             var orderElement = document.getElementById('order_' + orderId);
             if (orderElement) {
@@ -279,12 +321,11 @@
 
             activeOrdersCount--;
             if (activeOrdersCount <= 0) {
-                stopAlarm(); // घंटी बंद हो जाएगी
+                stopAlarm();
                 activeOrdersCount = 0;
             }
         }
 
-        // आर्डर रिजेक्ट करने पर
         function rejectOrder(orderId) {
             var orderElement = document.getElementById('order_' + orderId);
             if (orderElement) {
@@ -302,7 +343,7 @@
 
             activeOrdersCount--;
             if (activeOrdersCount <= 0) {
-                stopAlarm(); // घंटी बंद हो जाएगी
+                stopAlarm();
                 activeOrdersCount = 0;
             }
         }
@@ -328,7 +369,7 @@
                 newItem.className = 'veg-item';
                 newItem.style.display = 'flex';
                 newItem.style.justifyContent = 'space-between';
-                newItem.style.alignItems: 'center';
+                newItem.style.alignItems = 'center';
                 newItem.innerHTML = `<span><b>${name}</b> - ₹${price}/किग्रा (उपलब्ध: हाँ)</span> <button onclick="toggleStock(this)" style="background: green; color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer;">चालू</button>`;
                 container.appendChild(newItem);
                 document.getElementById('vegName').value = '';
