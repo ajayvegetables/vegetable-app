@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>वेजिटेबल पार्टनर - दुकानदार डैशबोर्ड</title>
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%B5%E0%A5%87%E0%A4%9C%E0%A4%BF%E0%A4%AB%E0%A4%9F%E0%A4%AC%E0%A4%B2%20%E0%A4%AA%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%9A%E0%A4%A8%22%2C%22short_name%22%3A%22VegPartner%22%2C%22start_url%22%3A%22.%2Fshopkeeper.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fff3e0%22%2C%22theme_color%22%3A%22%23e65100%22%7D">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%B5%E0%A5%87%E0%A4%9C%E0%A4%BF%E0%A4%AB%E0%A4%9F%E0%A4%AC%E0%A4%B2%20%E0%A4%AA%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%9F%E0%A4%A8%22%2C%22short_name%22%3A%22VegPartner%22%2C%22start_url%22%3A%22.%2Fshopkeeper.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fff3e0%22%2C%22theme_color%22%3A%22%23e65100%22%7D">
     <meta name="theme-color" content="#e65100">
     
     <style>
@@ -26,8 +26,6 @@
         .history-top-icon-btn { background: #37474f; color: white; padding: 4px 8px; border-radius: 10px; font-weight: bold; font-size: 10px; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); text-decoration: none; display: flex; align-items: center; gap: 2px; }
         .help-btn { background: #2e7d32; color: white; padding: 4px 8px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .notif-badge-btn { background: #c62828; color: white; padding: 4px 8px; border-radius: 10px; font-weight: bold; font-size: 10px; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        
-        /* गियर आइकॉन का नया चमकीला और साफ़ रंग-रूप */
         .gear-icon-btn { background: #0277bd; color: white; padding: 4px 9px; border-radius: 10px; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid #b3e5fc; box-shadow: 0 1px 4px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
 
         .status-bar { text-align: center; background: #ffe0b2; padding: 6px; border-radius: 4px; font-weight: bold; margin-bottom: 8px; color: #bf360c; font-size: 11px; }
@@ -47,7 +45,6 @@
         .btn-reject { background: #c62828; }
         .btn-call { background: #0288d1; text-decoration: none; text-align: center; display: block; padding: 6px; border-radius: 3px; color: white; font-weight: bold; margin-top: 6px; font-size: 11px; width: 100%; }
 
-        /* सब्जी कार्ड लेआउट (हिंदी नाम के नीचे अंग्रेजी नाम) */
         .item-row { display: flex; flex-direction: column; background: #fff; border: 1px solid #eee; padding: 8px; border-radius: 5px; margin-bottom: 6px; }
         .item-top { display: flex; flex-direction: column; width: 100%; margin-bottom: 4px; }
         .item-row input.item-name { width: 100%; border: none; background: transparent; font-size: 13px; font-weight: bold; color: #333; outline: none; }
@@ -188,8 +185,11 @@
 
         <div class="section-box" style="margin-top: 10px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <h3 style="margin: 0; color:#e65100; font-size:12px;">सब्जी / फल, रेट व कुल स्टॉक (किलो):</h3>
-                <button class="btn-main" style="background:#2e7d32; font-size:10px; padding:5px 10px; width:auto;" onclick="addNewItemRow()">+ नया आइटम जोड़ें</button>
+                <h3 style="margin: 0; color:#e65100; font-size:12px;">कैटलॉग और रेट मैनेज करें:</h3>
+                <div style="display: flex; gap: 4px;">
+                    <button class="btn-main" style="background:#2e7d32; font-size:10px; padding:5px 8px; width:auto;" onclick="addNewItemRow()">+ नया आइटम</button>
+                    <button class="btn-main" style="background:#e65100; font-size:10px; padding:5px 8px; width:auto;" onclick="saveCatalogSettings()">💾 सेव करें</button>
+                </div>
             </div>
             
             <div id="catalog-items-container"></div>
@@ -477,7 +477,7 @@
         
         set(ref(db, 'shopSettings'), settingsData).then(() => {
             if(showAlert) {
-                alert("सेटिंग्स और कैटलॉग सफलतापूर्वक सेव हो गए हैं!");
+                alert("कैटलॉग सफलतापूर्वक सेव हो गया है!");
             }
         }).catch((err) => {
             if(showAlert) {
@@ -513,7 +513,7 @@
         playSpecialAlarm();
         alarmInterval = setInterval(() => {
             playSpecialAlarm();
-        }, 2500);
+        }, 1500);
     }
 
     function stopContinuousAlarm() {
@@ -530,12 +530,12 @@
             let gain = audioCtx.createGain();
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.2);
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.15);
             gain.gain.setValueAtTime(1, audioCtx.currentTime);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.5);
+            osc.stop(audioCtx.currentTime + 0.4);
         } catch(e) {
             console.log("Audio error", e);
         }
@@ -565,8 +565,9 @@
 
             document.getElementById('notifCount').innerText = ordersArray.length;
 
+            // जैसे ही कोई नया आर्डर बढ़े, तुरंत बिना देरी के अलार्म बजेगा
             if (previousCount !== null && ordersArray.length > previousCount) {
-                customerNotifications.push("नया आर्डर प्राप्त हुआ है!");
+                playSpecialAlarm();
             }
             previousCount = ordersArray.length;
 
