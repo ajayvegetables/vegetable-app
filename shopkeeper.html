@@ -354,9 +354,14 @@
         let container = document.getElementById('catalog-items-container');
         container.innerHTML = "";
         items.forEach((item, index) => {
-            let isOut = item.outOfStock ? "out-of-stock" : "";
-            let btnText = item.outOfStock ? "स्टॉक में है" : "स्टॉक नहीं है";
             let stockVal = item.stock !== undefined ? item.stock : 10;
+            
+            // डेटाबेस से आने वाले 'outOfStock' स्टेटस को प्राथमिकता दें, लेकिन अगर स्टॉक 0 है तो वह अपने आप लाल हो जाए
+            let isOut = item.outOfStock;
+            if (stockVal <= 0) isOut = true;
+
+            let btnText = isOut ? "स्टॉक नहीं है" : "स्टॉक में है";
+            let btnClass = isOut ? "stock-toggle-btn out-of-stock" : "stock-toggle-btn";
             let engName = getEnglishName(item.name);
 
             let div = document.createElement('div');
@@ -369,9 +374,9 @@
                 <div class="item-bottom">
                     <input type="number" class="item-price" value="${item.price}" placeholder="रेट">
                     <span>₹/kg</span>
-                    <input type="number" class="item-stock" value="${stockVal}" placeholder="स्टॉक" onchange="autoCheckStock(${index})">
+                    <input type="number" class="item-stock" value="${stockVal}" placeholder="स्टॉक" oninput="autoCheckStock(${index})" onchange="autoCheckStock(${index})">
                     <span>kg</span>
-                    <button class="stock-toggle-btn ${isOut}" onclick="toggleStock(${index})">${btnText}</button>
+                    <button class="${btnClass}" id="stock_btn_${index}" onclick="toggleStock(${index})">${btnText}</button>
                     <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
                 </div>
             `;
@@ -379,28 +384,19 @@
         });
     }
 
+    // जब दुकानदार अपनी मर्जी से बटन पर क्लिक करके लाल/हरा करना चाहे
     window.toggleStock = function(index) {
-        let rows = document.querySelectorAll('.item-row');
-        let catalog = [];
-        rows.forEach((row, idx) => {
-            let name = row.querySelector('.item-name').value.trim();
-            let price = parseFloat(row.querySelector('.item-price').value) || 0;
-            let stock = parseFloat(row.querySelector('.item-stock').value) || 0;
-            let stockBtn = row.querySelector('.stock-toggle-btn');
-            let isOut = idx === index ? !stockBtn.classList.contains('out-of-stock') : stockBtn.classList.contains('out-of-stock');
-            
-            if(name) {
-                catalog.push({ name: name, price: price, stock: stock, outOfStock: isOut });
-            }
-        });
-
-        let upi = document.getElementById('shopUpi').value.trim();
-        let whatsapp = document.getElementById('shopWhatsapp').value.trim();
-        let offerText = document.getElementById('shopOfferText').value.trim();
-
-        set(ref(db, 'shopSettings'), { upi, whatsapp, offerText, catalog });
+        let stockBtn = document.getElementById(`stock_btn_${index}`);
+        stockBtn.classList.toggle('out-of-stock');
+        if(stockBtn.classList.contains('out-of-stock')) {
+            stockBtn.innerText = "स्टॉक नहीं है";
+        } else {
+            stockBtn.innerText = "स्टॉक में है";
+        }
+        saveCatalogSettingsWithoutAlert();
     };
 
+    // जब दुकानदार बॉक्स में स्टॉक की संख्या बदले (टाइप करे)
     window.autoCheckStock = function(index) {
         let rows = document.querySelectorAll('.item-row');
         let targetRow = rows[index];
@@ -408,9 +404,13 @@
         let stockBtn = targetRow.querySelector('.stock-toggle-btn');
         let stockVal = parseFloat(stockInput.value) || 0;
 
-        if (stockVal <= 0) {
-            stockBtn.classList.add('out-of-stock');
+        // यदि स्टॉक 0 से ज्यादा है, तो ऑटोमैटिक हरा हो जाए। अगर 0 या उससे कम है तो लाल हो जाए।
+        if (stockVal > 0) {
+            stockBtn.classList.remove('out-of-stock');
             stockBtn.innerText = "स्टॉक में है";
+        } else {
+            stockBtn.classList.add('out-of-stock');
+            stockBtn.innerText = "स्टॉक नहीं है";
         }
         saveCatalogSettingsWithoutAlert();
     };
@@ -428,9 +428,9 @@
             <div class="item-bottom">
                 <input type="number" class="item-price" placeholder="रेट">
                 <span>₹/kg</span>
-                <input type="number" class="item-stock" value="10" placeholder="स्टॉक">
+                <input type="number" class="item-stock" value="10" placeholder="स्टॉक" oninput="autoCheckStock(${newIndex})" onchange="autoCheckStock(${newIndex})">
                 <span>kg</span>
-                <button class="stock-toggle-btn" onclick="this.classList.toggle('out-of-stock'); this.innerText = this.classList.contains('out-of-stock') ? 'स्टॉक में है' : 'स्टॉक नहीं है';">स्टॉक नहीं है</button>
+                <button class="stock-toggle-btn" id="stock_btn_${newIndex}" onclick="toggleStock(${newIndex})">स्टॉक में है</button>
                 <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
             </div>
         `;
@@ -439,7 +439,6 @@
 
     window.saveCatalogSettings = function() {
         saveCatalogSettingsData(true);
-        closeSettingsModal();
     };
 
     function saveCatalogSettingsWithoutAlert() {
@@ -458,15 +457,9 @@
             let price = parseFloat(row.querySelector('.item-price').value) || 0;
             let stock = parseFloat(row.querySelector('.item-stock').value) || 0;
             let stockBtn = row.querySelector('.stock-toggle-btn');
-            let isOut = stockBtn ? stockBtn.classList.contains('out-of-stock') : false;
-
-            if (stock <= 0) {
-                isOut = true;
-                if(stockBtn) {
-                    stockBtn.classList.add('out-of-stock');
-                    stockBtn.innerText = "स्टॉक में है";
-                }
-            }
+            
+            // यदि बटन लाल है (यानी मैनुअल 'स्टॉक नहीं है' किया गया है) या स्टॉक 0 है, तो वह कैटलॉग में 'outOfStock: true' हो जाएगा
+            let isOut = (stock <= 0) || (stockBtn ? stockBtn.classList.contains('out-of-stock') : false);
 
             if(name) {
                 catalog.push({ name: name, price: price, stock: stock, outOfStock: isOut });
@@ -477,7 +470,7 @@
         
         set(ref(db, 'shopSettings'), settingsData).then(() => {
             if(showAlert) {
-                alert("कैटलॉग सफलतापूर्वक सेव हो गया है!");
+                alert("कैटलॉग और स्टॉक सफलतापूर्वक सेव हो गए हैं!");
             }
         }).catch((err) => {
             if(showAlert) {
@@ -565,7 +558,6 @@
 
             document.getElementById('notifCount').innerText = ordersArray.length;
 
-            // जैसे ही कोई नया आर्डर बढ़े, तुरंत बिना देरी के अलार्म बजेगा
             if (previousCount !== null && ordersArray.length > previousCount) {
                 playSpecialAlarm();
             }
