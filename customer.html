@@ -12,86 +12,67 @@
     
     <style>
         * { box-sizing: border-box; }
-        /* अब यह मोबाइल की पूरी स्क्रीन को कवर करेगा, बीच में सिकुड़ेगा नहीं */
-        body { font-family: Arial, sans-serif; background: #e8f5e9; margin: 0; padding: 0; color: #333; padding-bottom: 70px; width: 100%; min-height: 100vh; }
-        .container { width: 100%; min-height: 100vh; margin: 0; background: white; padding: 10px; border-radius: 0; box-shadow: none; }
+        html, body { margin: 0; padding: 0; width: 100%; min-height: 100vh; background: #e8f5e9; font-family: Arial, sans-serif; color: #333; }
         
-        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #e8f5e9; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 15px; }
-        .login-box { background: white; width: 100%; max-width: 380px; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-align: center; }
-        .login-box h2 { color: #2e7d32; margin-bottom: 5px; font-size: 18px; }
-        .login-box p { font-size: 12px; color: #666; margin-bottom: 15px; }
-
-        .header { display: flex; justify-content: space-between; align-items: center; background: #2e7d32; color: white; padding: 10px 12px; border-radius: 6px; margin-bottom: 8px; }
-        .shop-title { font-size: 15px; font-weight: bold; }
-        .help-btn { background: #c62828; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; }
-        .shop-btn { background: #1976d2; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; display: inline-block; }
+        /* स्क्रीन के किनारों से थोड़ा अंदर लाने के लिए पैडिंग जोड़ी गई है */
+        .container { width: 100%; min-height: 100vh; margin: 0; background: white; padding: 12px; border-radius: 0; box-shadow: none; padding-bottom: 80px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; background: #2e7d32; color: white; padding: 12px 15px; border-radius: 8px; margin-bottom: 12px; font-size: 15px; }
+        .shop-title { font-size: 18px; font-weight: bold; }
+        .help-btn { background: #c62828; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; }
+        .shop-btn { background: #1976d2; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; display: inline-block; }
 
         .banner { 
             background: linear-gradient(135deg, #ff9800, #ff5722); 
             color: white; 
-            padding: 12px 10px; 
+            padding: 14px 12px; 
             border-radius: 8px; 
-            font-size: 13px; 
+            font-size: 14px; 
             font-weight: bold; 
-            margin-bottom: 10px; 
+            margin-bottom: 12px; 
             text-align: center; 
             box-shadow: 0 3px 8px rgba(255, 152, 0, 0.4);
             border: 2px dashed #fffde7;
         }
         
-        .status-notification { background: #e3f2fd; border: 1px solid #90caf9; padding: 8px; border-radius: 6px; margin-bottom: 8px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; color: #0d47a1; font-weight: bold; }
-        .close-notif-btn { background: none; border: none; font-size: 14px; font-weight: bold; cursor: pointer; color: #c62828; padding: 0 4px; }
+        .status-notification { background: #e3f2fd; border: 1px solid #90caf9; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; color: #0d47a1; font-weight: bold; }
+        .close-notif-btn { background: none; border: none; font-size: 16px; font-weight: bold; cursor: pointer; color: #c62828; padding: 0 6px; }
 
-        .catalog-title { font-size: 13px; color: #2e7d32; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; margin-bottom: 8px; font-weight: bold; }
+        .catalog-title { font-size: 15px; color: #2e7d32; border-bottom: 2px solid #c8e6c9; padding-bottom: 5px; margin-bottom: 10px; font-weight: bold; }
         
-        .product-card { display: flex; align-items: center; background: #fafafa; border: 1px solid #e0e0e0; padding: 10px; border-radius: 6px; margin-bottom: 6px; gap: 8px; }
-        .product-emoji { font-size: 28px; width: 40px; text-align: center; flex-shrink: 0; }
-        .product-info { flex-grow: 1; font-size: 12px; }
-        .product-name { font-weight: bold; color: #333; font-size: 13px; }
-        .product-eng-name { font-size: 10px; color: #1976d2; font-weight: bold; margin-top: 1px; }
-        .product-price { color: #d32f2f; font-weight: bold; font-size: 11px; margin-top: 2px; }
+        /* प्रोडक्ट कार्ड को बड़ा और साफ़ सुथरा बनाया गया है */
+        .product-card { display: flex; align-items: center; background: #fafafa; border: 1px solid #ddd; padding: 12px 10px; border-radius: 8px; margin-bottom: 8px; gap: 10px; }
+        .product-emoji { font-size: 32px; width: 45px; text-align: center; flex-shrink: 0; }
+        .product-info { flex-grow: 1; font-size: 14px; }
+        .product-name { font-weight: bold; color: #222; font-size: 16px; }
+        .product-eng-name { font-size: 12px; color: #1976d2; font-weight: bold; margin-top: 2px; }
+        .product-price { color: #d32f2f; font-weight: bold; font-size: 13px; margin-top: 3px; }
         
-        .qty-select { padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background: white; }
-        .add-btn { background: #2e7d32; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .qty-select { padding: 7px; border: 1px solid #bbb; border-radius: 6px; font-size: 13px; background: white; font-weight: bold; }
+        .add-btn { background: #2e7d32; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
 
-        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2e7d32; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 6px rgba(0,0,0,0.2); z-index: 1000; font-size: 13px; font-weight: bold; }
-        .checkout-btn { background: #ff9800; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2e7d32; color: white; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 8px rgba(0,0,0,0.3); z-index: 1000; font-size: 15px; font-weight: bold; }
+        .checkout-btn { background: #ff9800; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
 
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 10px; }
-        .modal-content { background: white; padding: 15px; width: 95%; max-width: 400px; border-radius: 8px; max-height: 85vh; overflow-y: auto; position: relative; }
-        .close-modal { position: absolute; top: 8px; right: 8px; font-size: 14px; font-weight: bold; cursor: pointer; color: #fff; background: #c62828; padding: 2px 7px; border-radius: 50%; }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 15px; }
+        .modal-content { background: white; padding: 20px; width: 100%; max-width: 420px; border-radius: 10px; max-height: 85vh; overflow-y: auto; position: relative; }
+        .close-modal { position: absolute; top: 10px; right: 10px; font-size: 16px; font-weight: bold; cursor: pointer; color: #fff; background: #c62828; padding: 3px 8px; border-radius: 50%; }
 
-        .form-group { margin-bottom: 8px; text-align: left; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 2px; font-size: 11px; }
-        .form-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
+        .form-group { margin-bottom: 10px; text-align: left; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
         
-        .btn-main { background: #2e7d32; color: white; border: none; width: 100%; padding: 10px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; text-align: center; }
+        .btn-main { background: #2e7d32; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: center; }
         .btn-main:disabled { background: #9e9e9e; cursor: not-allowed; opacity: 0.7; }
         
-        .upi-pay-link-btn { display: block; background: #1976d2; color: white; text-decoration: none; padding: 8px; border-radius: 5px; font-size: 11px; font-weight: bold; margin-top: 6px; text-align: center; }
-        .cart-item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #eee; padding: 6px 0; font-size: 11px; }
-        .remove-cart-item { background: #c62828; color: white; border: none; padding: 2px 6px; font-size: 10px; border-radius: 3px; cursor: pointer; font-weight: bold; margin-left: 6px; }
+        .upi-pay-link-btn { display: block; background: #1976d2; color: white; text-decoration: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: bold; margin-top: 8px; text-align: center; }
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #ddd; padding: 8px 0; font-size: 13px; }
+        .remove-cart-item { background: #c62828; color: white; border: none; padding: 4px 8px; font-size: 11px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 8px; }
     </style>
 </head>
 <body>
 
-<div id="loginScreen" style="display:flex;">
-    <div class="login-box">
-        <h2>🛍️ ऑनलाइन स्टोर लॉगिन</h2>
-        <p>ऑर्डर करने के लिए कृपया अपना नाम और मोबाइल नंबर दर्ज करें:</p>
-        <div class="form-group">
-            <label>आपका पूरा नाम:</label>
-            <input type="text" id="loginName" placeholder="पूरा नाम लिखें">
-        </div>
-        <div class="form-group">
-            <label>मोबाइल नंबर (10 अंक):</label>
-            <input type="tel" id="loginPhone" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10">
-        </div>
-        <button class="btn-main" onclick="validateAndLogin()">ऐप में प्रवेश करें ➡️</button>
-    </div>
-</div>
-
-<div class="container" id="mainAppContainer" style="display:none;">
+<div class="container" id="mainAppContainer">
     <div class="header">
         <div>
             <a href="tel:9997077062" id="shopCallBtn" class="shop-btn">🛒 दुकान</a>
@@ -108,7 +89,7 @@
 
     <div class="catalog-title">📦 उपलब्ध आइटम कैटलॉग (लाइव अपडेटेड)</div>
     <div id="customer-catalog-container">
-        <p style="text-align: center; color: #777; font-size: 12px;">लाइव कैटलॉग लोड हो रहा है...</p>
+        <p style="text-align: center; color: #777; font-size: 14px;">लाइव कैटलॉग लोड हो रहा है...</p>
     </div>
 </div>
 
@@ -120,25 +101,25 @@
 <div id="checkoutModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
-        <h3 style="color:#2e7d32; margin-top:0; font-size:14px;">🛍️ बिल और भुगतान विवरण</h3>
+        <h3 style="color:#2e7d32; margin-top:0; font-size:16px;">🛍️ बिल और भुगतान विवरण</h3>
         
-        <div id="cartItemsList" style="margin-bottom: 6px; max-height: 120px; overflow-y: auto;"></div>
-        <hr style="border:0; border-top:1px solid #ddd; margin:6px 0;">
+        <div id="cartItemsList" style="margin-bottom: 8px; max-height: 140px; overflow-y: auto;"></div>
+        <hr style="border:0; border-top:1px solid #ddd; margin:8px 0;">
         
-        <div id="billCalculationBox" style="font-size: 11px; background: #f1f8e9; padding: 8px; border-radius: 5px; margin-bottom: 8px; line-height: 1.4;"></div>
+        <div id="billCalculationBox" style="font-size: 13px; background: #f1f8e9; padding: 10px; border-radius: 6px; margin-bottom: 10px; line-height: 1.5;"></div>
         
-        <div id="paymentSection" style="text-align: center; margin-bottom: 10px; background: #fff8e1; padding: 8px; border-radius: 6px; border: 1px dashed #ffb300;">
-            <p style="font-size: 11px; font-weight: bold; color: #d32f2f; margin: 4px 0;">📱 QR Code स्कैन करें या नीचे दिए गए बटन से पेमेंट करें:</p>
-            <div style="background: #fff; padding: 6px; border: 1px solid #ccc; display: inline-block; border-radius: 6px; margin: 4px 0;">
-                <img id="upiQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=upi://pay?pa=9997077062@paytm&pn=SmartStore&am=0" alt="UPI QR" style="width: 110px; height: 110px;">
-                <p style="font-size: 10px; margin: 2px 0 0 0; font-weight: bold; color: #333;">UPI ID: <span id="displayUpiId">9997077062@paytm</span></p>
+        <div id="paymentSection" style="text-align: center; margin-bottom: 12px; background: #fff8e1; padding: 10px; border-radius: 8px; border: 1px dashed #ffb300;">
+            <p style="font-size: 12px; font-weight: bold; color: #d32f2f; margin: 4px 0;">📱 QR Code स्कैन करें या नीचे दिए गए बटन से पेमेंट करें:</p>
+            <div style="background: #fff; padding: 8px; border: 1px solid #ccc; display: inline-block; border-radius: 8px; margin: 6px 0;">
+                <img id="upiQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=upi://pay?pa=9997077062@paytm&pn=SmartStore&am=0" alt="UPI QR" style="width: 120px; height: 120px;">
+                <p style="font-size: 11px; margin: 4px 0 0 0; font-weight: bold; color: #333;">UPI ID: <span id="displayUpiId">9997077062@paytm</span></p>
             </div>
             
             <a id="upiAppPayLink" href="#" class="upi-pay-link-btn" target="_blank" onclick="unlockOrderButtonAfterPayment()">📲 PhonePe / GPay / Paytm से भुगतान करने के लिए यहाँ क्लिक करें</a>
         </div>
 
-        <div class="form-group"><label>आपका नाम:</label><input type="text" id="custName" readonly style="background:#eee;"></div>
-        <div class="form-group"><label>मोबाइल नंबर:</label><input type="tel" id="custPhone" readonly style="background:#eee;"></div>
+        <div class="form-group"><label>आपका नाम:</label><input type="text" id="custName" placeholder="पूरा नाम दर्ज करें"></div>
+        <div class="form-group"><label>मोबाइल नंबर:</label><input type="tel" id="custPhone" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10" oninput="listenForOrderNotifications(this.value)"></div>
         <div class="form-group"><label>पूरा पता (Address):</label><input type="text" id="custAddress" placeholder="मोहल्ला, मकान नंबर, गली..."></div>
         
         <button id="submitOrderBtn" class="btn-main" onclick="placeOrderToDatabase()" disabled>🔒 पहले UPI पेमेंट पूरा करें</button>
@@ -147,9 +128,9 @@
 
 <div id="successModal" class="modal">
     <div class="modal-content" style="text-align: center;">
-        <h3 style="color: #2e7d32; margin-top:0;">🎉 आर्डर सफलतापूर्वक भेज दिया गया है!</h3>
-        <p id="successMsgText" style="font-size: 12px; line-height: 1.5; color: #333;"></p>
-        <button class="btn-main" onclick="location.reload()" style="margin-top: 10px;">ठीक है (OK)</button>
+        <h3 style="color: #2e7d32; margin-top:0; font-size:18px;">🎉 आर्डर सफलतापूर्वक भेज दिया गया है!</h3>
+        <p id="successMsgText" style="font-size: 13px; line-height: 1.6; color: #333;"></p>
+        <button class="btn-main" onclick="location.reload()" style="margin-top: 12px;">ठीक है (OK)</button>
     </div>
 </div>
 
@@ -235,44 +216,6 @@
     }
 
     window.onload = function() {
-        let savedPhone = localStorage.getItem("custPhone");
-        let savedName = localStorage.getItem("custName");
-        if (savedPhone && savedName) {
-            document.getElementById('loginName').value = savedName;
-            document.getElementById('loginPhone').value = savedPhone;
-        }
-    };
-
-    window.validateAndLogin = function() {
-        let name = document.getElementById('loginName').value.trim();
-        let phone = document.getElementById('loginPhone').value.trim();
-
-        if (!name) {
-            alert("कृपया अपना नाम दर्ज करें!");
-            return;
-        }
-        if (!phone || phone.length !== 10) {
-            alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!");
-            return;
-        }
-
-        localStorage.setItem("custName", name);
-        localStorage.setItem("custPhone", phone);
-
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('mainAppContainer').style.display = 'block';
-
-        document.getElementById('custName').value = name;
-        document.getElementById('custPhone').value = phone;
-
-        let savedAddress = localStorage.getItem("custAddress");
-        if (savedAddress) document.getElementById('custAddress').value = savedAddress;
-
-        listenForOrderNotifications(phone);
-        loadStoreData();
-    };
-
-    function loadStoreData() {
         const settingsRef = ref(db, 'shopSettings');
         onValue(settingsRef, (snapshot) => {
             const data = snapshot.val();
@@ -300,7 +243,24 @@
                 }
             }
         });
-    }
+
+        let savedPhone = localStorage.getItem("custPhone");
+        if (savedPhone) {
+            let phoneInput = document.getElementById('custPhone');
+            if(phoneInput) phoneInput.value = savedPhone;
+            listenForOrderNotifications(savedPhone);
+        }
+        let savedName = localStorage.getItem("custName");
+        if (savedName) {
+            let nameInput = document.getElementById('custName');
+            if(nameInput) nameInput.value = savedName;
+        }
+        let savedAddress = localStorage.getItem("custAddress");
+        if (savedAddress) {
+            let addrInput = document.getElementById('custAddress');
+            if(addrInput) addrInput.value = savedAddress;
+        }
+    };
 
     function renderCustomerCatalog(catalog) {
         let container = document.getElementById('customer-catalog-container');
@@ -310,7 +270,7 @@
         let availableItems = catalog.filter(item => !item.outOfStock && (item.stock === undefined || item.stock > 0));
 
         if (availableItems.length === 0) {
-            container.innerHTML = '<p style="text-align: center; color: #d32f2f; font-weight: bold; font-size: 12px;">फिलहाल कोई भी आइटम स्टॉक में उपलब्ध नहीं है।</p>';
+            container.innerHTML = '<p style="text-align: center; color: #d32f2f; font-weight: bold; font-size: 14px;">फिलहाल कोई भी आइटम स्टॉक में उपलब्ध नहीं है।</p>';
             return;
         }
 
@@ -369,7 +329,7 @@
 
     function showCompactNotification(msg) {
         let notif = document.createElement('div');
-        notif.style.cssText = "position:fixed; bottom:60px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:6px 12px; border-radius:4px; font-size:11px; z-index:3000;";
+        notif.style.cssText = "position:fixed; bottom:70px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:8px 16px; border-radius:6px; font-size:13px; z-index:3000; font-weight:bold;";
         notif.innerText = msg;
         document.body.appendChild(notif);
         setTimeout(() => notif.remove(), 1500);
@@ -406,7 +366,7 @@
 
         let keys = Object.keys(cart);
         if(keys.length === 0) {
-            listContainer.innerHTML = '<p style="text-align:center; color:#777; font-size:11px;">कार्ट खाली है।</p>';
+            listContainer.innerHTML = '<p style="text-align:center; color:#777; font-size:13px;">कार्ट खाली है।</p>';
             document.getElementById('checkoutModal').style.display = 'none';
             document.getElementById('cartBar').style.display = 'none';
             return;
@@ -440,7 +400,7 @@
         document.getElementById('billCalculationBox').innerHTML = `
             <b>उप-कुल (Subtotal):</b> ₹${Math.round(subtotal)}<br>
             <b>नियम व शर्तें:</b> ${discountText}<br>
-            <b style="color:#d32f2f; font-size:12px;">फाइनल भुगतान राशि: ₹${Math.round(finalAmount)}</b>
+            <b style="color:#d32f2f; font-size:14px;">फाइनल भुगतान राशि: ₹${Math.round(finalAmount)}</b>
         `;
 
         let upiPayUrl = `upi://pay?pa=${shopUpiId}&pn=SmartStore&am=${Math.round(finalAmount)}&cu=INR`;
@@ -503,11 +463,14 @@
         let address = document.getElementById('custAddress').value.trim();
 
         if (!name || phone.length !== 10 || !address) {
-            alert("कृपया अपना पूरा पता दर्ज करें!");
+            alert("कृपया अपना सही नाम, 10 अंकों का फोन नंबर और पूरा पता दर्ज करें!");
             return;
         }
 
+        localStorage.setItem("custName", name);
+        localStorage.setItem("custPhone", phone);
         localStorage.setItem("custAddress", address);
+        listenForOrderNotifications(phone);
 
         let itemsArray = [];
         let totalAmount = 0;
