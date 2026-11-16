@@ -4,16 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ऑनलाइन स्टोर - आर्डर करें</title>
-    <!-- PWA Manifest for App Installation -->
+    
+    <!-- PWA Manifest और Web App Capable टैग्स (ऐप की तरह इंस्टॉल होने के लिए) -->
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%85%E0%A4%82%E0%A4%B2%E0%A4%BE%E0%A4%87%E0%A4%A8%20%E0%A4%B8%E0%A5%8D%E0%A4%9A%E0%A5%8B%E0%A4%B0%22%2C%22short_name%22%3A%22Store%22%2C%22start_url%22%3A%22.%2Fcustomer.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23e8f5e9%22%2C%22theme_color%22%3A%22%232e7d32%22%7D">
     <meta name="theme-color" content="#2e7d32">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ऑनलाइन स्टोर">
     
     <style>
         * { box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #e8f5e9; margin: 0; padding: 5px; color: #333; padding-bottom: 70px; }
         .container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         
-        /* लॉगिन स्क्रीन स्टाइल */
         #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #e8f5e9; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 15px; }
         .login-box { background: white; width: 100%; max-width: 380px; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-align: center; }
         .login-box h2 { color: #2e7d32; margin-bottom: 5px; font-size: 18px; }
@@ -73,8 +77,7 @@
 </head>
 <body>
 
-<!-- लॉगिन / मोबाइल नंबर वेरिफिकेशन स्क्रीन (बिना लॉगिन अंदर नहीं जा पाएंगे) -->
-<div id="loginScreen">
+<div id="loginScreen" style="display:flex;">
     <div class="login-box">
         <h2>🛍️ ऑनलाइन स्टोर लॉगिन</h2>
         <p>ऑर्डर करने के लिए कृपया अपना नाम और मोबाइल नंबर दर्ज करें:</p>
@@ -156,6 +159,22 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+    // PWA Service Worker Registration (ऐप की तरह इंस्टॉल करने के लिए जरूरी)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            const swCode = `
+                self.addEventListener('fetch', function(event) {
+                    event.respondWith(fetch(event.request).catch(function() {
+                        return caches.match(event.request);
+                    }));
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW registration failed: ', err));
+        });
+    }
+
     const firebaseConfig = {
         apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
         authDomain: "ajayvegetables-e6201.firebaseapp.com",
@@ -177,7 +196,6 @@
     let currentOfferText = "✨ विशेष ऑफर लोड हो रहा है...";
     let paymentInitiated = false;
 
-    // बिना इंटरनेट इमेज टूटने की समस्या को खत्म करने के लिए एकदम सटीक और सुंदर इमोजी/आइकॉन फिक्स
     function getItemEmoji(itemName) {
         if (!itemName) return "🥗";
         let name = itemName.trim().toLowerCase();
@@ -227,19 +245,11 @@
     }
 
     window.onload = function() {
-        // चेक करें क्या यूजर पहले से लॉग इन है
         let savedPhone = localStorage.getItem("custPhone");
         let savedName = localStorage.getItem("custName");
-        let savedAddress = localStorage.getItem("custAddress");
-
-        if (savedPhone && savedPhone.length === 10 && savedName) {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainAppContainer').style.display = 'block';
-            document.getElementById('custPhone').value = savedPhone;
-            document.getElementById('custName').value = savedName;
-            if (savedAddress) document.getElementById('custAddress').value = savedAddress;
-            listenForOrderNotifications(savedPhone);
-            loadStoreData();
+        if (savedPhone && savedName) {
+            document.getElementById('loginName').value = savedName;
+            document.getElementById('loginPhone').value = savedPhone;
         }
     };
 
@@ -264,6 +274,9 @@
 
         document.getElementById('custName').value = name;
         document.getElementById('custPhone').value = phone;
+
+        let savedAddress = localStorage.getItem("custAddress");
+        if (savedAddress) document.getElementById('custAddress').value = savedAddress;
 
         listenForOrderNotifications(phone);
         loadStoreData();
