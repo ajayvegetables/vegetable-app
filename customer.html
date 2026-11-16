@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ऑनलाइन स्टोर - आर्डर करें</title>
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%85%E0%A4%82%E0%A4%B2%E0%A4%BE%E0%A4%87%E0%A4%A8%20%E0%A4%B8%E0%A5%8D%E0%A4%9F%E0%A5%8B%E0%A4%B0%22%2C%22short_name%22%3A%22Store%22%2C%22start_url%22%3A%22.%2Fcustomer.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23e8f5e9%22%2C%22theme_color%22%3A%22%232e7d32%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3081%2F3081559.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any maskable%22%7D%5D%7D">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%85%E0%A4%82%E0%A4%B2%E0%A4%BE%E0%A4%87%E0%A4%A8%20%E0%A4%B8%E0%A5%8D%E0%A4%9A%E0%A5%8B%E0%A4%B0%22%2C%22short_name%22%3A%22Store%22%2C%22start_url%22%3A%22.%2Fcustomer.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23e8f5e9%22%2C%22theme_color%22%3A%22%232e7d32%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3081%2F3081559.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any maskable%22%7D%5D%7D">
     <meta name="theme-color" content="#2e7d32">
     
     <style>
@@ -22,9 +22,10 @@
         .catalog-title { font-size: 13px; color: #2e7d32; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; margin-bottom: 8px; font-weight: bold; }
         
         .product-card { display: flex; align-items: center; background: #fafafa; border: 1px solid #e0e0e0; padding: 8px; border-radius: 6px; margin-bottom: 6px; gap: 8px; }
-        .product-img { width: 45px; height: 45px; object-fit: contain; flex-shrink: 0; }
+        .product-img { width: 42px; height: 42px; object-fit: contain; flex-shrink: 0; }
         .product-info { flex-grow: 1; font-size: 12px; }
-        .product-name { font-weight: bold; color: #333; }
+        .product-name { font-weight: bold; color: #333; font-size: 13px; }
+        .product-eng-name { font-size: 10px; color: #1976d2; font-weight: bold; margin-top: 1px; }
         .product-price { color: #d32f2f; font-weight: bold; font-size: 11px; margin-top: 2px; }
         
         .qty-select { padding: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background: white; }
@@ -52,7 +53,7 @@
         <div>
             <a href="shopkeeper.html" class="shop-btn">🛒 दुकानदार</a>
         </div>
-        <div class="shop-title">अजय वेजिटेबल्स & स्टोर</div>
+        <div class="shop-title">स्मार्ट स्टोर</div>
         <div>
             <a href="tel:9997077062" class="help-btn">📞 Help</a>
         </div>
@@ -91,14 +92,14 @@
             <input type="text" id="custAddress" placeholder="मोहल्ला, मकान नंबर, गली...">
         </div>
         
-        <button class="btn-main" onclick="placeOrderToDatabase()">🚀 आर्डर भेजें (WhatsApp/Live)</button>
+        <button class="btn-main" onclick="placeOrderToDatabase()">🚀 आर्डर भेजें (Live)</button>
     </div>
 </div>
 
 <!-- Success Modal -->
 <div id="successModal" class="modal">
     <div class="modal-content" style="text-align: center;">
-        <h3 style="color: #2e7d32; margin-top:0;">🎉 आर्डर सफलतापर्वक भेज दिया गया है!</h3>
+        <h3 style="color: #2e7d32; margin-top:0;">🎉 आर्डर सफलतापूर्वक भेज दिया गया है!</h3>
         <p id="successMsgText" style="font-size: 12px; line-height: 1.5; color: #333;"></p>
         <button class="btn-main" onclick="location.reload()" style="margin-top: 10px;">ठीक है (OK)</button>
     </div>
@@ -127,14 +128,14 @@
     let shopUpiId = "9997077062@paytm";
     let shopWhatsappNumber = "9997077062";
 
-    // एकदम सटीक और परफेक्ट आइकन मैपिंग इंजन (कोई भी सब्जी, फल या फास्ट फूड हो, सही फोटो ही आएगी)
+    // यूनिवर्सल डिक्शनरी (सब्जी, फल, फास्ट फूड और हलवाई आइटम सबके लिए सही और सटीक आइकन)
     function getItemIcon(itemName) {
-        if (!itemName) return "https://cdn-icons-png.flaticon.com/512/2329/2329895.png";
+        if (!itemName) return "https://cdn-icons-png.flaticon.com/512/3081/3081559.png";
         let name = itemName.trim().toLowerCase();
 
         if (name.includes("गोभी")) return "https://cdn-icons-png.flaticon.com/512/4146/4146746.png";
         if (name.includes("लौकी")) return "https://cdn-icons-png.flaticon.com/512/8157/8157155.png";
-        if (name.includes("मूली")) return "https://cdn-icons-png.flaticon.com/512/10313/10313364.png";
+        if (name.includes("मूली")) return "https://cdn-icons-png.flaticon.com/512/3194/3194581.png";
         if (name.includes("गाजर")) return "https://cdn-icons-png.flaticon.com/512/2329/2329895.png";
         if (name.includes("शिमला") || name.includes("capsicum")) return "https://cdn-icons-png.flaticon.com/512/4151/4151831.png";
         if (name.includes("मिर्च") || name.includes("chilli")) return "https://cdn-icons-png.flaticon.com/512/2909/2909777.png";
@@ -154,8 +155,29 @@
         if (name.includes("सेब") || name.includes("apple")) return "https://cdn-icons-png.flaticon.com/512/415/415733.png";
         if (name.includes("केला") || name.includes("banana")) return "https://cdn-icons-png.flaticon.com/512/552/552489.png";
         
-        // डिफ़ॉल्ट यूनिवर्सल आइकन
+        // यदि कोई नया या अलग आइटम हो, तो साफ-सुथरा शॉपिंग बास्केट/वेजिटेबल आइकन दिखेगा (कभी जानवर या मछली नहीं आएगी)
         return "https://cdn-icons-png.flaticon.com/512/3081/3081559.png";
+    }
+
+    // अंग्रेजी नाम जनरेटर (दुकानदार ऐप की तरह ही यहाँ भी काम करेगा)
+    const universalDictionary = {
+        "मेथी": "Fenugreek Leaves", "कद्दू": "Pumpkin", "पालक": "Spinach", "टमाटर": "Tomato",
+        "आलू": "Potato", "प्याज़": "Onion", "प्याज": "Onion", "मटर": "Green Peas",
+        "गाजर": "Carrot", "मूली": "Radish", "अदरक": "Ginger", "लहसुन": "Garlic",
+        "गोभी": "Cauliflower", "पत्तागोभी": "Cabbage", "बैंगन": "Brinjal", "भिंडी": "Ladyfinger",
+        "शिमला मिर्च": "Capsicum", "नींबू": "Lemon", "धनिया": "Coriander", "हरी मिर्च": "Green Chilli",
+        "खीरा": "Cucumber", "लौकी": "Bottle Gourd", "तोरी": "Ridge Gourd", "करेला": "Bitter Gourd",
+        "चुकंदर": "Beetroot", "सेब": "Apple", "केला": "Banana", "आम": "Mango",
+        "अनार": "Pomegranate", "पपीता": "Papaya", "संतरा": "Orange", "अंगूर": "Grapes",
+        "समोसा": "Samosa", "कचौड़ी": "Kachori", "कचौरी": "Kachori", "बर्गर": "Burger",
+        "पिज़्ज़ा": "Pizza", "पिज्जा": "Pizza", "जलेबी": "Jalebi", "पकोड़ा": "Pakoda"
+    };
+
+    function getEnglishName(hindiName) {
+        if (!hindiName) return "Item";
+        let clean = hindiName.trim();
+        if (universalDictionary[clean]) return universalDictionary[clean];
+        return clean;
     }
 
     window.onload = function() {
@@ -193,21 +215,23 @@
 
         availableItems.forEach((item, index) => {
             let iconUrl = getItemIcon(item.name);
+            let engName = getEnglishName(item.name);
             let card = document.createElement('div');
             card.className = "product-card";
             card.innerHTML = `
                 <img src="${iconUrl}" class="product-img" alt="icon">
                 <div class="product-info">
                     <div class="product-name">${item.name}</div>
-                    <div class="product-price">₹${item.price} / Unit</div>
+                    <div class="product-eng-name">(${engName})</div>
+                    <div class="product-price">₹${item.price} / किलो</div>
                 </div>
                 <div>
                     <select class="qty-select" id="qty_${index}">
-                        <option value="1">1 Unit</option>
-                        <option value="2">2 Units</option>
-                        <option value="3">3 Units</option>
-                        <option value="5">5 Units</option>
-                        <option value="0.5">0.5 kg</option>
+                        <option value="1">1 किलो</option>
+                        <option value="2">2 किलो</option>
+                        <option value="3">3 किलो</option>
+                        <option value="5">5 किलो</option>
+                        <option value="0.5">0.5 किलो</option>
                     </select>
                 </div>
                 <button class="add-btn" onclick="addToCart('${item.name}', ${item.price}, ${index})">जोड़ें</button>
@@ -226,7 +250,7 @@
         cart[name].qty += qty;
 
         updateCartBar();
-        alert(`'${name}' (${qty} Unit) कार्ट में जोड़ दिया गया है!`);
+        alert(`'${name}' (${qty} किलो) कार्ट में जोड़ दिया गया है!`);
     };
 
     function updateCartBar() {
@@ -257,7 +281,7 @@
             let item = cart[key];
             let row = document.createElement('div');
             row.className = "cart-item-row";
-            row.innerHTML = `<span><b>${item.name}</b> x ${item.qty}</span> <span>₹${item.price * item.qty}</span>`;
+            row.innerHTML = `<span><b>${item.name}</b> x ${item.qty} किलो</span> <span>₹${item.price * item.qty}</span>`;
             listContainer.appendChild(row);
         });
 
@@ -289,6 +313,7 @@
             itemsArray.push({
                 name: item.name,
                 qty: item.qty,
+                qtyText: `${item.qty} किलो`,
                 price: item.price
             });
             totalAmount += (item.price * item.qty);
