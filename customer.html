@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ऑनलाइन स्टोर - आर्डर करें</title>
+    <!-- PWA Manifest for App Installation -->
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%85%E0%A4%82%E0%A4%B2%E0%A4%BE%E0%A4%87%E0%A4%A8%20%E0%A4%B8%E0%A5%8D%E0%A4%9A%E0%A5%8B%E0%A4%B0%22%2C%22short_name%22%3A%22Store%22%2C%22start_url%22%3A%22.%2Fcustomer.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23e8f5e9%22%2C%22theme_color%22%3A%22%232e7d32%22%7D">
     <meta name="theme-color" content="#2e7d32">
     
@@ -12,10 +13,15 @@
         body { font-family: Arial, sans-serif; background: #e8f5e9; margin: 0; padding: 5px; color: #333; padding-bottom: 70px; }
         .container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         
+        /* लॉगिन स्क्रीन स्टाइल */
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #e8f5e9; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 15px; }
+        .login-box { background: white; width: 100%; max-width: 380px; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-align: center; }
+        .login-box h2 { color: #2e7d32; margin-bottom: 5px; font-size: 18px; }
+        .login-box p { font-size: 12px; color: #666; margin-bottom: 15px; }
+
         .header { display: flex; justify-content: space-between; align-items: center; background: #2e7d32; color: white; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; }
         .shop-title { font-size: 15px; font-weight: bold; }
         .help-btn { background: #c62828; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; }
-        
         .shop-btn { background: #1976d2; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; display: inline-block; }
 
         .banner { 
@@ -29,7 +35,6 @@
             text-align: center; 
             box-shadow: 0 3px 8px rgba(255, 152, 0, 0.4);
             border: 2px dashed #fffde7;
-            letter-spacing: 0.3px;
         }
         
         .status-notification { background: #e3f2fd; border: 1px solid #90caf9; padding: 8px; border-radius: 6px; margin-bottom: 8px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; color: #0d47a1; font-weight: bold; }
@@ -38,10 +43,7 @@
         .catalog-title { font-size: 13px; color: #2e7d32; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; margin-bottom: 8px; font-weight: bold; }
         
         .product-card { display: flex; align-items: center; background: #fafafa; border: 1px solid #e0e0e0; padding: 8px; border-radius: 6px; margin-bottom: 6px; gap: 8px; }
-        
-        .product-img-container { width: 42px; height: 42px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #e8f5e9; border-radius: 50%; border: 1px solid #c8e6c9; overflow: hidden; }
-        .product-img { width: 30px; height: 30px; object-fit: contain; }
-
+        .product-emoji { font-size: 26px; width: 40px; text-align: center; flex-shrink: 0; }
         .product-info { flex-grow: 1; font-size: 12px; }
         .product-name { font-weight: bold; color: #333; font-size: 13px; }
         .product-eng-name { font-size: 10px; color: #1976d2; font-weight: bold; margin-top: 1px; }
@@ -57,7 +59,7 @@
         .modal-content { background: white; padding: 15px; width: 95%; max-width: 400px; border-radius: 8px; max-height: 85vh; overflow-y: auto; position: relative; }
         .close-modal { position: absolute; top: 8px; right: 8px; font-size: 14px; font-weight: bold; cursor: pointer; color: #fff; background: #c62828; padding: 2px 7px; border-radius: 50%; }
 
-        .form-group { margin-bottom: 8px; }
+        .form-group { margin-bottom: 8px; text-align: left; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 2px; font-size: 11px; }
         .form-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
         
@@ -65,14 +67,30 @@
         .btn-main:disabled { background: #9e9e9e; cursor: not-allowed; opacity: 0.7; }
         
         .upi-pay-link-btn { display: block; background: #1976d2; color: white; text-decoration: none; padding: 8px; border-radius: 5px; font-size: 11px; font-weight: bold; margin-top: 6px; text-align: center; }
-
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #eee; padding: 6px 0; font-size: 11px; }
         .remove-cart-item { background: #c62828; color: white; border: none; padding: 2px 6px; font-size: 10px; border-radius: 3px; cursor: pointer; font-weight: bold; margin-left: 6px; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<!-- लॉगिन / मोबाइल नंबर वेरिफिकेशन स्क्रीन (बिना लॉगिन अंदर नहीं जा पाएंगे) -->
+<div id="loginScreen">
+    <div class="login-box">
+        <h2>🛍️ ऑनलाइन स्टोर लॉगिन</h2>
+        <p>ऑर्डर करने के लिए कृपया अपना नाम और मोबाइल नंबर दर्ज करें:</p>
+        <div class="form-group">
+            <label>आपका पूरा नाम:</label>
+            <input type="text" id="loginName" placeholder="पूरा नाम लिखें">
+        </div>
+        <div class="form-group">
+            <label>मोबाइल नंबर (10 अंक):</label>
+            <input type="tel" id="loginPhone" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10">
+        </div>
+        <button class="btn-main" onclick="validateAndLogin()">ऐप में प्रवेश करें ➡️</button>
+    </div>
+</div>
+
+<div class="container" id="mainAppContainer" style="display:none;">
     <div class="header">
         <div>
             <a href="tel:9997077062" id="shopCallBtn" class="shop-btn">🛒 दुकान</a>
@@ -118,8 +136,8 @@
             <a id="upiAppPayLink" href="#" class="upi-pay-link-btn" target="_blank" onclick="unlockOrderButtonAfterPayment()">📲 PhonePe / GPay / Paytm से भुगतान करने के लिए यहाँ क्लिक करें</a>
         </div>
 
-        <div class="form-group"><label>आपका नाम:</label><input type="text" id="custName" placeholder="पूरा नाम दर्ज करें"></div>
-        <div class="form-group"><label>मोबाइल नंबर:</label><input type="tel" id="custPhone" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10" oninput="listenForOrderNotifications(this.value)"></div>
+        <div class="form-group"><label>आपका नाम:</label><input type="text" id="custName" readonly style="background:#eee;"></div>
+        <div class="form-group"><label>मोबाइल नंबर:</label><input type="tel" id="custPhone" readonly style="background:#eee;"></div>
         <div class="form-group"><label>पूरा पता (Address):</label><input type="text" id="custAddress" placeholder="मोहल्ला, मकान नंबर, गली..."></div>
         
         <button id="submitOrderBtn" class="btn-main" onclick="placeOrderToDatabase()" disabled>🔒 पहले UPI पेमेंट पूरा करें</button>
@@ -159,36 +177,37 @@
     let currentOfferText = "✨ विशेष ऑफर लोड हो रहा है...";
     let paymentInitiated = false;
 
-    // सुरक्षित और सटीक वेक्टर आइकन जो हर सब्जी से बिल्कुल मेल खाएंगे
-    function getItemImageUrl(itemName) {
-        if (!itemName) return "https://api.iconify.design/lucide:salad.svg?color=%232e7d32";
+    // बिना इंटरनेट इमेज टूटने की समस्या को खत्म करने के लिए एकदम सटीक और सुंदर इमोजी/आइकॉन फिक्स
+    function getItemEmoji(itemName) {
+        if (!itemName) return "🥗";
         let name = itemName.trim().toLowerCase();
 
-        if (name.includes("करेला") || name.includes("bitter gourd")) return "https://api.iconify.design/fluent-emoji-flat:cucumber.svg"; 
-        if (name.includes("भिंडी") || name.includes("ladyfinger") || name.includes("okra")) return "https://api.iconify.design/fluent-emoji-flat:green-salad.svg"; 
-        if (name.includes("पालक") || name.includes("spinach")) return "https://api.iconify.design/fluent-emoji-flat:leafy-green.svg"; 
-        if (name.includes("मेथी") || name.includes("fenugreek")) return "https://api.iconify.design/fluent-emoji-flat:herb.svg"; 
-        if (name.includes("धनिया") || name.includes("coriander")) return "https://api.iconify.design/fluent-emoji-flat:herb.svg"; 
-        if (name.includes("मूली") || name.includes("radish")) return "https://api.iconify.design/fluent-emoji-flat:carrot.svg"; 
-        if (name.includes("लौकी") || name.includes("bottle gourd")) return "https://api.iconify.design/fluent-emoji-flat:cucumber.svg"; 
-        if (name.includes("गोभी") || name.includes("cauliflower") || name.includes("पत्तागोभी")) return "https://api.iconify.design/fluent-emoji-flat:broccoli.svg";
-        if (name.includes("गाजर") || name.includes("carrot")) return "https://api.iconify.design/fluent-emoji-flat:carrot.svg";
-        if (name.includes("टमाटर") || name.includes("tomato")) return "https://api.iconify.design/fluent-emoji-flat:tomato.svg";
-        if (name.includes("आलू") || name.includes("potato")) return "https://api.iconify.design/fluent-emoji-flat:potato.svg";
-        if (name.includes("प्याज") || name.includes("प्याज़") || name.includes("onion")) return "https://api.iconify.design/fluent-emoji-flat:onion.svg";
-        if (name.includes("मटर") || name.includes("peas")) return "https://api.iconify.design/fluent-emoji-flat:peanuts.svg"; 
-        if (name.includes("अदरक") || name.includes("ginger")) return "https://api.iconify.design/fluent-emoji-flat:chestnut.svg";
-        if (name.includes("लहसुन") || name.includes("garlic")) return "https://api.iconify.design/fluent-emoji-flat:garlic.svg";
-        if (name.includes("शिमला") || name.includes("capsicum") || name.includes("मिर्च")) return "https://api.iconify.design/fluent-emoji-flat:hot-pepper.svg";
-        if (name.includes("कद्दू") || name.includes("pumpkin")) return "https://api.iconify.design/fluent-emoji-flat:tangerine.svg";
-        if (name.includes("खीरा") || name.includes("cucumber")) return "https://api.iconify.design/fluent-emoji-flat:cucumber.svg";
-        if (name.includes("बैंगन") || name.includes("brinjal") || name.includes("eggplant")) return "https://api.iconify.design/fluent-emoji-flat:eggplant.svg";
-        if (name.includes("सेब") || name.includes("apple")) return "https://api.iconify.design/fluent-emoji-flat:red-apple.svg";
-        if (name.includes("केला") || name.includes("banana")) return "https://api.iconify.design/fluent-emoji-flat:banana.svg";
-        if (name.includes("आम") || name.includes("mango")) return "https://api.iconify.design/fluent-emoji-flat:mango.svg";
-        if (name.includes("नींबू") || name.includes("lemon")) return "https://api.iconify.design/fluent-emoji-flat:lemon.svg";
+        if (name.includes("करेला") || name.includes("bitter gourd")) return "🥒"; 
+        if (name.includes("भिंडी") || name.includes("ladyfinger") || name.includes("okra")) return "🟢"; 
+        if (name.includes("पालक") || name.includes("spinach")) return "🥬"; 
+        if (name.includes("मेथी") || name.includes("fenugreek")) return "🌿"; 
+        if (name.includes("धनिया") || name.includes("coriander")) return "☘️"; 
+        if (name.includes("मूली") || name.includes("radish")) return "🥕"; 
+        if (name.includes("लौकी") || name.includes("bottle gourd")) return "🥒"; 
+        if (name.includes("गोभी") || name.includes("cauliflower")) return "🥦";
+        if (name.includes("गाजर") || name.includes("carrot")) return "🥕";
+        if (name.includes("टमाटर") || name.includes("tomato")) return "🍅";
+        if (name.includes("आलू") || name.includes("potato")) return "🥔";
+        if (name.includes("प्याज") || name.includes("प्याज़") || name.includes("onion")) return "🧅";
+        if (name.includes("मटर") || name.includes("peas")) return "🫛"; 
+        if (name.includes("अदरक") || name.includes("ginger")) return "🫚";
+        if (name.includes("लहसुन") || name.includes("garlic")) return "🧄";
+        if (name.includes("शिमला") || name.includes("capsicum")) return "🫑";
+        if (name.includes("मिर्च") || name.includes("chilli")) return "🌶️";
+        if (name.includes("कद्दू") || name.includes("pumpkin")) return "🎃";
+        if (name.includes("खीरा") || name.includes("cucumber")) return "🥒";
+        if (name.includes("बैंगन") || name.includes("brinjal")) return "🍆";
+        if (name.includes("सेब") || name.includes("apple")) return "🍎";
+        if (name.includes("केला") || name.includes("banana")) return "🍌";
+        if (name.includes("आम") || name.includes("mango")) return "🥭";
+        if (name.includes("नींबू") || name.includes("lemon")) return "🍋";
 
-        return "https://api.iconify.design/lucide:salad.svg?color=%232e7d32";
+        return "🥗";
     }
 
     const universalDictionary = {
@@ -208,6 +227,49 @@
     }
 
     window.onload = function() {
+        // चेक करें क्या यूजर पहले से लॉग इन है
+        let savedPhone = localStorage.getItem("custPhone");
+        let savedName = localStorage.getItem("custName");
+        let savedAddress = localStorage.getItem("custAddress");
+
+        if (savedPhone && savedPhone.length === 10 && savedName) {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainAppContainer').style.display = 'block';
+            document.getElementById('custPhone').value = savedPhone;
+            document.getElementById('custName').value = savedName;
+            if (savedAddress) document.getElementById('custAddress').value = savedAddress;
+            listenForOrderNotifications(savedPhone);
+            loadStoreData();
+        }
+    };
+
+    window.validateAndLogin = function() {
+        let name = document.getElementById('loginName').value.trim();
+        let phone = document.getElementById('loginPhone').value.trim();
+
+        if (!name) {
+            alert("कृपया अपना नाम दर्ज करें!");
+            return;
+        }
+        if (!phone || phone.length !== 10) {
+            alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!");
+            return;
+        }
+
+        localStorage.setItem("custName", name);
+        localStorage.setItem("custPhone", phone);
+
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainAppContainer').style.display = 'block';
+
+        document.getElementById('custName').value = name;
+        document.getElementById('custPhone').value = phone;
+
+        listenForOrderNotifications(phone);
+        loadStoreData();
+    };
+
+    function loadStoreData() {
         const settingsRef = ref(db, 'shopSettings');
         onValue(settingsRef, (snapshot) => {
             const data = snapshot.val();
@@ -235,24 +297,7 @@
                 }
             }
         });
-
-        let savedPhone = localStorage.getItem("custPhone");
-        if (savedPhone) {
-            let phoneInput = document.getElementById('custPhone');
-            if(phoneInput) phoneInput.value = savedPhone;
-            listenForOrderNotifications(savedPhone);
-        }
-        let savedName = localStorage.getItem("custName");
-        if (savedName) {
-            let nameInput = document.getElementById('custName');
-            if(nameInput) nameInput.value = savedName;
-        }
-        let savedAddress = localStorage.getItem("custAddress");
-        if (savedAddress) {
-            let addrInput = document.getElementById('custAddress');
-            if(addrInput) addrInput.value = savedAddress;
-        }
-    };
+    }
 
     function renderCustomerCatalog(catalog) {
         let container = document.getElementById('customer-catalog-container');
@@ -267,14 +312,12 @@
         }
 
         availableItems.forEach((item, index) => {
-            let imgSrc = getItemImageUrl(item.name);
+            let emojiIcon = getItemEmoji(item.name);
             let engName = getEnglishName(item.name);
             let card = document.createElement('div');
             card.className = "product-card";
             card.innerHTML = `
-                <div class="product-img-container">
-                    <img src="${imgSrc}" class="product-img" alt="${item.name}">
-                </div>
+                <div class="product-emoji">${emojiIcon}</div>
                 <div class="product-info">
                     <div class="product-name">${item.name}</div>
                     <div class="product-eng-name">(${engName})</div>
@@ -457,14 +500,11 @@
         let address = document.getElementById('custAddress').value.trim();
 
         if (!name || phone.length !== 10 || !address) {
-            alert("कृपया अपना सही नाम, 10 अंकों का फोन नंबर और पूरा पता दर्ज करें!");
+            alert("कृपया अपना पूरा पता दर्ज करें!");
             return;
         }
 
-        localStorage.setItem("custName", name);
-        localStorage.setItem("custPhone", phone);
         localStorage.setItem("custAddress", address);
-        listenForOrderNotifications(phone);
 
         let itemsArray = [];
         let totalAmount = 0;
