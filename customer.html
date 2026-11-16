@@ -64,7 +64,7 @@
 
     <div class="banner" id="shopBanner">विशेष ऑफर: ₹200 से अधिक के आर्डर पर 10% की छूट!</div>
 
-    <!-- आर्डर एक्सेप्ट/रिजेक्ट नोटिफिकेशन दिखाने की जगह -->
+    <!-- आर्डर स्टेटस नोटिफिकेशन -->
     <div id="orderStatusNotificationContainer"></div>
 
     <div class="catalog-title">📦 उपलब्ध आइटम कैटलॉग (लाइव अपडेटेड)</div>
@@ -89,7 +89,7 @@
         
         <div id="billCalculationBox" style="font-size: 11px; background: #f1f8e9; padding: 8px; border-radius: 5px; margin-bottom: 8px; line-height: 1.4;"></div>
         
-        <!-- स्टेप 1: भुगतान करें (UPI QR Code) -->
+        <!-- भुगतान अनुभाग (UPI QR Code) -->
         <div id="paymentSection" style="text-align: center; margin-bottom: 10px;">
             <p style="font-size: 11px; font-weight: bold; color: #d32f2f; margin: 4px 0;">👇 पहले नीचे दिए गए UPI QR Code पर स्कैन करके भुगतान करें:</p>
             <div style="background: #fff; padding: 8px; border: 1px solid #ccc; display: inline-block; border-radius: 6px;">
@@ -102,7 +102,6 @@
         <div class="form-group"><label>मोबाइल नंबर:</label><input type="tel" id="custPhone" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10" oninput="listenForOrderNotifications(this.value)"></div>
         <div class="form-group"><label>पूरा पता (Address):</label><input type="text" id="custAddress" placeholder="मोहल्ला, मकान नंबर, गली..."></div>
         
-        <!-- स्टेप 2: भुगतान होने के बाद आर्डर भेजें -->
         <button class="btn-main" onclick="placeOrderToDatabase()">✅ भुगतान हो गया, दुकानदार को आर्डर भेजें</button>
     </div>
 </div>
@@ -137,39 +136,35 @@
     let currentCatalog = [];
     let cart = {};
     let shopUpiId = "9997077062@paytm";
-    let currentOfferText = "₹200 से अधिक की सब्जी खरीदने पर 10% की छूट";
+    let currentOfferText = "₹200 से अधिक के आर्डर पर 10% की छूट";
 
-    // 100% सटीक और अलग-अलग यूनिक इमोजी (मूली के लिए सफेद मूली और मटर के लिए फली)
+    // सटीक और फ्रेश आइकन (पालक, मेथी, मूली और अन्य सभी सब्जियों के लिए सही तस्वीरें)
     function getItemEmoji(itemName) {
         if (!itemName) return "🛍️";
         let name = itemName.trim().toLowerCase();
 
-        if (name.includes("धनिया")) return "🌿";
-        if (name.includes("मेथी")) return "🌱";
-        if (name.includes("पालक")) return "🥬";
-        if (name.includes("अदरक")) return "🫚";
-        if (name.includes("लहसुन")) return "🧄";
-        if (name.includes("मूली") || name.includes("radish")) return "⚪🥕"; // सफेद मूली
-        if (name.includes("गाजर") || name.includes("carrot")) return "🥕";
+        if (name.includes("पालक")) return "🌿"; // ताज़ा पालक के पत्ते
+        if (name.includes("मेथी")) return "🌱"; // ताज़ी मेथी
+        if (name.includes("मूली")) return "🌾"; // ताज़ी सफेद मूली (साग सहित)
+        if (name.includes("धनिया")) return "🍃";
         if (name.includes("गोभी")) return "🥦";
-        if (name.includes("लौकी")) return "🥒";
-        if (name.includes("शिमला")) return "🫑";
-        if (name.includes("मिर्च") || name.includes("chilli")) return "🌶️";
-        if (name.includes("कद्दू") || name.includes("pumpkin")) return "🎃";
+        if (name.includes("गाजर")) return "🥕";
         if (name.includes("टमाटर") || name.includes("tomato")) return "🍅";
         if (name.includes("आलू") || name.includes("potato")) return "🥔";
         if (name.includes("प्याज") || name.includes("प्याज़") || name.includes("onion")) return "🧅";
-        if (name.includes("मटर") || name.includes("peas")) return "🫛"; // मटर की फली (Green Peas Pod)
-        if (name.includes("समोसा") || name.includes("samosa")) return "🥟";
-        if (name.includes("कचौड़ी") || name.includes("kachori")) return "🥠";
-        if (name.includes("बर्गर") || name.includes("burger")) return "🍔";
-        if (name.includes("पिज़्ज़ा") || name.includes("पिज्जा") || name.includes("pizza")) return "🍕";
-        if (name.includes("जलेबी") || name.includes("jalebi")) return "🥨";
-        if (name.includes("सेब") || name.includes("apple")) return "🍎";
-        if (name.includes("केला") || name.includes("banana")) return "🍌";
-        if (name.includes("आम") || name.includes("mango")) return "🥭";
-        if (name.includes("नींबू") || name.includes("lemon")) return "🍋";
-        
+        if (name.includes("मटर") || name.includes("peas")) return "🫛";
+        if (name.includes("अदरक") || name.includes("ginger")) return "🫚";
+        if (name.includes("लहसुन") || name.includes("garlic")) return "🧄";
+        if (name.includes("शिमला")) return "🫑";
+        if (name.includes("मिर्च") || name.includes("chilli")) return "🌶️";
+        if (name.includes("कद्दू") || name.includes("pumpkin")) return "🎃";
+        if (name.includes("लौकी") || name.includes("खीरा")) return "🥒";
+        if (name.includes("बैंगन")) return "🍆";
+        if (name.includes("सेब")) return "🍎";
+        if (name.includes("केला")) return "🍌";
+        if (name.includes("आम")) return "🥭";
+        if (name.includes("नींबू")) return "🍋";
+
         return "🛒";
     }
 
@@ -180,8 +175,7 @@
         "गोभी": "Cauliflower", "पत्तागोभी": "Cabbage", "बैंगन": "Brinjal", "भिंडी": "Ladyfinger",
         "शिमला मिर्च": "Capsicum", "नींबू": "Lemon", "धनिया": "Coriander", "हरी मिर्च": "Green Chilli",
         "खीरा": "Cucumber", "लौकी": "Bottle Gourd", "तोरी": "Ridge Gourd", "करेला": "Bitter Gourd",
-        "चुकंदर": "Beetroot", "सेब": "Apple", "केला": "Banana", "आम": "Mango",
-        "समोसा": "Samosa", "कचौड़ी": "Kachori", "बर्गर": "Burger", "पिज़्ज़ा": "Pizza", "जलेबी": "Jalebi"
+        "चुकंदर": "Beetroot", "सेब": "Apple", "केला": "Banana", "आम": "Mango"
     };
 
     function getEnglishName(hindiName) {
@@ -204,6 +198,7 @@
             }
         });
 
+        // एड्रेस ऑटो-फिल (Local Storage से पुराना डेटा लोड करना)
         let savedPhone = localStorage.getItem("custPhone");
         if (savedPhone) {
             document.getElementById('custPhone').value = savedPhone;
@@ -211,6 +206,8 @@
         }
         let savedName = localStorage.getItem("custName");
         if (savedName) document.getElementById('custName').value = savedName;
+        let savedAddress = localStorage.getItem("custAddress");
+        if (savedAddress) document.getElementById('custAddress').value = savedAddress;
     };
 
     function renderCustomerCatalog(catalog) {
@@ -312,7 +309,6 @@
             listContainer.appendChild(row);
         });
 
-        // ऑफर और डिस्काउंट कैलकुलेशन
         let finalAmount = subtotal;
         let discountText = "कोई विशेष ऑफर लागू नहीं है।";
 
@@ -320,8 +316,6 @@
             let discount = subtotal * 0.10;
             finalAmount = subtotal - discount;
             discountText = `ऑफर लागू (${currentOfferText}): -₹${Math.round(discount)} की छूट`;
-        } else if (currentOfferText.includes("फ्री") && subtotal >= 200) {
-            discountText = `ऑफर लागू: ${currentOfferText}`;
         } else {
             discountText = `ऑफर शर्त: ${currentOfferText}`;
         }
@@ -332,7 +326,6 @@
             <b style="color:#d32f2f; font-size:12px;">फाइनल भुगतान राशि: ₹${Math.round(finalAmount)}</b>
         `;
 
-        // UPI QR Code में फिक्स अमाउंट जोड़ना
         let upiPayUrl = `upi://pay?pa=${shopUpiId}&pn=SmartStore&am=${Math.round(finalAmount)}&cu=INR`;
         document.getElementById('upiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(upiPayUrl)}`;
 
@@ -375,8 +368,10 @@
             return;
         }
 
+        // एड्रेस ऑटो-फिल के लिए Local Storage में सेव करें
         localStorage.setItem("custName", name);
         localStorage.setItem("custPhone", phone);
+        localStorage.setItem("custAddress", address);
         listenForOrderNotifications(phone);
 
         let itemsArray = [];
@@ -412,7 +407,8 @@
         const newOrderRef = push(ref(db, 'orders'));
         set(newOrderRef, orderData).then(() => {
             closeCheckoutModal();
-            document.getElementById('successMsgText').innerHTML = `आर्डर सफलतापर्वक दुकानदार के पास भेज दिया गया है!<br><b>कुल राशि: ₹${Math.round(totalAmount)}</b><br><br><span style="color:#d32f2f; font-weight:bold;">नोट: दुकानदार द्वारा आर्डर एक्सेप्ट या रिजेक्ट होने पर ऊपर नोटिफिकेशन में चेक कर लें।</span>`;
+            // पॉपअप मैसेज एकदम आपके निर्देशानुसार सेट कर दिया गया है
+            document.getElementById('successMsgText').innerHTML = `आर्डर सफलतापूर्वक भेज दिया गया है!<br><b>कुल राशि: ₹${Math.round(totalAmount)}</b><br><br><span style="color:#d32f2f; font-weight:bold;">आपका ऑर्डर दुकानदार ने एक्सेप्ट किया है या रिजेक्ट, ऊपर नोटिफिकेशन में चेक कर लें।</span>`;
             document.getElementById('successModal').style.display = 'flex';
             cart = {};
             updateCartBar();
