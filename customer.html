@@ -16,7 +16,8 @@
         .shop-title { font-size: 15px; font-weight: bold; }
         .help-btn { background: #c62828; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; }
         
-        .call-shop-btn { background: #ff9800; color: #fff; padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        /* पहले जैसा ही दुकान वाला बटन (कलर और स्टाइल पूर्ववत) */
+        .shop-btn { background: #1976d2; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; display: inline-block; }
 
         .banner { 
             background: linear-gradient(135deg, #ff9800, #ff5722); 
@@ -72,7 +73,8 @@
 <div class="container">
     <div class="header">
         <div>
-            <a href="tel:9997077062" id="shopCallBtn" class="call-shop-btn">🛒 दुकानदार को कॉल करें</a>
+            <!-- यहाँ अब सिर्फ 'दुकान' लिखा है और क्लिक करने पर सीधे दुकानदार के सही लॉगिन/व्हाट्सएप नंबर पर कॉल लगेगी -->
+            <a href="tel:9997077062" id="shopCallBtn" class="shop-btn">🛒 दुकान</a>
         </div>
         <div class="shop-title">ऑनलाइन स्टोर</div>
         <div>
@@ -152,7 +154,7 @@
     let currentCatalog = [];
     let cart = {};
     let shopUpiId = "9997077062@paytm";
-    let shopPhoneNumber = "9997077062";
+    let shopPhoneNumber = "9997077062"; // डिफ़ॉल्ट नंबर
     let currentOfferText = "✨ विशेष ऑफर लोड हो रहा है...";
     let paymentInitiated = false;
 
@@ -209,15 +211,17 @@
             if (data) {
                 if(data.upi) { 
                     shopUpiId = data.upi; 
-                    let extractedPhone = shopUpiId.split('@')[0];
-                    if(extractedPhone.length === 10) {
-                        shopPhoneNumber = extractedPhone;
-                        let callBtn = document.getElementById('shopCallBtn');
-                        if(callBtn) callBtn.href = `tel:${shopPhoneNumber}`;
-                    }
                     let upiEl = document.getElementById('displayUpiId');
                     if(upiEl) upiEl.innerText = shopUpiId; 
                 }
+                
+                // अब यह यूपीआई से नंबर न लेकर डेटाबेस में सेव किए गए 'whatsapp' या 'shopPhone' नंबर को कैच करेगा
+                if(data.whatsapp || data.shopPhone) {
+                    shopPhoneNumber = data.whatsapp || data.shopPhone;
+                    let callBtn = document.getElementById('shopCallBtn');
+                    if(callBtn) callBtn.href = `tel:${shopPhoneNumber}`;
+                }
+
                 if(data.offerText) { 
                     currentOfferText = data.offerText; 
                     let bannerEl = document.getElementById('shopBanner');
