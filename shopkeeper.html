@@ -9,29 +9,30 @@
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3081/3081559.png">
     
     <style>
-        body { font-family: Arial, sans-serif; background: #fff3e0; margin: 0; padding: 5px; color: #333; padding-top: 40px; box-sizing: border-box; }
-        .container { width: 94%; max-width: 420px; box-sizing: border-box; margin: auto; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #fff3e0; margin: 0; padding: 5px; color: #333; padding-top: 45px; }
+        .container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         h2 { color: #e65100; text-align: center; margin-bottom: 5px; font-size: 16px; }
         .screen { display: none; }
         .active { display: block; }
-        .form-group { margin-bottom: 6px; }
+        .form-group { margin-bottom: 8px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 2px; font-size: 11px; }
-        .form-group input, .form-group textarea { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 11px; }
-        .btn-main { background: #e65100; color: white; border: none; width: 100%; padding: 8px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; box-sizing: border-box; }
+        .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
+        .btn-main { background: #e65100; color: white; border: none; width: 100%; padding: 10px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; text-align: center; }
         
         .top-bar-fixed { position: fixed; top: 5px; right: 8px; display: flex; gap: 4px; z-index: 999; align-items: center; }
         .top-left-fixed { position: fixed; top: 5px; left: 8px; display: flex; gap: 4px; z-index: 999; }
         
-        .logout-circle-btn { background: #c62828; color: white; padding: 3px 6px; border-radius: 12px; border: none; font-size: 9px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .history-top-icon-btn { background: #37474f; color: white; padding: 3px 7px; border-radius: 10px; font-weight: bold; font-size: 10px; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); text-decoration: none; display: flex; align-items: center; gap: 2px; }
-        .help-btn { background: #2e7d32; color: white; padding: 3px 7px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .notif-badge-btn { background: #c62828; color: white; padding: 3px 7px; border-radius: 10px; font-weight: bold; font-size: 10px; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .logout-circle-btn { background: #c62828; color: white; padding: 4px 8px; border-radius: 12px; border: none; font-size: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .history-top-icon-btn { background: #37474f; color: white; padding: 4px 8px; border-radius: 10px; font-weight: bold; font-size: 10px; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); text-decoration: none; display: flex; align-items: center; gap: 2px; }
+        .help-btn { background: #2e7d32; color: white; padding: 4px 8px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .notif-badge-btn { background: #c62828; color: white; padding: 4px 8px; border-radius: 10px; font-weight: bold; font-size: 10px; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
-        .status-bar { text-align: center; background: #ffe0b2; padding: 5px; border-radius: 4px; font-weight: bold; margin-bottom: 8px; color: #bf360c; font-size: 10px; }
-        .section-box { background: #fafafa; border: 1px solid #ddd; padding: 8px; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box; }
-        .section-box h3 { margin-top: 0; color: #e65100; font-size: 12px; border-bottom: 2px solid #ffe0b2; padding-bottom: 2px; }
+        .status-bar { text-align: center; background: #ffe0b2; padding: 6px; border-radius: 4px; font-weight: bold; margin-bottom: 8px; color: #bf360c; font-size: 11px; }
+        .section-box { background: #fafafa; border: 1px solid #ddd; padding: 8px; border-radius: 6px; margin-bottom: 10px; }
+        .section-box h3 { margin-top: 0; color: #e65100; font-size: 12px; border-bottom: 2px solid #ffe0b2; padding-bottom: 3px; }
         
-        .order-card { background: #ffebee; border: 2px solid #d32f2f; border-left: 6px solid #d32f2f; padding: 12px; border-radius: 6px; margin-bottom: 10px; font-size: 12px; box-sizing: border-box; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .order-card { background: #ffebee; border: 2px solid #d32f2f; border-left: 6px solid #d32f2f; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
         .location-info { font-size: 11px; color: #d32f2f; font-weight: bold; margin: 3px 0; background: #fff; padding: 3px 6px; border-radius: 3px; display: inline-block; border: 1px solid #ffcdd2; }
         .map-link-btn { background: #1976d2; color: white; padding: 3px 8px; border-radius: 3px; text-decoration: none; font-size: 10px; font-weight: bold; display: inline-block; margin-top: 3px; }
         
@@ -39,40 +40,40 @@
         .remove-item-btn { background: #c62828; color: white; border: none; padding: 2px 6px; font-size: 10px; border-radius: 3px; cursor: pointer; font-weight: bold; }
 
         .btn-group { display: flex; gap: 6px; margin-top: 8px; }
-        .btn { flex: 1; padding: 7px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 11px; }
+        .btn { flex: 1; padding: 8px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; color: white; font-size: 11px; }
         .btn-accept { background: #2e7d32; }
         .btn-reject { background: #c62828; }
-        .btn-call { background: #0288d1; text-decoration: none; text-align: center; display: inline-block; padding: 5px 8px; border-radius: 3px; color: white; font-weight: bold; margin-top: 5px; font-size: 11px; width: 100%; box-sizing: border-box; }
+        .btn-call { background: #0288d1; text-decoration: none; text-align: center; display: block; padding: 6px; border-radius: 3px; color: white; font-weight: bold; margin-top: 6px; font-size: 11px; width: 100%; }
 
-        .item-row { display: flex; flex-direction: column; background: #fff; border: 1px solid #eee; padding: 6px; border-radius: 5px; margin-bottom: 6px; box-sizing: border-box; }
+        .item-row { display: flex; flex-direction: column; background: #fff; border: 1px solid #eee; padding: 6px; border-radius: 5px; margin-bottom: 6px; }
         .item-top { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 4px; }
-        .item-row input.item-name { width: 50%; border: none; background: transparent; font-size: 12px; font-weight: bold; color: #333; outline: none; }
-        .item-bottom { display: flex; align-items: center; gap: 4px; width: 100%; border-top: 1px dashed #f0f0f0; padding-top: 4px; }
-        .item-row input.item-price { width: 40px; border: 1px solid #ccc; background: #fff; padding: 2px; font-size: 11px; text-align: center; border-radius: 3px; outline: none; font-weight: bold; color: #e65100; }
-        .item-row span { font-size: 10px; color: #666; }
+        .item-row input.item-name { width: 100%; border: none; background: transparent; font-size: 12px; font-weight: bold; color: #333; outline: none; }
+        .item-bottom { display: flex; align-items: center; gap: 6px; width: 100%; border-top: 1px dashed #f0f0f0; padding-top: 4px; }
+        .item-row input.item-price { width: 60px; border: 1px solid #ccc; background: #fff; padding: 4px; font-size: 11px; text-align: center; border-radius: 3px; outline: none; font-weight: bold; color: #e65100; }
+        .item-row span { font-size: 11px; color: #666; }
         
-        .stock-toggle-btn { background: #2e7d32; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 9px; font-weight: bold; cursor: pointer; }
+        .stock-toggle-btn { background: #2e7d32; color: white; border: none; padding: 5px 8px; border-radius: 3px; font-size: 10px; font-weight: bold; cursor: pointer; }
         .stock-toggle-btn.out-of-stock { background: #c62828; }
-        .remove-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 3px 6px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 9px; margin-left: auto; }
+        .remove-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 5px 8px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 10px; margin-left: auto; }
 
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 5px; box-sizing: border-box; }
-        .modal-content { background: white; padding: 10px; width: 92%; max-width: 360px; border-radius: 6px; max-height: 80vh; overflow-y: auto; box-sizing: border-box; position: relative; margin: auto; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 5px; }
+        .modal-content { background: white; padding: 12px; width: 95%; max-width: 400px; border-radius: 6px; max-height: 85vh; overflow-y: auto; position: relative; margin: auto; }
         
         .close-modal { position: absolute; top: 8px; right: 8px; font-size: 14px; font-weight: bold; cursor: pointer; color: #fff; background: #c62828; padding: 2px 7px; border-radius: 50%; z-index: 10; }
         .history-top-actions { display: flex; gap: 4px; align-items: center; margin-right: 35px; }
         .clear-all-btn { background: #c62828; color: white; border: none; padding: 4px 6px; font-size: 9px; border-radius: 3px; cursor: pointer; font-weight: bold; }
         .restore-btn { background: #2e7d32; color: white; border: none; padding: 4px 6px; font-size: 9px; border-radius: 3px; cursor: pointer; font-weight: bold; }
 
-        .history-item-box { background: #f1f8e9; border-left: 2px solid #2e7d32; padding: 6px; margin-bottom: 6px; font-size: 10px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .rejected-item-box { background: #fafafa; border-left: 2px solid #757575; padding: 6px; margin-bottom: 6px; font-size: 10px; border-radius: 3px; color: #555; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .history-item-box { background: #f1f8e9; border-left: 3px solid #2e7d32; padding: 8px; margin-bottom: 6px; font-size: 11px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .rejected-item-box { background: #fafafa; border-left: 3px solid #757575; padding: 8px; margin-bottom: 6px; font-size: 11px; border-radius: 3px; color: #555; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         
         .history-actions { display: flex; gap: 4px; align-items: center; }
         .action-icon-btn { background: #ddd; border: none; padding: 4px 6px; border-radius: 3px; font-size: 11px; cursor: pointer; text-decoration: none; display: inline-block; }
         .share-btn { background: #25D366; color: white; }
         .delete-btn { background: #c62828; color: white; }
 
-        .custom-alert-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 10px; box-sizing: border-box; }
-        .custom-alert-content { background: white; padding: 15px; width: 85%; max-width: 280px; border-radius: 8px; text-align: center; position: relative; }
+        .custom-alert-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 10px; }
+        .custom-alert-content { background: white; padding: 15px; width: 90%; max-width: 280px; border-radius: 8px; text-align: center; position: relative; }
     </style>
 </head>
 <body>
@@ -90,7 +91,7 @@
 <div id="customAlertModal" class="custom-alert-modal" onclick="closeCustomAlertOutside(event)">
     <div class="custom-alert-content" id="customAlertBox">
         <p id="customAlertText" style="font-size: 12px; font-weight: bold; margin-bottom: 12px; color: #333;"></p>
-        <button onclick="closeCustomAlert()" style="background: #e65100; color: white; border: none; padding: 5px 15px; font-size: 11px; border-radius: 4px; font-weight: bold; cursor: pointer;">ठीक है (OK)</button>
+        <button onclick="closeCustomAlert()" style="background: #e65100; color: white; border: none; padding: 6px 15px; font-size: 11px; border-radius: 4px; font-weight: bold; cursor: pointer;">ठीक है (OK)</button>
     </div>
 </div>
 
@@ -131,17 +132,17 @@
     
     <div id="loginScreen" class="screen active">
         <h2>🔐 वेजिटेबल पार्टनर - लॉगिन</h2>
-        <p style="text-align: center; color: #666; font-size: 10px;">लॉगिन करने के लिए मोबाइल नंबर दर्ज करें</p>
+        <p style="text-align: center; color: #666; font-size: 11px;">लॉगिन करने के लिए मोबाइल नंबर दर्ज करें</p>
         
         <div class="form-group" style="margin-top: 8px;">
             <label>मोबाइल नंबर:</label>
             <input type="tel" id="loginPhone" placeholder="10 अंकों का नंबर" maxlength="10">
         </div>
         <button class="btn-main" onclick="sendOtp()">ओटीपी भेजें</button>
-        <div id="otpBox" style="display:none; margin-top:6px;">
+        <div id="otpBox" style="display:none; margin-top:8px;">
             <label>ओटीपी दर्ज करें (सुरक्षा कोड: 1234):</label>
             <input type="text" id="enteredOtp" placeholder="4 अंकों का OTP" maxlength="4">
-            <button class="btn-main" onclick="verifyOtp()">सत्यापित करें (Verify)</button>
+            <button class="btn-main" style="margin-top:5px;" onclick="verifyOtp()">सत्यापित करें (Verify)</button>
         </div>
         <div id="loginError" class="error-msg"></div>
     </div>
@@ -149,12 +150,12 @@
     <div id="subScreen" class="screen">
         <h2>💳 सब्सक्रिप्शन भुगतान</h2>
         <p style="text-align: center; color: #d32f2f; font-weight: bold; font-size:11px;">आपका सब्सक्रिप्शन सक्रिय नहीं है!</p>
-        <p style="text-align: center; font-size: 10px;">ऐप को 30 दिनों के लिए चालू रखने हेतु नीचे दिए गए क्यूआर कोड पर **₹30** का भुगतान करें:</p>
+        <p style="text-align: center; font-size: 11px;">ऐप को 30 दिनों के लिए चालू रखने हेतु नीचे दिए गए क्यूआर कोड पर **₹30** का भुगतान करें:</p>
         
         <div style="text-align: center; margin: 8px 0;">
-            <div style="background: #eee; padding: 8px; border-radius: 5px; display:inline-block;">
-                <p style="margin:0; font-weight:bold; color:#555; font-size:10px;">[आपका UPI QR Code]</p>
-                <p style="font-size: 9px; color: #777; margin:2px 0 0 0;">UPI ID: 9997077062@paytm</p>
+            <div style="background: #eee; padding: 10px; border-radius: 5px; display:inline-block;">
+                <p style="margin:0; font-weight:bold; color:#555; font-size:11px;">[आपका UPI QR Code]</p>
+                <p style="font-size: 10px; color: #777; margin:3px 0 0 0;">UPI ID: 9997077062@paytm</p>
             </div>
         </div>
 
@@ -168,7 +169,7 @@
         <!-- ✅ नए ऑर्डर्स की सूची सबसे ऊपर -->
         <h3 style="font-size:12px; margin-top:0; color:#d32f2f;">🚨 नए आर्डर्स की सूची:</h3>
         <div id="orders-container">
-            <p style="text-align: center; color: #777; font-size:10px;">नया ऑर्डर आने का इंतज़ार है...</p>
+            <p style="text-align: center; color: #777; font-size:11px;">नया ऑर्डर आने का इंतज़ार है...</p>
         </div>
 
         <div class="section-box" style="margin-top: 10px;">
@@ -186,11 +187,15 @@
                 <textarea id="shopOfferText" rows="2" placeholder="जैसे: ₹200 से अधिक के ऑर्डर पर फ्री डिलीवरी!"></textarea>
             </div>
 
-            <!-- ✅ नया आइटम जोड़ें और सेटिंग्स सेव करें बटन सब्जियों की सूची के ऊपर -->
-            <button class="btn-main" style="background:#2e7d32; font-size:10px; padding:5px; margin-bottom:6px;" onclick="addNewItemRow()">+ नया आइटम जोड़ें</button>
-            <button class="btn-main" style="font-size:11px; padding:7px; margin-bottom:8px;" onclick="saveCatalogSettings()">कैटलॉग व सेटिंग्स सेव करें</button>
+            <!-- ✅ सेटिंग्स सेव करें बटन नारंगी रंग में ऊपर कर दिया गया है -->
+            <button class="btn-main" style="font-size:11px; padding:8px; margin-bottom:8px;" onclick="saveCatalogSettings()">कैटलॉग व सेटिंग्स सेव करें</button>
 
-            <h4 style="margin: 6px 0 3px 0; color:#e65100; font-size:11px;">सब्जी / फल और रेट (क्लिक करके बदलें):</h4>
+            <!-- ✅ सब्जी हेडिंग और नया आइटम जोड़ने वाला बटन (अब हरे रंग का बटन ऊपर है और नया आइटम सूची में सबसे ऊपर जुड़ेगा) -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 6px 0 4px 0;">
+                <h4 style="margin: 0; color:#e65100; font-size:11px;">सब्जी / फल और रेट (क्लिक करके बदलें):</h4>
+                <button class="btn-main" style="background:#2e7d32; font-size:10px; padding:5px 10px; width:auto;" onclick="addNewItemRow()">+ नया आइटम जोड़ें</button>
+            </div>
+            
             <div id="catalog-items-container"></div>
         </div>
     </div>
@@ -331,7 +336,6 @@
         });
     }
 
-    // ✅ तुरंत क्लिक करते ही स्टॉक डेटाबेस में सेव होने का फंक्शन
     window.toggleStock = function(index) {
         let rows = document.querySelectorAll('.item-row');
         let catalog = [];
@@ -353,13 +357,14 @@
         set(ref(db, 'shopSettings'), { upi, whatsapp, offerText, catalog });
     };
 
+    // ✅ नया आइटम जोड़ने पर वह अब सूची में सबसे ऊपर (Top) जुड़ेगा ताकि स्क्रॉल न करना पड़े
     window.addNewItemRow = function() {
         let container = document.getElementById('catalog-items-container');
         let div = document.createElement('div');
         div.className = "item-row";
         div.innerHTML = `
             <div class="item-top">
-                <input type="text" class="item-name" placeholder="आइटम नाम">
+                <input type="text" class="item-name" placeholder="नया आइटम नाम दर्ज करें">
             </div>
             <div class="item-bottom">
                 <input type="number" class="item-price" placeholder="रेट">
@@ -368,7 +373,7 @@
                 <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
             </div>
         `;
-        container.appendChild(div);
+        container.insertBefore(div, container.firstChild);
     };
 
     window.saveCatalogSettings = function() {
@@ -464,7 +469,7 @@
             const data = snapshot.val();
 
             if (!data) {
-                container.innerHTML = '<p style="text-align: center; color: #777; font-size:10px;">नया ऑर्डर आने का इंतज़ार है...</p>';
+                container.innerHTML = '<p style="text-align: center; color: #777; font-size:11px;">नया ऑर्डर आने का इंतज़ार है...</p>';
                 document.getElementById('notifCount').innerText = "0";
                 previousCount = 0;
                 stopContinuousAlarm();
@@ -567,7 +572,7 @@
                             <div>
                                 <b>👤 ${h.name}</b> (₹${h.amount})<br>
                                 📞 ${h.phone} | 📍 ${h.address}<br>
-                                <span style="color:#555; font-size:8px;">⏰ समय: ${timeStr}</span>
+                                <span style="color:#555; font-size:9px;">⏰ समय: ${timeStr}</span>
                             </div>
                             <div class="history-actions" onclick="event.stopPropagation()">
                                 <a href="${waShareUrl}" target="_blank" class="action-icon-btn share-btn" title="WhatsApp पर शेयर करें">📤</a>
@@ -581,7 +586,7 @@
                             <div>
                                 <b>👤 ${h.name}</b> (रद्द)<br>
                                 📞 ${h.phone} | 📍 ${h.address || 'लागू नहीं'}<br>
-                                <span style="color:#555; font-size:8px;">⏰ रद्द समय: ${timeStr}</span>
+                                <span style="color:#555; font-size:9px;">⏰ रद्द समय: ${timeStr}</span>
                             </div>
                             <div class="history-actions" onclick="event.stopPropagation()">
                                 <a href="${waShareUrl}" target="_blank" class="action-icon-btn share-btn" title="WhatsApp पर शेयर करें">📤</a>
