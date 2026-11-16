@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ऑनलाइन स्टोर - आर्डर करें</title>
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%85%E0%A4%82%E0%A4%B2%E0%A4%BE%E0%A4%87%E0%A4%A8%20%E0%A4%B8%E0%A5%8D%E0%A4%9A%E0%A5%8B%E0%A4%B0%22%2C%22short_name%22%3A%22Store%22%2C%22start_url%22%3A%22.%2Fcustomer.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23e8f5e9%22%2C%22theme_color%22%3A%22%232e7d32%22%5D">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%85%E0%A4%82%E0%A4%B2%E0%A4%BE%E0%A4%87%E0%A4%A8%20%E0%A4%B8%E0%A5%8D%E0%A4%9A%E0%A5%8B%E0%A4%B0%22%2C%22short_name%22%3A%22Store%22%2C%22start_url%22%3A%22.%2Fcustomer.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23e8f5e9%22%2C%22theme_color%22%3A%22%232e7d32%22%7D">
     <meta name="theme-color" content="#2e7d32">
     
     <style>
@@ -21,7 +21,7 @@
         .catalog-title { font-size: 13px; color: #2e7d32; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; margin-bottom: 8px; font-weight: bold; }
         
         .product-card { display: flex; align-items: center; background: #fafafa; border: 1px solid #e0e0e0; padding: 8px; border-radius: 6px; margin-bottom: 6px; gap: 8px; }
-        .product-img { width: 42px; height: 42px; object-fit: contain; flex-shrink: 0; }
+        .product-emoji { font-size: 28px; width: 40px; text-align: center; flex-shrink: 0; }
         .product-info { flex-grow: 1; font-size: 12px; }
         .product-name { font-weight: bold; color: #333; font-size: 13px; }
         .product-eng-name { font-size: 10px; color: #1976d2; font-weight: bold; margin-top: 1px; }
@@ -115,35 +115,35 @@
     let currentCatalog = [];
     let cart = {};
 
-    // 100% सटीक और साफ-सुथरे आइकन (सब्जियां, फल, और मिठाइयां/फास्ट फूड)
-    function getItemIcon(itemName) {
-        if (!itemName) return "https://cdn-icons-png.flaticon.com/512/3081/3081559.png";
+    // 100% सटीक और पक्के इमोजी आइकन (सब्जियां, फल, फास्ट फूड)
+    function getItemEmoji(itemName) {
+        if (!itemName) return "🛍️";
         let name = itemName.trim().toLowerCase();
 
-        if (name.includes("गोभी")) return "https://cdn-icons-png.flaticon.com/512/4146/4146746.png";
-        if (name.includes("लौकी")) return "https://cdn-icons-png.flaticon.com/512/8157/8157155.png";
-        if (name.includes("मूली")) return "https://cdn-icons-png.flaticon.com/512/3194/3194581.png";
-        if (name.includes("गाजर")) return "https://cdn-icons-png.flaticon.com/512/2329/2329895.png";
-        if (name.includes("शिमला") || name.includes("capsicum")) return "https://cdn-icons-png.flaticon.com/512/4151/4151831.png";
-        if (name.includes("मिर्च") || name.includes("chilli")) return "https://cdn-icons-png.flaticon.com/512/2909/2909777.png";
-        if (name.includes("मेथी") || name.includes("धनिया") || name.includes("पालक")) return "https://cdn-icons-png.flaticon.com/512/2713/2713490.png";
-        if (name.includes("कद्दू") || name.includes("pumpkin")) return "https://cdn-icons-png.flaticon.com/512/3342/3342137.png";
-        if (name.includes("टमाटर") || name.includes("tomato")) return "https://cdn-icons-png.flaticon.com/512/1147/1147805.png";
-        if (name.includes("आलू") || name.includes("potato")) return "https://cdn-icons-png.flaticon.com/512/2674/2674134.png";
-        if (name.includes("प्याज") || name.includes("प्याज़") || name.includes("onion")) return "https://cdn-icons-png.flaticon.com/512/766/766320.png";
-        if (name.includes("मटर") || name.includes("peas")) return "https://cdn-icons-png.flaticon.com/512/4392/4392476.png";
-        if (name.includes("अदरक") || name.includes("ginger")) return "https://cdn-icons-png.flaticon.com/512/4282/4282858.png";
-        if (name.includes("लहसुन") || name.includes("garlic")) return "https://cdn-icons-png.flaticon.com/512/4282/4282860.png";
-        if (name.includes("समोसा") || name.includes("samosa")) return "https://cdn-icons-png.flaticon.com/512/2515/2515183.png";
-        if (name.includes("कचौड़ी") || name.includes("kachori")) return "https://cdn-icons-png.flaticon.com/512/2515/2515263.png";
-        if (name.includes("बर्गर") || name.includes("burger")) return "https://cdn-icons-png.flaticon.com/512/3076/3076129.png";
-        if (name.includes("पिज़्ज़ा") || name.includes("पिज्जा") || name.includes("pizza")) return "https://cdn-icons-png.flaticon.com/512/3595/3595455.png";
-        if (name.includes("जलेबी") || name.includes("jalebi")) return "https://cdn-icons-png.flaticon.com/512/3014/3014583.png";
-        if (name.includes("सेब") || name.includes("apple")) return "https://cdn-icons-png.flaticon.com/512/415/415733.png";
-        if (name.includes("केला") || name.includes("banana")) return "https://cdn-icons-png.flaticon.com/512/552/552489.png";
-        if (name.includes("आम") || name.includes("mango")) return "https://cdn-icons-png.flaticon.com/512/2909/2909777.png"; // फल आइकन
+        if (name.includes("गोभी")) return "🥦";
+        if (name.includes("लौकी")) return "🥒";
+        if (name.includes("मूली")) return "🥕";
+        if (name.includes("गाजर")) return "🥕";
+        if (name.includes("शिमला")) return "🫑";
+        if (name.includes("मिर्च") || name.includes("chilli")) return "🌶️";
+        if (name.includes("मेथी") || name.includes("पालक") || name.includes("धनिया")) return "🌿";
+        if (name.includes("कद्दू") || name.includes("pumpkin")) return "🎃";
+        if (name.includes("टमाटर") || name.includes("tomato")) return "🍅";
+        if (name.includes("आलू") || name.includes("potato")) return "🥔";
+        if (name.includes("प्याज") || name.includes("प्याज़") || name.includes("onion")) return "🧅";
+        if (name.includes("मटर") || name.includes("peas")) return "🟢";
+        if (name.includes("अदरक") || name.includes("ginger") || name.includes("लहसुन")) return "🧄";
+        if (name.includes("समोसा") || name.includes("samosa")) return "🥟";
+        if (name.includes("कचौड़ी") || name.includes("kachori")) return "🥠";
+        if (name.includes("बर्गर") || name.includes("burger")) return "🍔";
+        if (name.includes("पिज़्ज़ा") || name.includes("पिज्जा") || name.includes("pizza")) return "🍕";
+        if (name.includes("जलेबी") || name.includes("jalebi")) return "🥨";
+        if (name.includes("सेब") || name.includes("apple")) return "🍎";
+        if (name.includes("केला") || name.includes("banana")) return "🍌";
+        if (name.includes("आम") || name.includes("mango")) return "🥭";
+        if (name.includes("नींबू") || name.includes("lemon")) return "🍋";
         
-        return "https://cdn-icons-png.flaticon.com/512/3081/3081559.png";
+        return "🛒";
     }
 
     // अंग्रेजी अनुवाद डिक्शनरी
@@ -195,12 +195,12 @@
         }
 
         availableItems.forEach((item, index) => {
-            let iconUrl = getItemIcon(item.name);
+            let emojiIcon = getItemEmoji(item.name);
             let engName = getEnglishName(item.name);
             let card = document.createElement('div');
             card.className = "product-card";
             card.innerHTML = `
-                <img src="${iconUrl}" class="product-img" alt="icon">
+                <div class="product-emoji">${emojiIcon}</div>
                 <div class="product-info">
                     <div class="product-name">${item.name}</div>
                     <div class="product-eng-name">(${engName})</div>
@@ -237,7 +237,6 @@
         }
         cart[name].qty += qtyVal;
         
-        // सुंदर टेक्स्ट डिस्प्ले के लिए
         if(qtyVal < 1) {
             cart[name].qtyText = `${Math.round(cart[name].qty * 1000)} ग्राम`;
         } else {
