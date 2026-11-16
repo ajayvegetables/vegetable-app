@@ -17,9 +17,21 @@
         .help-btn { background: #c62828; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; }
         .shop-btn { background: #1976d2; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; }
 
-        .banner { background: #fffde7; border: 1px dashed #fbc02d; padding: 6px; border-radius: 5px; font-size: 11px; color: #f57f17; font-weight: bold; margin-bottom: 8px; text-align: center; }
+        /* शानदार, बड़ा और आकर्षक ऑफर बैनर */
+        .banner { 
+            background: linear-gradient(135deg, #ff9800, #ff5722); 
+            color: white; 
+            padding: 12px 10px; 
+            border-radius: 8px; 
+            font-size: 13px; 
+            font-weight: bold; 
+            margin-bottom: 10px; 
+            text-align: center; 
+            box-shadow: 0 3px 8px rgba(255, 152, 0, 0.4);
+            border: 2px dashed #fffde7;
+            letter-spacing: 0.3px;
+        }
         
-        /* आर्डर स्टेटस नोटिफिकेशन बार */
         .status-notification { background: #e3f2fd; border: 1px solid #90caf9; padding: 8px; border-radius: 6px; margin-bottom: 8px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; color: #0d47a1; font-weight: bold; }
         .close-notif-btn { background: none; border: none; font-size: 14px; font-weight: bold; cursor: pointer; color: #c62828; padding: 0 4px; }
 
@@ -67,14 +79,15 @@
         </div>
     </div>
 
-    <div class="banner" id="shopBanner">विशेष ऑफर: ₹200 से अधिक के आर्डर पर 10% की छूट!</div>
+    <!-- आकर्षक और बड़ा लाइव ऑफर बैनर -->
+    <div class="banner" id="shopBanner">🔥 शानदार ऑफर लोड हो रहा है...</div>
 
     <!-- आर्डर स्टेटस नोटिफिकेशन बार -->
     <div id="orderStatusNotificationContainer"></div>
 
     <div class="catalog-title">📦 उपलब्ध आइटम कैटलॉग (लाइव अपडेटेड)</div>
     <div id="customer-catalog-container">
-        <p style="text-align: center; color: #777; font-size: 12px;">कैटलॉग लोड हो रहा है...</p>
+        <p style="text-align: center; color: #777; font-size: 12px;">लाइव कैटलॉग लोड हो रहा है...</p>
     </div>
 </div>
 
@@ -94,7 +107,7 @@
         
         <div id="billCalculationBox" style="font-size: 11px; background: #f1f8e9; padding: 8px; border-radius: 5px; margin-bottom: 8px; line-height: 1.4;"></div>
         
-        <!-- भुगतान अनुभाग (UPI QR Code और ऐप ओपन करने की लिंक) -->
+        <!-- भुगतान अनुभाग (लाइव QR Code और UPI ऐप लिंक) -->
         <div id="paymentSection" style="text-align: center; margin-bottom: 10px; background: #fff8e1; padding: 8px; border-radius: 6px; border: 1px dashed #ffb300;">
             <p style="font-size: 11px; font-weight: bold; color: #d32f2f; margin: 4px 0;">📱 QR Code स्कैन करें या नीचे दिए गए बटन से पेमेंट करें:</p>
             <div style="background: #fff; padding: 6px; border: 1px solid #ccc; display: inline-block; border-radius: 6px; margin: 4px 0;">
@@ -104,21 +117,13 @@
             
             <!-- PhonePe / GooglePay ऐप खोलने वाला डायरेक्ट बटन -->
             <a id="upiAppPayLink" href="#" class="upi-pay-link-btn" target="_blank" onclick="unlockOrderButtonAfterPayment()">📲 PhonePe / GPay / Paytm से भुगतान करने के लिए यहाँ क्लिक करें</a>
-            
-            <!-- पेमेंट कन्फर्मेशन चेकबॉक्स (जब तक ऐप पर क्लिक करके पेमेंट नहीं होगी, बटन बंद रहेगा) -->
-            <div style="margin-top: 8px; text-align: left; font-size: 11px; font-weight: bold; color: #2e7d32;">
-                <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                    <input type="checkbox" id="paymentConfirmedCheckbox" onchange="toggleOrderButton()" style="width: 16px; height: 16px;">
-                    मैंने UPI ऐप से सफलतापूर्वक पेमेंट कर दिया है।
-                </label>
-            </div>
         </div>
 
         <div class="form-group"><label>आपका नाम:</label><input type="text" id="custName" placeholder="पूरा नाम दर्ज करें"></div>
         <div class="form-group"><label>मोबाइल नंबर:</label><input type="tel" id="custPhone" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10" oninput="listenForOrderNotifications(this.value)"></div>
         <div class="form-group"><label>पूरा पता (Address):</label><input type="text" id="custAddress" placeholder="मोहल्ला, मकान नंबर, गली..."></div>
         
-        <!-- आर्डर भेजने वाला बटन (शुरुआत में बंद रहेगा) -->
+        <!-- आर्डर भेजने वाला बटन (जब तक पेमेंट लिंक पर क्लिक नहीं होगा, बंद रहेगा) -->
         <button id="submitOrderBtn" class="btn-main" onclick="placeOrderToDatabase()" disabled>🔒 पहले UPI पेमेंट पूरा करें</button>
     </div>
 </div>
@@ -153,18 +158,19 @@
     let currentCatalog = [];
     let cart = {};
     let shopUpiId = "9997077062@paytm";
-    let currentOfferText = "लाइव ऑफर लोड हो रहा है...";
+    let currentOfferText = "✨ विशेष ऑफर लोड हो रहा है...";
     let paymentInitiated = false;
 
-    // 100% सही और स्पष्ट, अलग-अलग सब्जियां व फल (पालक, मेथी, मूली और धनिया के लिए एकदम सटीक आइकॉन)
+    // 100% सही और बिल्कुल स्पष्ट, अलग-अलग सब्जियां व फल (पालक, मेथी, मूली और लौकी के बिल्कुल सटीक आइकन्स)
     function getItemEmoji(itemName) {
         if (!itemName) return "🛍️";
         let name = itemName.trim().toLowerCase();
 
         if (name.includes("पालक")) return "🥬"; 
         if (name.includes("मेथी")) return "🌿"; 
-        if (name.includes("मूली") || name.includes("radish")) return "🥕🤍"; 
         if (name.includes("धनिया")) return "☘️"; 
+        if (name.includes("मूली") || name.includes("radish")) return "🥕"; // बिल्कुल सही सफेद मूली का रूप
+        if (name.includes("लौकी") || name.includes("bottle gourd")) return "🥒"; 
         if (name.includes("गोभी")) return "🥦";
         if (name.includes("गाजर")) return "🥕";
         if (name.includes("टमाटर") || name.includes("tomato")) return "🍅";
@@ -176,7 +182,7 @@
         if (name.includes("शिमला")) return "🫑";
         if (name.includes("मिर्च") || name.includes("chilli")) return "🌶️";
         if (name.includes("कद्दू") || name.includes("pumpkin")) return "🎃";
-        if (name.includes("लौकी") || name.includes("खीरा")) return "🥒";
+        if (name.includes("खीरा")) return "🥒";
         if (name.includes("बैंगन")) return "🍆";
         if (name.includes("सेब")) return "🍎";
         if (name.includes("केला")) return "🍌";
@@ -209,6 +215,7 @@
     }
 
     window.onload = function() {
+        // लाइव डेटाबेस सिंक (Real-time Shop Settings & Catalog Sync)
         const settingsRef = ref(db, 'shopSettings');
         onValue(settingsRef, (snapshot) => {
             const data = snapshot.val();
@@ -357,7 +364,7 @@
             finalAmount = subtotal - discount;
             discountText = `ऑफर लागू (${currentOfferText}): -₹${Math.round(discount)} की छूट`;
         } else {
-            discountText = `ऑफर शर्त: ${currentOfferText}`;
+            discountText = `ऑफर / संदेश: ${currentOfferText}`;
         }
 
         document.getElementById('billCalculationBox').innerHTML = `
@@ -368,12 +375,9 @@
 
         let upiPayUrl = `upi://pay?pa=${shopUpiId}&pn=SmartStore&am=${Math.round(finalAmount)}&cu=INR`;
         document.getElementById('upiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(upiPayUrl)}`;
-        
-        // पेमेंट ऐप खोलने वाली लिंक सेट करें
         document.getElementById('upiAppPayLink').href = upiPayUrl;
 
         paymentInitiated = false;
-        document.getElementById('paymentConfirmedCheckbox').checked = false;
         let submitBtn = document.getElementById('submitOrderBtn');
         submitBtn.disabled = true;
         submitBtn.innerText = "🔒 पहले UPI पेमेंट पूरा करें";
@@ -385,29 +389,11 @@
         document.getElementById('checkoutModal').style.display = 'none';
     };
 
-    // जब यूजर UPI ऐप पर क्लिक करेगा, तब पेमेंट शुरू मानी जाएगी
     window.unlockOrderButtonAfterPayment = function() {
         paymentInitiated = true;
-        let checkboxDiv = document.getElementById('paymentConfirmedCheckbox');
-        checkboxDiv.disabled = false;
-    };
-
-    window.toggleOrderButton = function() {
-        let isChecked = document.getElementById('paymentConfirmedCheckbox').checked;
         let submitBtn = document.getElementById('submitOrderBtn');
-        
-        if (!paymentInitiated) {
-            alert("कृपया पहले ऊपर दिए गए 'PhonePay / GPay / Paytm से भुगतान करने के लिए यहाँ क्लिक करें' बटन पर क्लिक करके पेमेंट करें!");
-            document.getElementById('paymentConfirmedCheckbox').checked = false;
-            return;
-        }
-
-        submitBtn.disabled = !isChecked;
-        if(isChecked) {
-            submitBtn.innerText = "✅ भुगतान हो गया, दुकानदार को आर्डर भेजें";
-        } else {
-            submitBtn.innerText = "🔒 पहले UPI पेमेंट पूरा करें";
-        }
+        submitBtn.disabled = false;
+        submitBtn.innerText = "✅ भुगतान हो गया, दुकानदार को आर्डर भेजें";
     };
 
     window.listenForOrderNotifications = function(phone) {
@@ -433,6 +419,11 @@
     };
 
     window.placeOrderToDatabase = function() {
+        if (!paymentInitiated) {
+            alert("कृपया पहले ऊपर दिए गए 'PhonePay / GPay / Paytm से भुगतान करने के लिए यहाँ क्लिक करें' बटन पर क्लिक करके पेमेंट करें!");
+            return;
+        }
+
         let name = document.getElementById('custName').value.trim();
         let phone = document.getElementById('custPhone').value.trim();
         let address = document.getElementById('custAddress').value.trim();
