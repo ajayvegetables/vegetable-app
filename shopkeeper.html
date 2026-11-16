@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>स्मार्ट पार्टनर - दुकानदार डैशबोर्ड</title>
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%B8%E0%A5%8D%E0%A4%AE%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%9F%20%E0%A4%AA%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%9F%E0%A4%A8%22%2C%22short_name%22%3A%22SmartPartner%22%2C%22start_url%22%3A%22.%2Fshopkeeper.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fff3e0%22%2C%22theme_color%22%3A%22%23e65100%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3081%2F3081559.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any maskable%22%7D%5D%7D">
+    <title>वेजिटेबल पार्टनर - दुकानदार डैशबोर्ड</title>
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%B5%E0%A5%87%E0%A4%9C%E0%A4%BF%E0%A4%AB%E0%A4%9F%E0%A4%AC%E0%A4%B2%20%E0%A4%AA%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%9F%E0%A4%A8%22%2C%22short_name%22%3A%22VegPartner%22%2C%22start_url%22%3A%22.%2Fshopkeeper.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fff3e0%22%2C%22theme_color%22%3A%22%23e65100%22%7D">
     <meta name="theme-color" content="#e65100">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3081/3081559.png">
     
     <style>
         * { box-sizing: border-box; }
@@ -133,40 +132,27 @@
 
 <div class="container">
     
+    <!-- सुरक्षित रैंडम OTP लॉगिन स्क्रीन -->
     <div id="loginScreen" class="screen active">
-        <h2>🔐 स्मार्ट पार्टनर - लॉगिन</h2>
-        <p style="text-align: center; color: #666; font-size: 11px;">लॉगिन करने के लिए मोबाइल नंबर दर्ज करें</p>
+        <h2>🔐 सुरक्षित दुकानदार - लॉगिन</h2>
+        <p style="text-align: center; color: #666; font-size: 11px;">लॉगिन करने के लिए 10 अंकों का मोबाइल नंबर दर्ज करें</p>
         
         <div class="form-group" style="margin-top: 8px;">
             <label>मोबाइल नंबर:</label>
             <input type="tel" id="loginPhone" placeholder="10 अंकों का नंबर" maxlength="10">
         </div>
-        <button class="btn-main" onclick="sendOtp()">ओटीपी भेजें</button>
+        <button class="btn-main" onclick="sendRandomOtp()">नया OTP भेजें</button>
         <div id="otpBox" style="display:none; margin-top:8px;">
-            <label>ओटीपी दर्ज करें (सुरक्षा कोड: 1234):</label>
+            <label id="otpLabelText">इस नंबर के लिए सुरक्षा OTP दर्ज करें:</label>
             <input type="text" id="enteredOtp" placeholder="4 अंकों का OTP" maxlength="4">
-            <button class="btn-main" style="margin-top:5px;" onclick="verifyOtp()">सत्यापित करें (Verify)</button>
+            <button class="btn-main" style="margin-top:5px;" onclick="verifyRandomOtp()">सत्यापित करें (Verify)</button>
         </div>
-        <div id="loginError" class="error-msg"></div>
+        <div id="loginError" style="color:red; font-size:11px; margin-top:4px;"></div>
     </div>
 
-    <div id="subScreen" class="screen">
-        <h2>💳 सब्सक्रिप्शन भुगतान</h2>
-        <p style="text-align: center; color: #d32f2f; font-weight: bold; font-size:11px;">आपका सब्सक्रिप्शन सक्रिय नहीं है!</p>
-        <p style="text-align: center; font-size: 11px;">ऐप को 30 दिनों के लिए चालू रखने हेतु नीचे दिए गए क्यूआर कोड पर **₹30** का भुगतान करें:</p>
-        
-        <div style="text-align: center; margin: 8px 0;">
-            <div style="background: #eee; padding: 10px; border-radius: 5px; display:inline-block;">
-                <p style="margin:0; font-weight:bold; color:#555; font-size:11px;">[आपका UPI QR Code]</p>
-                <p style="font-size: 10px; color: #777; margin:3px 0 0 0;">UPI ID: 9997077062@paytm</p>
-            </div>
-        </div>
-
-        <button class="btn-main" onclick="confirmSubscription()">भुगतान कर दिया है (Activate)</button>
-    </div>
-
+    <!-- डैशबोर्ड स्क्रीन -->
     <div id="dashboardScreen" class="screen">
-        <h2>🔔 स्मार्ट पार्टनर डैशबोर्ड</h2>
+        <h2>🔔 वेजिटेबल पार्टनर डैशबोर्ड</h2>
         <div class="status-bar" id="connectionStatus">लाइव डेटाबेस से जुड़ रहा है...</div>
 
         <h3 style="font-size:12px; margin-top:0; color:#d32f2f;">🚨 नए आर्डर्स की सूची:</h3>
@@ -192,7 +178,7 @@
             <button class="btn-main" style="font-size:11px; padding:8px; margin-bottom:8px;" onclick="saveCatalogSettings()">कैटलॉग व सेटिंग्स सेव करें</button>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin: 6px 0 4px 0;">
-                <h4 style="margin: 0; color:#e65100; font-size:11px;">आइटम कैटलॉग, रेट व स्टॉक:</h4>
+                <h4 style="margin: 0; color:#e65100; font-size:11px;">सब्जी / फल, रेट व कुल स्टॉक (किलो):</h4>
                 <button class="btn-main" style="background:#2e7d32; font-size:10px; padding:5px 10px; width:auto;" onclick="addNewItemRow()">+ नया आइटम जोड़ें</button>
             </div>
             
@@ -220,102 +206,12 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    window.addEventListener('online', () => {
-        try { goOnline(db); } catch(e){}
-        let statusEl = document.getElementById('connectionStatus');
-        if(statusEl) statusEl.innerText = "🟢 इंटरनेट जुड़ गया, लाइव कनेक्टेड!";
-    });
-    window.addEventListener('offline', () => {
-        let statusEl = document.getElementById('connectionStatus');
-        if(statusEl) statusEl.innerText = "🔴 इंटरनेट नहीं है (ऑफलाइन मोड)";
-    });
-
+    let generatedRandomOtp = "";
     let customerNotifications = [];
     let alarmInterval = null;
     let lastDeletedHistory = {};
     let activeOrdersData = {};
     let removedItemsTracker = {};
-
-    // यूनिवर्सल डिक्शनरी (सब्जियां, फल, फास्ट फूड, हलवाई आइटम आदि सब शामिल)
-    const universalDictionary = {
-        "मेथी": "Fenugreek Leaves",
-        "कद्दू": "Pumpkin",
-        "पालक": "Spinach",
-        "टमाटर": "Tomato",
-        "आलू": "Potato",
-        "प्याज़": "Onion",
-        "प्याज": "Onion",
-        "मटर": "Green Peas",
-        "गाजर": "Carrot",
-        "मूली": "Radish",
-        "अदरक": "Ginger",
-        "लहसुन": "Garlic",
-        "गोभी": "Cauliflower",
-        "पत्तागोभी": "Cabbage",
-        "बैंगन": "Brinjal",
-        "भिंडी": "Ladyfinger",
-        "शिमला मिर्च": "Capsicum",
-        "नींबू": "Lemon",
-        "धनिया": "Coriander",
-        "हरी मिर्च": "Green Chilli",
-        "खीरा": "Cucumber",
-        "लौकी": "Bottle Gourd",
-        "तोरी": "Ridge Gourd",
-        "करेला": "Bitter Gourd",
-        "चुकंदर": "Beetroot",
-        "सेब": "Apple",
-        "केला": "Banana",
-        "आम": "Mango",
-        "अनार": "Pomegranate",
-        "पपीता": "Papaya",
-        "संतरा": "Orange",
-        "अंगूर": "Grapes",
-        "समोसा": "Samosa",
-        "कचौड़ी": "Kachori",
-        "कचौरी": "Kachori",
-        "बर्गर": "Burger",
-        "पिज़्ज़ा": "Pizza",
-        "पिज्जा": "Pizza",
-        "जलेबी": "Jalebi",
-        "पकोड़ा": "Pakoda",
-        "पकोड़ी": "Pakodi",
-        "ब्रेड": "Bread",
-        "चाय": "Tea"
-    };
-
-    // हिंदी शब्दों को अंग्रेजी या रोमन (Hinglish) में बदलने का स्मार्ट इंजन (कभी फेल नहीं होगा)
-    function getEnglishName(hindiName) {
-        if (!hindiName) return "Item";
-        let clean = hindiName.trim();
-        if (universalDictionary[clean]) {
-            return universalDictionary[clean];
-        }
-        
-        // हिंदी वर्णमाला से अंग्रेजी ध्वनियों में बदलने का ऑटोमैटिक कनवर्टर (ताकि कोई भी नया शब्द हो तो उसका रोमन रूप तुरंत बन जाए)
-        let hindiToEngMap = {
-            'अ':'a', 'आ':'aa', 'इ':'i', 'ई':'ee', 'उ':'u', 'ऊ':'oo', 'ऋ':'ri', 'ए':'e', 'ऐ':'ai', 'ओ':'o', 'औ':'au', 'अं':'an', 'अः':'ah',
-            'क':'k', 'ख':'kh', 'ग':'g', 'घ':'gh', 'ङ':'n',
-            'च':'ch', 'छ':'chh', 'ज':'j', 'झ':'jh', 'ञ':'n',
-            'ट':'t', 'ठ':'th', 'ड':'d', 'ढ':'dh', 'ण':'n',
-            'त':'t', 'थ':'th', 'द':'d', 'ध':'dh', 'न':'n',
-            'प':'p', 'फ':'ph', 'ब':'b', 'भ':'bh', 'म':'m',
-            'य':'y', 'र':'r', 'ल':'l', 'व':'v', 'श':'sh', 'ष':'sh', 'स':'s', 'ह':'h',
-            'क्ष':'ksh', 'त्र':'tr', 'ज्ञ':'gy',
-            'ा':'a', 'ि':'i', 'ी':'ee', 'ु':'u', 'ू':'oo', 'ृ':'ri', 'े':'e', 'ै':'ai', 'ो':'o', 'ौ':'au', 'ं':'n', 'ँ':'n', 'ः':'h', '्':''
-        };
-
-        let result = "";
-        for (let i = 0; i < clean.length; i++) {
-            let char = clean[i];
-            result += hindiToEngMap[char] !== undefined ? hindiToEngMap[char] : char;
-        }
-
-        // पहला अक्षर कैपिटल कर दें
-        if(result.length > 0) {
-            result = result.charAt(0).toUpperCase() + result.slice(1);
-        }
-        return result || clean;
-    }
 
     window.onload = function() {
         let savedPhone = localStorage.getItem("partnerPhone");
@@ -324,7 +220,8 @@
         }
     };
 
-    window.sendOtp = function() {
+    // सुरक्षा के लिए हर बार बिल्कुल नया रैंडम OTP जनरेट करने का फंक्शन
+    window.sendRandomOtp = function() {
         let phone = document.getElementById('loginPhone').value.trim();
         let errorEl = document.getElementById('loginError');
 
@@ -333,34 +230,35 @@
             return;
         }
 
+        // 1000 से 9999 के बीच का एक रैंडम 4-अंकों का कोड बनाएं
+        generatedRandomOtp = Math.floor(1000 + Math.random() * 9000).toString();
+        
         localStorage.setItem("partnerPhone", phone);
-        alert("आपका सुरक्षा OTP है: 1234");
+        localStorage.setItem("currentSessionOtp", generatedRandomOtp);
+
+        // स्क्रीन पर अलर्ट या मैसेज के रूप में नया OTP दिखाएं (सुरक्षित और यूनिक)
+        alert(`सुरक्षा संदेश: आपके मोबाइल (${phone}) के लिए नया OTP है: ${generatedRandomOtp}`);
+        
         document.getElementById('otpBox').style.display = 'block';
+        document.getElementById('otpLabelText').innerText = `नंबर (${phone}) के लिए OTP दर्ज करें (डिमोट्रेशन कोड: ${generatedRandomOtp}):`;
         errorEl.innerText = "";
     };
 
-    window.verifyOtp = function() {
+    window.verifyRandomOtp = function() {
         let entered = document.getElementById('enteredOtp').value.trim();
-        let phone = localStorage.getItem("partnerPhone");
+        let savedOtp = localStorage.getItem("currentSessionOtp") || generatedRandomOtp;
         let errorEl = document.getElementById('loginError');
 
-        if (entered === "1234" || phone) {
+        if (entered === savedOtp && entered !== "") {
             localStorage.setItem("isSubscribed", "true");
             showDashboard();
         } else {
-            errorEl.innerText = "गलत ओटीपी! पुनः प्रयास करें।";
+            errorEl.innerText = "गलत ओटीपी! कृपया सही 4 अंकों का कोड दर्ज करें।";
         }
-    };
-
-    window.confirmSubscription = function() {
-        localStorage.setItem("isSubscribed", "true");
-        alert("भुगतान सत्यापित! आपका ऐप चालू हो गया है।");
-        showDashboard();
     };
 
     function showDashboard() {
         document.getElementById('loginScreen').classList.remove('active');
-        document.getElementById('subScreen').classList.remove('active');
         document.getElementById('dashboardScreen').classList.add('active');
         
         loadShopSettings();
@@ -371,6 +269,7 @@
     window.logout = function() {
         if(confirm("क्या आप वाकई लॉग आउट करना चाहते हैं?")) {
             localStorage.removeItem("partnerPhone");
+            localStorage.removeItem("currentSessionOtp");
             location.reload();
         }
     };
@@ -388,20 +287,18 @@
                     renderCatalog(data.catalog);
                 } else {
                     renderCatalog([
-                        {name: "समोसा", price: 15, stock: 50, outOfStock: false},
-                        {name: "कचौड़ी", price: 20, stock: 40, outOfStock: false},
-                        {name: "बर्गर", price: 50, stock: 20, outOfStock: false}
+                        {name: "टमाटर", price: 40, stock: 10, outOfStock: false},
+                        {name: "आलू", price: 30, stock: 10, outOfStock: false},
+                        {name: "प्याज़", price: 50, stock: 10, outOfStock: false}
                     ]);
                 }
             } else {
                 renderCatalog([
-                    {name: "समोसा", price: 15, stock: 50, outOfStock: false},
-                    {name: "कचौड़ी", price: 20, stock: 40, outOfStock: false},
-                    {name: "बर्गर", price: 50, stock: 20, outOfStock: false}
+                    {name: "टमाटर", price: 40, stock: 10, outOfStock: false},
+                    {name: "आलू", price: 30, stock: 10, outOfStock: false},
+                    {name: "प्याज़", price: 50, stock: 10, outOfStock: false}
                 ]);
             }
-        }, (error) => {
-            console.log("Database sync error (handled):", error);
         });
     }
 
@@ -412,20 +309,18 @@
             let isOut = item.outOfStock ? "out-of-stock" : "";
             let btnText = item.outOfStock ? "स्टॉक में है" : "स्टॉक नहीं है";
             let stockVal = item.stock !== undefined ? item.stock : 10;
-            let engName = getEnglishName(item.name);
 
             let div = document.createElement('div');
             div.className = "item-row";
             div.innerHTML = `
                 <div class="item-top">
-                    <input type="text" class="item-name" value="${item.name}" placeholder="आइटम नाम (जैसे समोसा, पिज़्ज़ा)" oninput="updateEnglishSubName(this)">
-                    <div class="auto-eng-name">(${engName})</div>
+                    <input type="text" class="item-name" value="${item.name}" placeholder="आइटम नाम">
                 </div>
                 <div class="item-bottom">
                     <input type="number" class="item-price" value="${item.price}" placeholder="रेट">
-                    <span>₹/Unit</span>
-                    <input type="number" class="item-stock" value="${stockVal}" placeholder="स्टॉक" title="कुल उपलब्ध स्टॉक" onchange="autoCheckStock(${index})">
-                    <span>Qty</span>
+                    <span>₹/kg</span>
+                    <input type="number" class="item-stock" value="${stockVal}" placeholder="स्टॉक" title="कुल उपलब्ध स्टॉक (kg)" onchange="autoCheckStock(${index})">
+                    <span>kg</span>
                     <button class="stock-toggle-btn ${isOut}" onclick="toggleStock(${index})">${btnText}</button>
                     <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
                 </div>
@@ -433,14 +328,6 @@
             container.appendChild(div);
         });
     }
-
-    window.updateEnglishSubName = function(inputEl) {
-        let hindiVal = inputEl.value;
-        let engDiv = inputEl.parentElement.querySelector('.auto-eng-name');
-        if (engDiv) {
-            engDiv.innerText = `(${getEnglishName(hindiVal)})`;
-        }
-    };
 
     window.toggleStock = function(index) {
         let rows = document.querySelectorAll('.item-row');
@@ -484,14 +371,13 @@
         div.className = "item-row";
         div.innerHTML = `
             <div class="item-top">
-                <input type="text" class="item-name" placeholder="नया आइटम नाम दर्ज करें" oninput="updateEnglishSubName(this)">
-                <div class="auto-eng-name">(Item)</div>
+                <input type="text" class="item-name" placeholder="नया आइटम नाम दर्ज करें">
             </div>
             <div class="item-bottom">
                 <input type="number" class="item-price" placeholder="रेट">
-                <span>₹/Unit</span>
-                <input type="number" class="item-stock" value="20" placeholder="स्टॉक" title="कुल उपलब्ध स्टॉक">
-                <span>Qty</span>
+                <span>₹/kg</span>
+                <input type="number" class="item-stock" value="10" placeholder="स्टॉक" title="कुल उपलब्ध स्टॉक (kg)">
+                <span>kg</span>
                 <button class="stock-toggle-btn" onclick="this.classList.toggle('out-of-stock'); this.innerText = this.classList.contains('out-of-stock') ? 'स्टॉक में है' : 'स्टॉक नहीं है';">स्टॉक नहीं है</button>
                 <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
             </div>
@@ -538,11 +424,11 @@
         
         set(ref(db, 'shopSettings'), settingsData).then(() => {
             if(showAlert) {
-                alert("कैटलॉग, स्टॉक और सेटिंग्स सफलतापूर्वक सेव हो गई हैं!");
+                alert("कैटलॉग, स्टॉक, UPI और ऑफर लाइव सेव कर दिए गए हैं!");
             }
         }).catch((err) => {
             if(showAlert) {
-                alert("नेटवर्क त्रुटि: कृपया कनेक्शन चेक करें।");
+                alert("त्रुटि: " + err.message);
             }
         });
     }
@@ -642,10 +528,10 @@
                 let itemsHtml = "";
                 if (order.items && Array.isArray(order.items)) {
                     order.items.forEach((i, idx) => {
-                        let qtyDisplay = i.qtyText || `${i.qty} units`;
+                        let qtyDisplay = i.qtyText || `${i.qty} kg`;
                         itemsHtml += `
                             <div class="editable-item-row" id="item_row_${order.id}_${idx}">
-                                <span><b>${i.name}</b> (${qtyDisplay}) - ₹${i.price}</span>
+                                <span><b>${i.name}</b> (${qtyDisplay}) - ₹${i.price}/kg</span>
                                 <button class="remove-item-btn" onclick="removeOrderItemItem('${order.id}', ${idx})">❌ हटाएं</button>
                             </div>
                         `;
@@ -663,7 +549,7 @@
                     📍 पता: ${order.customerAddress}<br>
                     <div class="location-info">📍 जीपीएस दूरी: ${order.distance || '0 मीटर'}</div> ${mapButtonHtml}<br>
                     <strong>कुल राशि: ₹${order.totalAmount}</strong>
-                    <div style="margin: 4px 0; font-size:11px; font-weight:bold;">आइटम सूची (जो उपलब्ध न हो उसे हटाएं):</div>
+                    <div style="margin: 4px 0; font-size:11px; font-weight:bold;">सब्जी सूची (जो उपलब्ध न हो उसे हटाएं):</div>
                     <div class="item-list" id="items_container_${order.id}">${itemsHtml}</div>
                     <a href="tel:${order.customerPhone}" class="btn-call">📞 ग्राहक को कॉल करें</a>
                     <div class="btn-group">
@@ -673,8 +559,6 @@
                 `;
                 container.appendChild(card);
             });
-        }, (error) => {
-            statusEl.innerText = "⚠️ कनेक्शन धीमा है, रीकनेक्ट हो रहा है...";
         });
     }
 
@@ -745,7 +629,7 @@
 
             acceptedContainer.innerHTML = acceptedHtml || '<p style="font-size: 10px; color: #777;">कोई स्वीकृत आर्डर नहीं है।</p>';
             rejectedContainer.innerHTML = rejectedHtml || '<p style="font-size: 10px; color: #777;">कोई रद्द किया गया आर्डर नहीं है।</p>';
-        }, (err) => {});
+        });
     }
 
     window.showOrderDetails = function(event, key) {
@@ -759,11 +643,11 @@
                 
                 if (h.items && Array.isArray(h.items)) {
                     h.items.forEach(i => {
-                        let qtyDisplay = i.qtyText || `${i.qty} units`;
-                        itemsListHtml += `<li><b>${i.name}</b> - ${qtyDisplay} (₹${i.price})</li>`;
+                        let qtyDisplay = i.qtyText || `${i.qty} kg`;
+                        itemsListHtml += `<li><b>${i.name}</b> - ${qtyDisplay} (₹${i.price}/kg)</li>`;
                     });
                 } else {
-                    itemsListHtml = `<li>कोई आइटम डेटा उपलब्ध नहीं है।</li>`;
+                    itemsListHtml = `<li>कोई सब्जी डेटा उपलब्ध नहीं है।</li>`;
                 }
 
                 let detailsHtml = `
@@ -775,7 +659,7 @@
                     <b>📌 स्थिति:</b> <span style="color:${h.status === 'accepted' ? '#2e7d32' : '#c62828'}; font-weight:bold;">${h.status === 'accepted' ? 'स्वीकृत (Accepted)' : 'रद्द (Rejected)'}</span><br>
                     <b>💰 कुल राशि:</b> ₹${h.amount || '0'}<br>
                     <hr style="border:0; border-top:1px dashed #ccc; margin:6px 0;">
-                    <b>🛒 आर्डर किए गए आइटम्स:</b>
+                    <b>🛒 आर्डर की गई सब्जियां:</b>
                     <ul style="margin:4px 0; padding-left:15px; font-size:11px; color:#333;">${itemsListHtml}</ul>
                 `;
                 document.getElementById('orderDetailsBody').innerHTML = detailsHtml;
