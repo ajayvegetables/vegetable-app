@@ -5,25 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ऑनलाइन स्टोर - आर्डर करें</title>
     
-    <!-- PWA Manifest और Web App Capable टैग्स (ऐप की तरह इंस्टॉल होने के लिए) -->
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%85%E0%A4%82%E0%A4%B2%E0%A4%BE%E0%A4%87%E0%A4%A8%20%E0%A4%B8%E0%A5%8D%E0%A4%9A%E0%A5%8B%E0%A4%B0%22%2C%22short_name%22%3A%22Store%22%2C%22start_url%22%3A%22.%2Fcustomer.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23e8f5e9%22%2C%22theme_color%22%3A%22%232e7d32%22%7D">
     <meta name="theme-color" content="#2e7d32">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ऑनलाइन स्टोर">
     
     <style>
         * { box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #e8f5e9; margin: 0; padding: 5px; color: #333; padding-bottom: 70px; }
-        .container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        /* अब यह मोबाइल की पूरी स्क्रीन को कवर करेगा, बीच में सिकुड़ेगा नहीं */
+        body { font-family: Arial, sans-serif; background: #e8f5e9; margin: 0; padding: 0; color: #333; padding-bottom: 70px; width: 100%; min-height: 100vh; }
+        .container { width: 100%; min-height: 100vh; margin: 0; background: white; padding: 10px; border-radius: 0; box-shadow: none; }
         
         #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #e8f5e9; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 15px; }
         .login-box { background: white; width: 100%; max-width: 380px; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-align: center; }
         .login-box h2 { color: #2e7d32; margin-bottom: 5px; font-size: 18px; }
         .login-box p { font-size: 12px; color: #666; margin-bottom: 15px; }
 
-        .header { display: flex; justify-content: space-between; align-items: center; background: #2e7d32; color: white; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: #2e7d32; color: white; padding: 10px 12px; border-radius: 6px; margin-bottom: 8px; }
         .shop-title { font-size: 15px; font-weight: bold; }
         .help-btn { background: #c62828; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; }
         .shop-btn { background: #1976d2; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; display: inline-block; }
@@ -46,17 +44,17 @@
 
         .catalog-title { font-size: 13px; color: #2e7d32; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; margin-bottom: 8px; font-weight: bold; }
         
-        .product-card { display: flex; align-items: center; background: #fafafa; border: 1px solid #e0e0e0; padding: 8px; border-radius: 6px; margin-bottom: 6px; gap: 8px; }
-        .product-emoji { font-size: 26px; width: 40px; text-align: center; flex-shrink: 0; }
+        .product-card { display: flex; align-items: center; background: #fafafa; border: 1px solid #e0e0e0; padding: 10px; border-radius: 6px; margin-bottom: 6px; gap: 8px; }
+        .product-emoji { font-size: 28px; width: 40px; text-align: center; flex-shrink: 0; }
         .product-info { flex-grow: 1; font-size: 12px; }
         .product-name { font-weight: bold; color: #333; font-size: 13px; }
         .product-eng-name { font-size: 10px; color: #1976d2; font-weight: bold; margin-top: 1px; }
         .product-price { color: #d32f2f; font-weight: bold; font-size: 11px; margin-top: 2px; }
         
-        .qty-select { padding: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background: white; }
-        .add-btn { background: #2e7d32; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .qty-select { padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background: white; }
+        .add-btn { background: #2e7d32; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
 
-        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2e7d32; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 6px rgba(0,0,0,0.2); z-index: 1000; font-size: 13px; font-weight: bold; }
+        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2e7d32; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 6px rgba(0,0,0,0.2); z-index: 1000; font-size: 13px; font-weight: bold; }
         .checkout-btn { background: #ff9800; color: white; border: none; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 10px; }
@@ -159,19 +157,11 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // PWA Service Worker Registration (ऐप की तरह इंस्टॉल करने के लिए जरूरी)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            const swCode = `
-                self.addEventListener('fetch', function(event) {
-                    event.respondWith(fetch(event.request).catch(function() {
-                        return caches.match(event.request);
-                    }));
-                });
-            `;
+            const swCode = `self.addEventListener('fetch', function(event) { event.respondWith(fetch(event.request).catch(function() { return caches.match(event.request); })); });`;
             const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW registration failed: ', err));
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log(err));
         });
     }
 
