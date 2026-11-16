@@ -17,7 +17,7 @@
         .help-btn { background: #c62828; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; }
         .shop-btn { background: #1976d2; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; }
 
-        /* शानदार, बड़ा और आकर्षक ऑफर बैनर */
+        /* आकर्षक और बड़ा लाइव ऑफर बैनर */
         .banner { 
             background: linear-gradient(135deg, #ff9800, #ff5722); 
             color: white; 
@@ -63,7 +63,9 @@
         
         .upi-pay-link-btn { display: block; background: #1976d2; color: white; text-decoration: none; padding: 8px; border-radius: 5px; font-size: 11px; font-weight: bold; margin-top: 6px; text-align: center; }
 
-        .cart-item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #eee; padding: 5px 0; font-size: 11px; }
+        /* कार्ट आइटम रो और हटाने वाला बटन */
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #eee; padding: 6px 0; font-size: 11px; }
+        .remove-cart-item { background: #c62828; color: white; border: none; padding: 2px 6px; font-size: 10px; border-radius: 3px; cursor: pointer; font-weight: bold; margin-left: 6px; }
     </style>
 </head>
 <body>
@@ -102,6 +104,7 @@
         <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
         <h3 style="color:#2e7d32; margin-top:0; font-size:14px;">🛍️ बिल और भुगतान विवरण</h3>
         
+        <!-- कार्ट आइटम्स की सूची जिसमें हटाने (Remove) का बटन मौजूद है -->
         <div id="cartItemsList" style="margin-bottom: 6px; max-height: 120px; overflow-y: auto;"></div>
         <hr style="border:0; border-top:1px solid #ddd; margin:6px 0;">
         
@@ -169,7 +172,7 @@
         if (name.includes("पालक")) return "🥬"; 
         if (name.includes("मेथी")) return "🌿"; 
         if (name.includes("धनिया")) return "☘️"; 
-        if (name.includes("मूली") || name.includes("radish")) return "🥕"; // बिल्कुल सही सफेद मूली का रूप
+        if (name.includes("मूली") || name.includes("radish")) return "🥕"; 
         if (name.includes("लौकी") || name.includes("bottle gourd")) return "🥒"; 
         if (name.includes("गोभी")) return "🥦";
         if (name.includes("गाजर")) return "🥕";
@@ -215,7 +218,6 @@
     }
 
     window.onload = function() {
-        // लाइव डेटाबेस सिंक (Real-time Shop Settings & Catalog Sync)
         const settingsRef = ref(db, 'shopSettings');
         onValue(settingsRef, (snapshot) => {
             const data = snapshot.val();
@@ -237,7 +239,6 @@
             }
         });
 
-        // एड्रेस ऑटो-फिल (Local Storage से पुराना डेटा लोड करना)
         let savedPhone = localStorage.getItem("custPhone");
         if (savedPhone) {
             let phoneInput = document.getElementById('custPhone');
@@ -318,8 +319,17 @@
         }
 
         updateCartBar();
-        alert(`'${name}' (${qtyText}) कार्ट में जोड़ दिया गया है!`);
+        // बड़ा पॉपअप हटाकर एक छोटा और सरल नोटिफिकेशन कर दिया गया है
+        showCompactNotification(`'${name}' कार्ट में जोड़ दिया गया!`);
     };
+
+    function showCompactNotification(msg) {
+        let notif = document.createElement('div');
+        notif.style.cssText = "position:fixed; bottom:60px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:6px 12px; border-radius:4px; font-size:11px; z-index:3000;";
+        notif.innerText = msg;
+        document.body.appendChild(notif);
+        setTimeout(() => notif.remove(), 1500);
+    }
 
     function updateCartBar() {
         let totalCount = 0;
@@ -342,17 +352,34 @@
     }
 
     window.openCheckoutModal = function() {
+        renderCartItemsList();
+        document.getElementById('checkoutModal').style.display = 'flex';
+    };
+
+    // कार्ट आइटम्स की लिस्ट दिखाने और हटाने (Remove) का फंक्शन
+    function renderCartItemsList() {
         let listContainer = document.getElementById('cartItemsList');
         listContainer.innerHTML = "";
 
+        let keys = Object.keys(cart);
+        if(keys.length === 0) {
+            listContainer.innerHTML = '<p style="text-align:center; color:#777; font-size:11px;">कार्ट खाली है।</p>';
+            document.getElementById('checkoutModal').style.display = 'none';
+            document.getElementById('cartBar').style.display = 'none';
+            return;
+        }
+
         let subtotal = 0;
-        Object.keys(cart).forEach(key => {
+        keys.forEach(key => {
             let item = cart[key];
             let itemCost = item.price * item.qty;
             subtotal += itemCost;
             let row = document.createElement('div');
             row.className = "cart-item-row";
-            row.innerHTML = `<span><b>${item.name}</b> (${item.qtyText})</span> <span>₹${Math.round(itemCost)}</span>`;
+            row.innerHTML = `
+                <span><b>${item.name}</b> (${item.qtyText}) - ₹${Math.round(itemCost)}</span>
+                <button class="remove-cart-item" onclick="removeCartItem('${key}')">❌ हटाएं</button>
+            `;
             listContainer.appendChild(row);
         });
 
@@ -381,8 +408,13 @@
         let submitBtn = document.getElementById('submitOrderBtn');
         submitBtn.disabled = true;
         submitBtn.innerText = "🔒 पहले UPI पेमेंट पूरा करें";
+    }
 
-        document.getElementById('checkoutModal').style.display = 'flex';
+    // कार्ट से किसी आइटम को हटाने का फंक्शन
+    window.removeCartItem = function(key) {
+        delete cart[key];
+        updateCartBar();
+        renderCartItemsList();
     };
 
     window.closeCheckoutModal = function() {
