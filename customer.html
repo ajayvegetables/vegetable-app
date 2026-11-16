@@ -38,7 +38,11 @@
         .catalog-title { font-size: 13px; color: #2e7d32; border-bottom: 2px solid #c8e6c9; padding-bottom: 3px; margin-bottom: 8px; font-weight: bold; }
         
         .product-card { display: flex; align-items: center; background: #fafafa; border: 1px solid #e0e0e0; padding: 8px; border-radius: 6px; margin-bottom: 6px; gap: 8px; }
-        .product-emoji { font-size: 28px; width: 40px; text-align: center; flex-shrink: 0; }
+        
+        /* इमोजी हटाकर अब यहाँ असली फोटो/इमेज के लिए स्टाइल है */
+        .product-img-container { width: 42px; height: 42px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #fff; border-radius: 50%; border: 1px solid #ddd; overflow: hidden; }
+        .product-img { width: 36px; height: 36px; object-fit: contain; }
+
         .product-info { flex-grow: 1; font-size: 12px; }
         .product-name { font-weight: bold; color: #333; font-size: 13px; }
         .product-eng-name { font-size: 10px; color: #1976d2; font-weight: bold; margin-top: 1px; }
@@ -156,36 +160,38 @@
     let currentOfferText = "✨ विशेष ऑफर लोड हो रहा है...";
     let paymentInitiated = false;
 
-    function getItemEmoji(itemName) {
-        if (!itemName) return "🥗";
+    // अब यहाँ इमोजी की जगह सीधे असली सब्जियों की साफ़ तस्वीरें (Image URLs) सेट की गई हैं
+    function getItemImageUrl(itemName) {
+        if (!itemName) return "https://cdn-icons-png.flaticon.com/512/2921/2921822.png";
         let name = itemName.trim().toLowerCase();
 
-        if (name.includes("पालक") || name.includes("spinach")) return "🥬"; 
-        if (name.includes("मेथी") || name.includes("fenugreek")) return "🌿"; 
-        if (name.includes("धनिया") || name.includes("coriander")) return "☘️"; 
-        if (name.includes("मूली") || name.includes("radish")) return "🥕"; 
-        if (name.includes("लौकी") || name.includes("bottle gourd")) return "🥒"; 
-        if (name.includes("गोभी") || name.includes("cauliflower")) return "🥦";
-        if (name.includes("गाजर") || name.includes("carrot")) return "🥕";
-        if (name.includes("टमाटर") || name.includes("tomato")) return "🍅";
-        if (name.includes("आलू") || name.includes("potato")) return "🥔";
-        if (name.includes("प्याज") || name.includes("प्याज़") || name.includes("onion")) return "🧅";
-        if (name.includes("मटर") || name.includes("peas")) return "🫛"; 
-        if (name.includes("अदरक") || name.includes("ginger")) return "🫚";
-        if (name.includes("लहसुन") || name.includes("garlic")) return "🧄";
-        if (name.includes("शिमला") || name.includes("capsicum")) return "🫑";
-        if (name.includes("मिर्च") || name.includes("chilli")) return "🌶️";
-        if (name.includes("कद्दू") || name.includes("pumpkin")) return "🎃";
-        if (name.includes("खीरा") || name.includes("cucumber")) return "🥒";
-        if (name.includes("बैंगन") || name.includes("brinjal") || name.includes("eggplant")) return "🍆";
-        if (name.includes("भिंडी") || name.includes("ladyfinger") || name.includes("okra")) return "🟢";
-        if (name.includes("करेला") || name.includes("bitter gourd")) return "🥒";
-        if (name.includes("सेब") || name.includes("apple")) return "🍎";
-        if (name.includes("केला") || name.includes("banana")) return "🍌";
-        if (name.includes("आम") || name.includes("mango")) return "🥭";
-        if (name.includes("नींबू") || name.includes("lemon")) return "🍋";
+        if (name.includes("करेला") || name.includes("bitter gourd")) return "https://cdn-icons-png.flaticon.com/512/5551/5551878.png"; 
+        if (name.includes("भिंडी") || name.includes("ladyfinger") || name.includes("okra")) return "https://cdn-icons-png.flaticon.com/512/7632/7632707.png"; 
+        if (name.includes("पालक") || name.includes("spinach")) return "https://cdn-icons-png.flaticon.com/512/2329/2329895.png"; 
+        if (name.includes("मेथी") || name.includes("fenugreek")) return "https://cdn-icons-png.flaticon.com/512/2329/2329895.png"; 
+        if (name.includes("धनिया") || name.includes("coriander")) return "https://cdn-icons-png.flaticon.com/512/2917/2917995.png"; 
+        if (name.includes("मूली") || name.includes("radish")) return "https://cdn-icons-png.flaticon.com/512/3188/3188365.png"; 
+        if (name.includes("लौकी") || name.includes("bottle gourd")) return "https://cdn-icons-png.flaticon.com/512/3188/3188347.png"; 
+        if (name.includes("गोभी") || name.includes("cauliflower")) return "https://cdn-icons-png.flaticon.com/512/1147/1147805.png";
+        if (name.includes("गाजर") || name.includes("carrot")) return "https://cdn-icons-png.flaticon.com/512/2347/2347784.png";
+        if (name.includes("टमाटर") || name.includes("tomato")) return "https://cdn-icons-png.flaticon.com/512/1147/1147835.png";
+        if (name.includes("आलू") || name.includes("potato")) return "https://cdn-icons-png.flaticon.com/512/1535/1535043.png";
+        if (name.includes("प्याज") || name.includes("प्याज़") || name.includes("onion")) return "https://cdn-icons-png.flaticon.com/512/1147/1147858.png";
+        if (name.includes("मटर") || name.includes("peas")) return "https://cdn-icons-png.flaticon.com/512/4141/4141703.png"; 
+        if (name.includes("अदरक") || name.includes("ginger")) return "https://cdn-icons-png.flaticon.com/512/4347/4347417.png";
+        if (name.includes("लहसुन") || name.includes("garlic")) return "https://cdn-icons-png.flaticon.com/512/3188/3188383.png";
+        if (name.includes("शिमला") || name.includes("capsicum")) return "https://cdn-icons-png.flaticon.com/512/1147/1147902.png";
+        if (name.includes("मिर्च") || name.includes("chilli")) return "https://cdn-icons-png.flaticon.com/512/1147/1147838.png";
+        if (name.includes("कद्दू") || name.includes("pumpkin")) return "https://cdn-icons-png.flaticon.com/512/3188/3188358.png";
+        if (name.includes("खीरा") || name.includes("cucumber")) return "https://cdn-icons-png.flaticon.com/512/3188/3188371.png";
+        if (name.includes("बैंगन") || name.includes("brinjal") || name.includes("eggplant")) return "https://cdn-icons-png.flaticon.com/512/1147/1147934.png";
+        if (name.includes("सेब") || name.includes("apple")) return "https://cdn-icons-png.flaticon.com/512/415/415733.png";
+        if (name.includes("केला") || name.includes("banana")) return "https://cdn-icons-png.flaticon.com/512/815/815591.png";
+        if (name.includes("आम") || name.includes("mango")) return "https://cdn-icons-png.flaticon.com/512/2315/2315338.png";
+        if (name.includes("नींबू") || name.includes("lemon")) return "https://cdn-icons-png.flaticon.com/512/3188/3188377.png";
 
-        return "🥗"; // ट्रॉली की जगह अब डिफ़ॉल्ट रूप से सब्जी/सलाद का आइकॉन आएगा
+        // यदि कोई नई सब्जी जोड़ी जाती है जिसका नाम पर ऊपर मैच न हो, तो यह डिफ़ॉल्ट सब्जी का आइकन दिखाएगा
+        return "https://cdn-icons-png.flaticon.com/512/2921/2921822.png";
     }
 
     const universalDictionary = {
@@ -264,12 +270,14 @@
         }
 
         availableItems.forEach((item, index) => {
-            let emojiIcon = getItemEmoji(item.name);
+            let imgSrc = getItemImageUrl(item.name);
             let engName = getEnglishName(item.name);
             let card = document.createElement('div');
             card.className = "product-card";
             card.innerHTML = `
-                <div class="product-emoji">${emojiIcon}</div>
+                <div class="product-img-container">
+                    <img src="${imgSrc}" class="product-img" alt="${item.name}">
+                </div>
                 <div class="product-info">
                     <div class="product-name">${item.name}</div>
                     <div class="product-eng-name">(${engName})</div>
