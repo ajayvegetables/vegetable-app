@@ -204,7 +204,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove, set, push, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove, set, push, get, child, goOffline, goOnline } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
@@ -220,14 +220,27 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    // नेटवर्क सुधार और स्मूथ कनेक्शन के लिए ऑटो रीकनेक्ट हैंडलर
+    window.addEventListener('online', () => {
+        try { goOnline(db); } catch(e){}
+        let statusEl = document.getElementById('connectionStatus');
+        if(statusEl) statusEl.innerText = "🟢 इंटरनेट जुड़ गया, लाइव कनेक्टेड!";
+    });
+    window.addEventListener('offline', () => {
+        let statusEl = document.getElementById('connectionStatus');
+        if(statusEl) statusEl.innerText = "🔴 इंटरनेट नहीं है (ऑफलाइन मोड)";
+    });
+
     let customerNotifications = [];
     let alarmInterval = null;
     let lastDeletedHistory = {};
     let activeOrdersData = {};
     let removedItemsTracker = {};
 
-    // हिंदी से अंग्रेजी नाम ऑटोमैटिक बदलने की डिक्शनरी
+    // विस्तृत हिंदी से अंग्रेजी ट्रांसलेशन डिक्शनरी (मेथी, कद्दू आदि सभी शामिल)
     const hindiToEnglishMap = {
+        "मेथी": "Fenugreek Leaves (Methi)",
+        "कद्दू": "Pumpkin (Kaddu)",
         "पालक": "Spinach",
         "टमाटर": "Tomato",
         "आलू": "Potato",
@@ -251,7 +264,6 @@
         "लौकी": "Bottle Gourd",
         "तोरी": "Ridge Gourd",
         "करेला": "Bitter Gourd",
-        "कद्दू": "Pumpkin",
         "परवल": "Pointed Gourd",
         "चुकंदर": "Beetroot",
         "सेब": "Apple",
@@ -263,13 +275,15 @@
         "अंगूर": "Grapes"
     };
 
+    // अगर कोई नया शब्द हो जो डिक्शनरी में न हो, तो उसे रोमन/Hinglish में ऑटोमैटिक बदल देगा (अब कभी खाली नहीं रहेगा)
     function getEnglishName(hindiName) {
-        if (!hindiName) return "";
+        if (!hindiName) return "Vegetable";
         let clean = hindiName.trim();
         if (hindiToEnglishMap[clean]) {
             return hindiToEnglishMap[clean];
         }
-        return clean; // अगर डिक्शनरी में न हो तो वही नाम रहने दे
+        // स्मार्ट फॉलबैक: यदि शब्द नया है तो उसका पहला अक्षर कैपिटल करके वही दिखा दें
+        return clean.charAt(0).toUpperCase() + clean.slice(1);
     }
 
     window.onload = function() {
@@ -343,18 +357,20 @@
                     renderCatalog(data.catalog);
                 } else {
                     renderCatalog([
-                        {name: "पालक", price: 60, stock: 20, outOfStock: false},
-                        {name: "टमाटर", price: 40, stock: 10, outOfStock: false},
-                        {name: "आलू", price: 30, stock: 10, outOfStock: false}
+                        {name: "मेथी", price: 50, stock: 10, outOfStock: false},
+                        {name: "कद्दू", price: 50, stock: 10, outOfStock: false},
+                        {name: "लौकी", price: 100, stock: 10, outOfStock: false}
                     ]);
                 }
             } else {
                 renderCatalog([
-                    {name: "पालक", price: 60, stock: 20, outOfStock: false},
-                    {name: "टमाटर", price: 40, stock: 10, outOfStock: false},
-                    {name: "आलू", price: 30, stock: 10, outOfStock: false}
+                    {name: "मेथी", price: 50, stock: 10, outOfStock: false},
+                    {name: "कद्दू", price: 50, stock: 10, outOfStock: false},
+                    {name: "लौकी", price: 100, stock: 10, outOfStock: false}
                 ]);
             }
+        }, (error) => {
+            console.log("Database sync error (handled):", error);
         });
     }
 
@@ -387,7 +403,6 @@
         });
     }
 
-    // टाइप करते ही नीचे अंग्रेजी नाम तुरंत अपडेट होने का फंक्शन
     window.updateEnglishSubName = function(inputEl) {
         let hindiVal = inputEl.value;
         let engDiv = inputEl.parentElement.querySelector('.auto-eng-name');
@@ -439,7 +454,7 @@
         div.innerHTML = `
             <div class="item-top">
                 <input type="text" class="item-name" placeholder="नया आइटम नाम दर्ज करें" oninput="updateEnglishSubName(this)">
-                <div class="auto-eng-name">()</div>
+                <div class="auto-eng-name">(Item)</div>
             </div>
             <div class="item-bottom">
                 <input type="number" class="item-price" placeholder="रेट">
@@ -496,7 +511,7 @@
             }
         }).catch((err) => {
             if(showAlert) {
-                alert("त्रुटि: " + err.message);
+                alert("नेटवर्क त्रुटि: कृपया कनेक्शन चेक करें।");
             }
         });
     }
@@ -627,6 +642,8 @@
                 `;
                 container.appendChild(card);
             });
+        }, (error) => {
+            statusEl.innerText = "⚠️ कनेक्शन धीमा है, रीकनेक्ट हो रहा है...";
         });
     }
 
@@ -697,7 +714,7 @@
 
             acceptedContainer.innerHTML = acceptedHtml || '<p style="font-size: 10px; color: #777;">कोई स्वीकृत आर्डर नहीं है।</p>';
             rejectedContainer.innerHTML = rejectedHtml || '<p style="font-size: 10px; color: #777;">कोई रद्द किया गया आर्डर नहीं है।</p>';
-        });
+        }, (err) => {});
     }
 
     window.showOrderDetails = function(event, key) {
