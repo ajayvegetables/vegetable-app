@@ -115,24 +115,27 @@
     let currentCatalog = [];
     let cart = {};
 
-    // 100% सटीक और पक्के इमोजी आइकन (सब्जियां, फल, फास्ट फूड)
+    // 100% अलग-अलग, बिल्कुल सटीक और यूनिक इमोजी आइकन
     function getItemEmoji(itemName) {
         if (!itemName) return "🛍️";
         let name = itemName.trim().toLowerCase();
 
+        if (name.includes("धनिया")) return "🌿";
+        if (name.includes("मेथी")) return "🌱";
+        if (name.includes("पालक")) return "🥬";
+        if (name.includes("अदरक")) return "🫚";
+        if (name.includes("लहसुन")) return "🧄";
+        if (name.includes("मूली")) return "🤍";
+        if (name.includes("गाजर")) return "🥕";
         if (name.includes("गोभी")) return "🥦";
         if (name.includes("लौकी")) return "🥒";
-        if (name.includes("मूली")) return "🥕";
-        if (name.includes("गाजर")) return "🥕";
         if (name.includes("शिमला")) return "🫑";
         if (name.includes("मिर्च") || name.includes("chilli")) return "🌶️";
-        if (name.includes("मेथी") || name.includes("पालक") || name.includes("धनिया")) return "🌿";
         if (name.includes("कद्दू") || name.includes("pumpkin")) return "🎃";
         if (name.includes("टमाटर") || name.includes("tomato")) return "🍅";
         if (name.includes("आलू") || name.includes("potato")) return "🥔";
         if (name.includes("प्याज") || name.includes("प्याज़") || name.includes("onion")) return "🧅";
         if (name.includes("मटर") || name.includes("peas")) return "🟢";
-        if (name.includes("अदरक") || name.includes("ginger") || name.includes("लहसुन")) return "🧄";
         if (name.includes("समोसा") || name.includes("samosa")) return "🥟";
         if (name.includes("कचौड़ी") || name.includes("kachori")) return "🥠";
         if (name.includes("बर्गर") || name.includes("burger")) return "🍔";
@@ -212,9 +215,9 @@
                         <option value="0.1">100 ग्राम</option>
                         <option value="0.2">200 ग्राम</option>
                         <option value="0.25">250 ग्राम</option>
-                        <option value="0.5" selected>500 ग्राम</option>
+                        <option value="0.5">500 ग्राम</option>
                         <option value="0.75">750 ग्राम</option>
-                        <option value="1">1 किलो</option>
+                        <option value="1" selected>1 किलो</option>
                         <option value="2">2 किलो</option>
                         <option value="3">3 किलो</option>
                         <option value="5">5 किलो</option>
@@ -229,7 +232,7 @@
 
     window.addToCart = function(name, price, index) {
         let qtySelect = document.getElementById(`qty_${index}`);
-        let qtyVal = parseFloat(qtySelect.value) || 0.5;
+        let qtyVal = parseFloat(qtySelect.value) || 1;
         let qtyText = qtySelect.options[qtySelect.selectedIndex].text;
 
         if (!cart[name]) {
@@ -237,7 +240,7 @@
         }
         cart[name].qty += qtyVal;
         
-        if(qtyVal < 1) {
+        if(cart[name].qty < 1) {
             cart[name].qtyText = `${Math.round(cart[name].qty * 1000)} ग्राम`;
         } else {
             cart[name].qtyText = `${cart[name].qty} किलो`;
