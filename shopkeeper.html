@@ -26,6 +26,7 @@
         .history-top-icon-btn { background: #37474f; color: white; padding: 4px 8px; border-radius: 10px; font-weight: bold; font-size: 10px; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); text-decoration: none; display: flex; align-items: center; gap: 2px; }
         .help-btn { background: #2e7d32; color: white; padding: 4px 8px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .notif-badge-btn { background: #c62828; color: white; padding: 4px 8px; border-radius: 10px; font-weight: bold; font-size: 10px; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .gear-icon-btn { background: #ff8f00; color: white; padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
 
         .status-bar { text-align: center; background: #ffe0b2; padding: 6px; border-radius: 4px; font-weight: bold; margin-bottom: 8px; color: #bf360c; font-size: 11px; }
         .section-box { background: #fafafa; border: 1px solid #ddd; padding: 8px; border-radius: 6px; margin-bottom: 10px; }
@@ -45,9 +46,9 @@
         .btn-call { background: #0288d1; text-decoration: none; text-align: center; display: block; padding: 6px; border-radius: 3px; color: white; font-weight: bold; margin-top: 6px; font-size: 11px; width: 100%; }
 
         .item-row { display: flex; flex-direction: column; background: #fff; border: 1px solid #eee; padding: 8px; border-radius: 5px; margin-bottom: 6px; }
-        .item-top { display: flex; flex-direction: column; width: 100%; margin-bottom: 6px; }
-        .item-row input.item-name { width: 100%; border: none; background: transparent; font-size: 13px; font-weight: bold; color: #333; outline: none; }
-        .auto-eng-name { font-size: 11px; color: #1976d2; font-weight: bold; margin-top: 2px; }
+        .item-top { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 6px; }
+        .item-row input.item-name { width: 55%; border: none; background: transparent; font-size: 13px; font-weight: bold; color: #333; outline: none; }
+        .auto-eng-display { font-size: 11px; color: #1976d2; font-weight: bold; width: 40%; text-align: right; }
         
         .item-bottom { display: flex; align-items: center; gap: 4px; width: 100%; border-top: 1px dashed #f0f0f0; padding-top: 6px; flex-wrap: wrap; }
         .item-row input.item-price { width: 45px; border: 1px solid #ccc; background: #fff; padding: 3px; font-size: 11px; text-align: center; border-radius: 3px; outline: none; font-weight: bold; color: #e65100; }
@@ -85,9 +86,33 @@
 </div>
 
 <div class="top-bar-fixed">
+    <button class="gear-icon-btn" onclick="openSettingsModal()" title="दुकान सेटिंग्स">⚙️</button>
     <button class="history-top-icon-btn" onclick="openHistoryModal()">📜 हिस्ट्री</button>
     <button class="notif-badge-btn" onclick="openNotifications()">🔔 <span id="notifCount">0</span></button>
     <a href="tel:9997077062" class="help-btn">📞 Help</a>
+</div>
+
+<div id="settingsModal" class="modal" onclick="closeSettingsModalOutside(event)">
+    <div class="modal-content" id="settingsModalContent">
+        <span class="close-modal" onclick="closeSettingsModal()">&times;</span>
+        <h3 style="color:#e65100; margin-top:0; font-size:13px;">⚙️ दुकान की सेटिंग्स, UPI व ऑफर</h3>
+        <hr style="border:0; border-top:1px solid #ddd; margin-bottom:8px;">
+        
+        <div class="form-group">
+            <label>आपका UPI ID:</label>
+            <input type="text" id="shopUpi" value="9997077062@paytm">
+        </div>
+        <div class="form-group">
+            <label>WhatsApp नंबर:</label>
+            <input type="tel" id="shopWhatsapp" value="9997077062">
+        </div>
+        <div class="form-group">
+            <label>ग्राहक के लिए ऑफर / शर्तें (Live Banner Text):</label>
+            <textarea id="shopOfferText" rows="2" placeholder="जैसे: ₹200 से अधिक के ऑर्डर पर फ्री डिलीवरी!"></textarea>
+        </div>
+
+        <button class="btn-main" style="font-size:11px; padding:8px; margin-top:6px;" onclick="saveCatalogSettings()">सेव करें (Save)</button>
+    </div>
 </div>
 
 <div id="customAlertModal" class="custom-alert-modal" onclick="closeCustomAlertOutside(event)">
@@ -132,7 +157,6 @@
 
 <div class="container">
     
-    <!-- सुरक्षित रैंडम OTP लॉगिन स्क्रीन -->
     <div id="loginScreen" class="screen active">
         <h2>🔐 सुरक्षित दुकानदार - लॉगिन</h2>
         <p style="text-align: center; color: #666; font-size: 11px;">लॉगिन करने के लिए 10 अंकों का मोबाइल नंबर दर्ज करें</p>
@@ -150,7 +174,6 @@
         <div id="loginError" style="color:red; font-size:11px; margin-top:4px;"></div>
     </div>
 
-    <!-- डैशबोर्ड स्क्रीन -->
     <div id="dashboardScreen" class="screen">
         <h2>🔔 वेजिटेबल पार्टनर डैशबोर्ड</h2>
         <div class="status-bar" id="connectionStatus">लाइव डेटाबेस से जुड़ रहा है...</div>
@@ -161,28 +184,14 @@
         </div>
 
         <div class="section-box" style="margin-top: 10px;">
-            <h3>⚙️ दुकान की सेटिंग्स, UPI व ऑफर</h3>
-            <div class="form-group">
-                <label>आपका UPI ID:</label>
-                <input type="text" id="shopUpi" value="9997077062@paytm">
-            </div>
-            <div class="form-group">
-                <label>WhatsApp नंबर:</label>
-                <input type="tel" id="shopWhatsapp" value="9997077062">
-            </div>
-            <div class="form-group">
-                <label>ग्राहक के लिए ऑफर / शर्तें (Live Banner Text):</label>
-                <textarea id="shopOfferText" rows="2" placeholder="जैसे: ₹200 से अधिक के ऑर्डर पर फ्री डिलीवरी!"></textarea>
-            </div>
-
-            <button class="btn-main" style="font-size:11px; padding:8px; margin-bottom:8px;" onclick="saveCatalogSettings()">कैटलॉग व सेटिंग्स सेव करें</button>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin: 6px 0 4px 0;">
-                <h4 style="margin: 0; color:#e65100; font-size:11px;">सब्जी / फल, रेट व कुल स्टॉक (किलो):</h4>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <h3 style="margin: 0; color:#e65100; font-size:12px;">सब्जी / फल, रेट व कुल स्टॉक (किलो):</h3>
                 <button class="btn-main" style="background:#2e7d32; font-size:10px; padding:5px 10px; width:auto;" onclick="addNewItemRow()">+ नया आइटम जोड़ें</button>
             </div>
             
             <div id="catalog-items-container"></div>
+            
+            <button class="btn-main" style="font-size:11px; padding:8px; margin-top:8px;" onclick="saveCatalogSettings()">कैटलॉग सेव करें</button>
         </div>
     </div>
 
@@ -190,7 +199,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove, set, push, get, child, goOffline, goOnline } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove, set, push, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
@@ -213,6 +222,31 @@
     let activeOrdersData = {};
     let removedItemsTracker = {};
 
+    // ऑटोमैटिक इंग्लिश नाम डिक्शनरी
+    const universalDictionary = {
+        "मेथी": "Fenugreek", "कद्दू": "Pumpkin", "पालक": "Spinach", "टमाटर": "Tomato",
+        "आलू": "Potato", "प्याज़": "Onion", "प्याज": "Onion", "मटर": "Green Peas",
+        "गाजर": "Carrot", "मूली": "Radish", "अदरक": "Ginger", "लहसुन": "Garlic",
+        "गोभी": "Cauliflower", "पत्तागोभी": "Cabbage", "बैंगन": "Brinjal", "भिंडी": "Ladyfinger",
+        "शिमला मिर्च": "Capsicum", "नींबू": "Lemon", "धनिया": "Coriander", "हरी मिर्च": "Green Chilli",
+        "खीरा": "Cucumber", "लौकी": "Bottle Gourd", "तोरी": "Ridge Gourd", "करेला": "Bitter Gourd",
+        "चुकंदर": "Beetroot", "सेब": "Apple", "केला": "Banana", "आम": "Mango"
+    };
+
+    function getEnglishName(hindiName) {
+        if (!hindiName) return "Item";
+        let clean = hindiName.trim();
+        return universalDictionary[clean] || clean;
+    }
+
+    window.updateAutoEnglishName = function(inputEl, index) {
+        let hindiVal = inputEl.value;
+        let engSpan = document.getElementById(`eng_display_${index}`);
+        if(engSpan) {
+            engSpan.innerText = `(${getEnglishName(hindiVal)})`;
+        }
+    };
+
     window.onload = function() {
         let savedPhone = localStorage.getItem("partnerPhone");
         if (savedPhone) {
@@ -220,7 +254,21 @@
         }
     };
 
-    // सुरक्षा के लिए हर बार बिल्कुल नया रैंडम OTP जनरेट करने का फंक्शन
+    window.openSettingsModal = function() {
+        document.getElementById('settingsModal').style.display = 'flex';
+    };
+
+    window.closeSettingsModal = function() {
+        document.getElementById('settingsModal').style.display = 'none';
+    };
+
+    window.closeSettingsModalOutside = function(event) {
+        let content = document.getElementById('settingsModalContent');
+        if (!content.contains(event.target)) {
+            closeSettingsModal();
+        }
+    };
+
     window.sendRandomOtp = function() {
         let phone = document.getElementById('loginPhone').value.trim();
         let errorEl = document.getElementById('loginError');
@@ -230,17 +278,15 @@
             return;
         }
 
-        // 1000 से 9999 के बीच का एक रैंडम 4-अंकों का कोड बनाएं
         generatedRandomOtp = Math.floor(1000 + Math.random() * 9000).toString();
         
         localStorage.setItem("partnerPhone", phone);
         localStorage.setItem("currentSessionOtp", generatedRandomOtp);
 
-        // स्क्रीन पर अलर्ट या मैसेज के रूप में नया OTP दिखाएं (सुरक्षित और यूनिक)
         alert(`सुरक्षा संदेश: आपके मोबाइल (${phone}) के लिए नया OTP है: ${generatedRandomOtp}`);
         
         document.getElementById('otpBox').style.display = 'block';
-        document.getElementById('otpLabelText').innerText = `नंबर (${phone}) के लिए OTP दर्ज करें (डिमोट्रेशन कोड: ${generatedRandomOtp}):`;
+        document.getElementById('otpLabelText').innerText = `नंबर (${phone}) के लिए OTP दर्ज करें:`;
         errorEl.innerText = "";
     };
 
@@ -309,17 +355,19 @@
             let isOut = item.outOfStock ? "out-of-stock" : "";
             let btnText = item.outOfStock ? "स्टॉक में है" : "स्टॉक नहीं है";
             let stockVal = item.stock !== undefined ? item.stock : 10;
+            let engName = getEnglishName(item.name);
 
             let div = document.createElement('div');
             div.className = "item-row";
             div.innerHTML = `
                 <div class="item-top">
-                    <input type="text" class="item-name" value="${item.name}" placeholder="आइटम नाम">
+                    <input type="text" class="item-name" value="${item.name}" placeholder="आइटम नाम" oninput="updateAutoEnglishName(this, ${index})">
+                    <span class="auto-eng-display" id="eng_display_${index}">(${engName})</span>
                 </div>
                 <div class="item-bottom">
                     <input type="number" class="item-price" value="${item.price}" placeholder="रेट">
                     <span>₹/kg</span>
-                    <input type="number" class="item-stock" value="${stockVal}" placeholder="स्टॉक" title="कुल उपलब्ध स्टॉक (kg)" onchange="autoCheckStock(${index})">
+                    <input type="number" class="item-stock" value="${stockVal}" placeholder="स्टॉक" onchange="autoCheckStock(${index})">
                     <span>kg</span>
                     <button class="stock-toggle-btn ${isOut}" onclick="toggleStock(${index})">${btnText}</button>
                     <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
@@ -367,16 +415,18 @@
 
     window.addNewItemRow = function() {
         let container = document.getElementById('catalog-items-container');
+        let newIndex = container.children.length;
         let div = document.createElement('div');
         div.className = "item-row";
         div.innerHTML = `
             <div class="item-top">
-                <input type="text" class="item-name" placeholder="नया आइटम नाम दर्ज करें">
+                <input type="text" class="item-name" placeholder="नया आइटम नाम दर्ज करें" oninput="updateAutoEnglishName(this, ${newIndex})">
+                <span class="auto-eng-display" id="eng_display_${newIndex}">(Item)</span>
             </div>
             <div class="item-bottom">
                 <input type="number" class="item-price" placeholder="रेट">
                 <span>₹/kg</span>
-                <input type="number" class="item-stock" value="10" placeholder="स्टॉक" title="कुल उपलब्ध स्टॉक (kg)">
+                <input type="number" class="item-stock" value="10" placeholder="स्टॉक">
                 <span>kg</span>
                 <button class="stock-toggle-btn" onclick="this.classList.toggle('out-of-stock'); this.innerText = this.classList.contains('out-of-stock') ? 'स्टॉक में है' : 'स्टॉक नहीं है';">स्टॉक नहीं है</button>
                 <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">हटाएं</button>
@@ -387,6 +437,7 @@
 
     window.saveCatalogSettings = function() {
         saveCatalogSettingsData(true);
+        closeSettingsModal();
     };
 
     function saveCatalogSettingsWithoutAlert() {
@@ -424,7 +475,7 @@
         
         set(ref(db, 'shopSettings'), settingsData).then(() => {
             if(showAlert) {
-                alert("कैटलॉग, स्टॉक, UPI और ऑफर लाइव सेव कर दिए गए हैं!");
+                alert("सेटिंग्स और कैटलॉग सफलतापूर्वक सेव हो गए हैं!");
             }
         }).catch((err) => {
             if(showAlert) {
@@ -495,7 +546,7 @@
 
         const ordersRef = ref(db, 'orders');
         onValue(ordersRef, (snapshot) => {
-            statusEl.innerText = "🟢 लाइव कनेक्टेड! नए ऑर्डर का इंतज़ार है...";
+            statusEl.innerText = "🟢 लाइव कनेक्टेड! नए ऑर्डर का इंतज़ार है...";
             const data = snapshot.val();
 
             if (!data) {
@@ -549,7 +600,7 @@
                     📍 पता: ${order.customerAddress}<br>
                     <div class="location-info">📍 जीपीएस दूरी: ${order.distance || '0 मीटर'}</div> ${mapButtonHtml}<br>
                     <strong>कुल राशि: ₹${order.totalAmount}</strong>
-                    <div style="margin: 4px 0; font-size:11px; font-weight:bold;">सब्जी सूची (जो उपलब्ध न हो उसे हटाएं):</div>
+                    <div style="margin: 4px 0; font-size:11px; font-weight:bold;">सब्जी सूची:</div>
                     <div class="item-list" id="items_container_${order.id}">${itemsHtml}</div>
                     <a href="tel:${order.customerPhone}" class="btn-call">📞 ग्राहक को कॉल करें</a>
                     <div class="btn-group">
@@ -656,7 +707,7 @@
                     <b>📍 पूरा पता:</b> ${h.address || 'लागू नहीं'}<br>
                     <b>📍 जीपीएस दूरी:</b> ${h.distance || 'लागू नहीं'}<br>
                     <b>⏰ दिनांक व समय:</b> ${timeStr}<br>
-                    <b>📌 स्थिति:</b> <span style="color:${h.status === 'accepted' ? '#2e7d32' : '#c62828'}; font-weight:bold;">${h.status === 'accepted' ? 'स्वीकृत (Accepted)' : 'रद्द (Rejected)'}</span><br>
+                    <b>📌 स्थिति:</b> <span style="color:${h.status === 'accepted' ? '#2e7d32' : '#c62828'}; font-weight:bold;">${h.status === 'accepted' ? 'स्वीकृत' : 'रद्द'}</span><br>
                     <b>💰 कुल राशि:</b> ₹${h.amount || '0'}<br>
                     <hr style="border:0; border-top:1px dashed #ccc; margin:6px 0;">
                     <b>🛒 आर्डर की गई सब्जियां:</b>
@@ -779,7 +830,7 @@
                 }).then(() => {
                     push(ref(db, 'orderHistory'), historyData).then(() => {
                         delete removedItemsTracker[orderId];
-                        alert('ऑर्डर स्वीकार कर लिया गया है और स्टॉक ऑटोमैटिक अपडेट हो गया है!');
+                        alert('ऑर्डर स्वीकार कर लिया गया है!');
                         remove(orderRef);
                     });
                 });
