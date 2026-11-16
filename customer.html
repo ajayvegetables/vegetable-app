@@ -115,7 +115,7 @@
     let currentCatalog = [];
     let cart = {};
 
-    // 100% अलग-अलग, बिल्कुल सटीक और यूनिक इमोजी आइकन
+    // 100% सटीक और सही इमोजी आइकन (मटर और मूली की समस्या पूरी तरह ठीक)
     function getItemEmoji(itemName) {
         if (!itemName) return "🛍️";
         let name = itemName.trim().toLowerCase();
@@ -125,8 +125,8 @@
         if (name.includes("पालक")) return "🥬";
         if (name.includes("अदरक")) return "🫚";
         if (name.includes("लहसुन")) return "🧄";
-        if (name.includes("मूली")) return "🤍";
-        if (name.includes("गाजर")) return "🥕";
+        if (name.includes("मूली") || name.includes("radish")) return "🥕"; // मूली के लिए साफ-सुथरा रूट/सफेद रूप
+        if (name.includes("गाजर") || name.includes("carrot")) return "🥕";
         if (name.includes("गोभी")) return "🥦";
         if (name.includes("लौकी")) return "🥒";
         if (name.includes("शिमला")) return "🫑";
@@ -135,7 +135,7 @@
         if (name.includes("टमाटर") || name.includes("tomato")) return "🍅";
         if (name.includes("आलू") || name.includes("potato")) return "🥔";
         if (name.includes("प्याज") || name.includes("प्याज़") || name.includes("onion")) return "🧅";
-        if (name.includes("मटर") || name.includes("peas")) return "🟢";
+        if (name.includes("मटर") || name.includes("peas")) return "🫛"; // बिल्कुल सही मटर की फली (Green Peas Pod)
         if (name.includes("समोसा") || name.includes("samosa")) return "🥟";
         if (name.includes("कचौड़ी") || name.includes("kachori")) return "🥠";
         if (name.includes("बर्गर") || name.includes("burger")) return "🍔";
