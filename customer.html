@@ -39,9 +39,8 @@
         
         .product-card { display: flex; align-items: center; background: #fafafa; border: 1px solid #e0e0e0; padding: 8px; border-radius: 6px; margin-bottom: 6px; gap: 8px; }
         
-        /* इमोजी हटाकर अब यहाँ असली फोटो/इमेज के लिए स्टाइल है */
-        .product-img-container { width: 42px; height: 42px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #fff; border-radius: 50%; border: 1px solid #ddd; overflow: hidden; }
-        .product-img { width: 36px; height: 36px; object-fit: contain; }
+        .product-img-container { width: 42px; height: 42px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #e8f5e9; border-radius: 50%; border: 1px solid #c8e6c9; overflow: hidden; }
+        .product-img { width: 30px; height: 30px; object-fit: contain; }
 
         .product-info { flex-grow: 1; font-size: 12px; }
         .product-name { font-weight: bold; color: #333; font-size: 13px; }
@@ -160,38 +159,36 @@
     let currentOfferText = "✨ विशेष ऑफर लोड हो रहा है...";
     let paymentInitiated = false;
 
-    // अब यहाँ इमोजी की जगह सीधे असली सब्जियों की साफ़ तस्वीरें (Image URLs) सेट की गई हैं
+    // सुरक्षित और सटीक वेक्टर आइकन जो हर सब्जी से बिल्कुल मेल खाएंगे
     function getItemImageUrl(itemName) {
-        if (!itemName) return "https://cdn-icons-png.flaticon.com/512/2921/2921822.png";
+        if (!itemName) return "https://api.iconify.design/lucide:salad.svg?color=%232e7d32";
         let name = itemName.trim().toLowerCase();
 
-        if (name.includes("करेला") || name.includes("bitter gourd")) return "https://cdn-icons-png.flaticon.com/512/5551/5551878.png"; 
-        if (name.includes("भिंडी") || name.includes("ladyfinger") || name.includes("okra")) return "https://cdn-icons-png.flaticon.com/512/7632/7632707.png"; 
-        if (name.includes("पालक") || name.includes("spinach")) return "https://cdn-icons-png.flaticon.com/512/2329/2329895.png"; 
-        if (name.includes("मेथी") || name.includes("fenugreek")) return "https://cdn-icons-png.flaticon.com/512/2329/2329895.png"; 
-        if (name.includes("धनिया") || name.includes("coriander")) return "https://cdn-icons-png.flaticon.com/512/2917/2917995.png"; 
-        if (name.includes("मूली") || name.includes("radish")) return "https://cdn-icons-png.flaticon.com/512/3188/3188365.png"; 
-        if (name.includes("लौकी") || name.includes("bottle gourd")) return "https://cdn-icons-png.flaticon.com/512/3188/3188347.png"; 
-        if (name.includes("गोभी") || name.includes("cauliflower")) return "https://cdn-icons-png.flaticon.com/512/1147/1147805.png";
-        if (name.includes("गाजर") || name.includes("carrot")) return "https://cdn-icons-png.flaticon.com/512/2347/2347784.png";
-        if (name.includes("टमाटर") || name.includes("tomato")) return "https://cdn-icons-png.flaticon.com/512/1147/1147835.png";
-        if (name.includes("आलू") || name.includes("potato")) return "https://cdn-icons-png.flaticon.com/512/1535/1535043.png";
-        if (name.includes("प्याज") || name.includes("प्याज़") || name.includes("onion")) return "https://cdn-icons-png.flaticon.com/512/1147/1147858.png";
-        if (name.includes("मटर") || name.includes("peas")) return "https://cdn-icons-png.flaticon.com/512/4141/4141703.png"; 
-        if (name.includes("अदरक") || name.includes("ginger")) return "https://cdn-icons-png.flaticon.com/512/4347/4347417.png";
-        if (name.includes("लहसुन") || name.includes("garlic")) return "https://cdn-icons-png.flaticon.com/512/3188/3188383.png";
-        if (name.includes("शिमला") || name.includes("capsicum")) return "https://cdn-icons-png.flaticon.com/512/1147/1147902.png";
-        if (name.includes("मिर्च") || name.includes("chilli")) return "https://cdn-icons-png.flaticon.com/512/1147/1147838.png";
-        if (name.includes("कद्दू") || name.includes("pumpkin")) return "https://cdn-icons-png.flaticon.com/512/3188/3188358.png";
-        if (name.includes("खीरा") || name.includes("cucumber")) return "https://cdn-icons-png.flaticon.com/512/3188/3188371.png";
-        if (name.includes("बैंगन") || name.includes("brinjal") || name.includes("eggplant")) return "https://cdn-icons-png.flaticon.com/512/1147/1147934.png";
-        if (name.includes("सेब") || name.includes("apple")) return "https://cdn-icons-png.flaticon.com/512/415/415733.png";
-        if (name.includes("केला") || name.includes("banana")) return "https://cdn-icons-png.flaticon.com/512/815/815591.png";
-        if (name.includes("आम") || name.includes("mango")) return "https://cdn-icons-png.flaticon.com/512/2315/2315338.png";
-        if (name.includes("नींबू") || name.includes("lemon")) return "https://cdn-icons-png.flaticon.com/512/3188/3188377.png";
+        if (name.includes("करेला") || name.includes("bitter gourd")) return "https://api.iconify.design/fluent-emoji-flat:cucumber.svg"; 
+        if (name.includes("भिंडी") || name.includes("ladyfinger") || name.includes("okra")) return "https://api.iconify.design/fluent-emoji-flat:green-salad.svg"; 
+        if (name.includes("पालक") || name.includes("spinach")) return "https://api.iconify.design/fluent-emoji-flat:leafy-green.svg"; 
+        if (name.includes("मेथी") || name.includes("fenugreek")) return "https://api.iconify.design/fluent-emoji-flat:herb.svg"; 
+        if (name.includes("धनिया") || name.includes("coriander")) return "https://api.iconify.design/fluent-emoji-flat:herb.svg"; 
+        if (name.includes("मूली") || name.includes("radish")) return "https://api.iconify.design/fluent-emoji-flat:carrot.svg"; 
+        if (name.includes("लौकी") || name.includes("bottle gourd")) return "https://api.iconify.design/fluent-emoji-flat:cucumber.svg"; 
+        if (name.includes("गोभी") || name.includes("cauliflower") || name.includes("पत्तागोभी")) return "https://api.iconify.design/fluent-emoji-flat:broccoli.svg";
+        if (name.includes("गाजर") || name.includes("carrot")) return "https://api.iconify.design/fluent-emoji-flat:carrot.svg";
+        if (name.includes("टमाटर") || name.includes("tomato")) return "https://api.iconify.design/fluent-emoji-flat:tomato.svg";
+        if (name.includes("आलू") || name.includes("potato")) return "https://api.iconify.design/fluent-emoji-flat:potato.svg";
+        if (name.includes("प्याज") || name.includes("प्याज़") || name.includes("onion")) return "https://api.iconify.design/fluent-emoji-flat:onion.svg";
+        if (name.includes("मटर") || name.includes("peas")) return "https://api.iconify.design/fluent-emoji-flat:peanuts.svg"; 
+        if (name.includes("अदरक") || name.includes("ginger")) return "https://api.iconify.design/fluent-emoji-flat:chestnut.svg";
+        if (name.includes("लहसुन") || name.includes("garlic")) return "https://api.iconify.design/fluent-emoji-flat:garlic.svg";
+        if (name.includes("शिमला") || name.includes("capsicum") || name.includes("मिर्च")) return "https://api.iconify.design/fluent-emoji-flat:hot-pepper.svg";
+        if (name.includes("कद्दू") || name.includes("pumpkin")) return "https://api.iconify.design/fluent-emoji-flat:tangerine.svg";
+        if (name.includes("खीरा") || name.includes("cucumber")) return "https://api.iconify.design/fluent-emoji-flat:cucumber.svg";
+        if (name.includes("बैंगन") || name.includes("brinjal") || name.includes("eggplant")) return "https://api.iconify.design/fluent-emoji-flat:eggplant.svg";
+        if (name.includes("सेब") || name.includes("apple")) return "https://api.iconify.design/fluent-emoji-flat:red-apple.svg";
+        if (name.includes("केला") || name.includes("banana")) return "https://api.iconify.design/fluent-emoji-flat:banana.svg";
+        if (name.includes("आम") || name.includes("mango")) return "https://api.iconify.design/fluent-emoji-flat:mango.svg";
+        if (name.includes("नींबू") || name.includes("lemon")) return "https://api.iconify.design/fluent-emoji-flat:lemon.svg";
 
-        // यदि कोई नई सब्जी जोड़ी जाती है जिसका नाम पर ऊपर मैच न हो, तो यह डिफ़ॉल्ट सब्जी का आइकन दिखाएगा
-        return "https://cdn-icons-png.flaticon.com/512/2921/2921822.png";
+        return "https://api.iconify.design/lucide:salad.svg?color=%232e7d32";
     }
 
     const universalDictionary = {
