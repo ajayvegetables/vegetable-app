@@ -15,9 +15,9 @@
         .header { display: flex; justify-content: space-between; align-items: center; background: #2e7d32; color: white; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; }
         .shop-title { font-size: 15px; font-weight: bold; }
         .help-btn { background: #c62828; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; }
-        .shop-btn { background: #1976d2; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; }
+        
+        .call-shop-btn { background: #ff9800; color: #fff; padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-        /* आकर्षक और बड़ा लाइव ऑफर बैनर */
         .banner { 
             background: linear-gradient(135deg, #ff9800, #ff5722); 
             color: white; 
@@ -63,7 +63,6 @@
         
         .upi-pay-link-btn { display: block; background: #1976d2; color: white; text-decoration: none; padding: 8px; border-radius: 5px; font-size: 11px; font-weight: bold; margin-top: 6px; text-align: center; }
 
-        /* कार्ट आइटम रो और हटाने वाला बटन */
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #eee; padding: 6px 0; font-size: 11px; }
         .remove-cart-item { background: #c62828; color: white; border: none; padding: 2px 6px; font-size: 10px; border-radius: 3px; cursor: pointer; font-weight: bold; margin-left: 6px; }
     </style>
@@ -73,7 +72,7 @@
 <div class="container">
     <div class="header">
         <div>
-            <a href="shopkeeper.html" class="shop-btn">🛒 दुकानदार</a>
+            <a href="tel:9997077062" id="shopCallBtn" class="call-shop-btn">🛒 दुकानदार को कॉल करें</a>
         </div>
         <div class="shop-title">ऑनलाइन स्टोर</div>
         <div>
@@ -81,10 +80,8 @@
         </div>
     </div>
 
-    <!-- आकर्षक और बड़ा लाइव ऑफर बैनर -->
     <div class="banner" id="shopBanner">🔥 शानदार ऑफर लोड हो रहा है...</div>
 
-    <!-- आर्डर स्टेटस नोटिफिकेशन बार -->
     <div id="orderStatusNotificationContainer"></div>
 
     <div class="catalog-title">📦 उपलब्ध आइटम कैटलॉग (लाइव अपडेटेड)</div>
@@ -98,19 +95,16 @@
     <button class="checkout-btn" onclick="openCheckoutModal()">आर्डर फाइनल करें ➡️</button>
 </div>
 
-<!-- Checkout Modal -->
 <div id="checkoutModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
         <h3 style="color:#2e7d32; margin-top:0; font-size:14px;">🛍️ बिल और भुगतान विवरण</h3>
         
-        <!-- कार्ट आइटम्स की सूची जिसमें हटाने (Remove) का बटन मौजूद है -->
         <div id="cartItemsList" style="margin-bottom: 6px; max-height: 120px; overflow-y: auto;"></div>
         <hr style="border:0; border-top:1px solid #ddd; margin:6px 0;">
         
         <div id="billCalculationBox" style="font-size: 11px; background: #f1f8e9; padding: 8px; border-radius: 5px; margin-bottom: 8px; line-height: 1.4;"></div>
         
-        <!-- भुगतान अनुभाग (लाइव QR Code और UPI ऐप लिंक) -->
         <div id="paymentSection" style="text-align: center; margin-bottom: 10px; background: #fff8e1; padding: 8px; border-radius: 6px; border: 1px dashed #ffb300;">
             <p style="font-size: 11px; font-weight: bold; color: #d32f2f; margin: 4px 0;">📱 QR Code स्कैन करें या नीचे दिए गए बटन से पेमेंट करें:</p>
             <div style="background: #fff; padding: 6px; border: 1px solid #ccc; display: inline-block; border-radius: 6px; margin: 4px 0;">
@@ -118,7 +112,6 @@
                 <p style="font-size: 10px; margin: 2px 0 0 0; font-weight: bold; color: #333;">UPI ID: <span id="displayUpiId">9997077062@paytm</span></p>
             </div>
             
-            <!-- PhonePe / GooglePay ऐप खोलने वाला डायरेक्ट बटन -->
             <a id="upiAppPayLink" href="#" class="upi-pay-link-btn" target="_blank" onclick="unlockOrderButtonAfterPayment()">📲 PhonePe / GPay / Paytm से भुगतान करने के लिए यहाँ क्लिक करें</a>
         </div>
 
@@ -126,12 +119,10 @@
         <div class="form-group"><label>मोबाइल नंबर:</label><input type="tel" id="custPhone" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10" oninput="listenForOrderNotifications(this.value)"></div>
         <div class="form-group"><label>पूरा पता (Address):</label><input type="text" id="custAddress" placeholder="मोहल्ला, मकान नंबर, गली..."></div>
         
-        <!-- आर्डर भेजने वाला बटन (जब तक पेमेंट लिंक पर क्लिक नहीं होगा, बंद रहेगा) -->
         <button id="submitOrderBtn" class="btn-main" onclick="placeOrderToDatabase()" disabled>🔒 पहले UPI पेमेंट पूरा करें</button>
     </div>
 </div>
 
-<!-- Success Modal -->
 <div id="successModal" class="modal">
     <div class="modal-content" style="text-align: center;">
         <h3 style="color: #2e7d32; margin-top:0;">🎉 आर्डर सफलतापूर्वक भेज दिया गया है!</h3>
@@ -161,10 +152,10 @@
     let currentCatalog = [];
     let cart = {};
     let shopUpiId = "9997077062@paytm";
+    let shopPhoneNumber = "9997077062";
     let currentOfferText = "✨ विशेष ऑफर लोड हो रहा है...";
     let paymentInitiated = false;
 
-    // 100% सही और बिल्कुल स्पष्ट, अलग-अलग सब्जियां व फल (पालक, मेथी, मूली और लौकी के बिल्कुल सटीक आइकन्स)
     function getItemEmoji(itemName) {
         if (!itemName) return "🛍️";
         let name = itemName.trim().toLowerCase();
@@ -191,11 +182,6 @@
         if (name.includes("केला")) return "🍌";
         if (name.includes("आम")) return "🥭";
         if (name.includes("नींबू")) return "🍋";
-        if (name.includes("समोसा")) return "🥟";
-        if (name.includes("कचौड़ी")) return "🥠";
-        if (name.includes("बर्गर")) return "🍔";
-        if (name.includes("पिज़्ज़ा") || name.includes("पिज्जा")) return "🍕";
-        if (name.includes("जलेबी")) return "🥨";
 
         return "🛒";
     }
@@ -207,8 +193,7 @@
         "गोभी": "Cauliflower", "पत्तागोभी": "Cabbage", "बैंगन": "Brinjal", "भिंडी": "Ladyfinger",
         "शिमला मिर्च": "Capsicum", "नींबू": "Lemon", "धनिया": "Coriander", "हरी मिर्च": "Green Chilli",
         "खीरा": "Cucumber", "लौकी": "Bottle Gourd", "तोरी": "Ridge Gourd", "करेला": "Bitter Gourd",
-        "चुकंदर": "Beetroot", "सेब": "Apple", "केला": "Banana", "आम": "Mango",
-        "समोसा": "Samosa", "कचौड़ी": "Kachori", "बर्गर": "Burger", "पिज़्ज़ा": "Pizza", "जलेबी": "Jalebi"
+        "चुकंदर": "Beetroot", "सेब": "Apple", "केला": "Banana", "आम": "Mango"
     };
 
     function getEnglishName(hindiName) {
@@ -224,6 +209,12 @@
             if (data) {
                 if(data.upi) { 
                     shopUpiId = data.upi; 
+                    let extractedPhone = shopUpiId.split('@')[0];
+                    if(extractedPhone.length === 10) {
+                        shopPhoneNumber = extractedPhone;
+                        let callBtn = document.getElementById('shopCallBtn');
+                        if(callBtn) callBtn.href = `tel:${shopPhoneNumber}`;
+                    }
                     let upiEl = document.getElementById('displayUpiId');
                     if(upiEl) upiEl.innerText = shopUpiId; 
                 }
@@ -319,7 +310,6 @@
         }
 
         updateCartBar();
-        // बड़ा पॉपअप हटाकर एक छोटा और सरल नोटिफिकेशन कर दिया गया है
         showCompactNotification(`'${name}' कार्ट में जोड़ दिया गया!`);
     };
 
@@ -356,7 +346,6 @@
         document.getElementById('checkoutModal').style.display = 'flex';
     };
 
-    // कार्ट आइटम्स की लिस्ट दिखाने और हटाने (Remove) का फंक्शन
     function renderCartItemsList() {
         let listContainer = document.getElementById('cartItemsList');
         listContainer.innerHTML = "";
@@ -410,7 +399,6 @@
         submitBtn.innerText = "🔒 पहले UPI पेमेंट पूरा करें";
     }
 
-    // कार्ट से किसी आइटम को हटाने का फंक्शन
     window.removeCartItem = function(key) {
         delete cart[key];
         updateCartBar();
