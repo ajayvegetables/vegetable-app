@@ -3,104 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>अजय कूपन वेजीटेबल्स - वेग सर्विस</title>
+    <title>अजय कूपन वेजीटेबल्स</title>
 
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22App%22%7D">
+    <!-- PWA और ऐप जैसा दिखने के लिए जरूरी सेटिंग्स -->
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2e7d32">
-    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="अजय वेज">
+    
+    <!-- ऐप आइकॉन के लिए (आप यहाँ अपना लोगो लिंक लगा सकते हैं) -->
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3721/3721719.png">
 
     <style>
         * { box-sizing: border-box; }
         html, body { margin: 0; padding: 0; width: 100%; min-height: 100vh; background: #f8f5e9; font-family: Arial, sans-serif; }
-        .container { width: 100%; min-height: 100vh; margin: 0; background: white; padding: 12px; border-radius: 0; box-shadow: none; }
+        .container { width: 100%; min-height: 100vh; margin: 0; background: white; padding: 12px; padding-bottom: 80px; }
         
         .header { display: flex; justify-content: space-between; align-items: center; background: #2e7d32; color: white; padding: 12px; border-radius: 8px; }
-        .shop-title { font-size: 18px; font-weight: bold; }
-        .help-btn { background: #c62828; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; }
-        .shop-btn { background: #1976d2; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; }
+        .shop-title { font-size: 16px; font-weight: bold; text-align: center; }
+        .admin-toggle-btn { background: #c62828; color: white; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: bold; border: none; cursor: pointer; }
+        .shop-btn { background: #1976d2; color: white; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: bold; }
 
         .banner {
             background: linear-gradient(135deg, #ff9800, #ff5722);
             color: white;
-            padding: 14px 12px;
+            padding: 12px;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
-            margin-bottom: 12px;
+            margin: 10px 0;
             text-align: center;
             box-shadow: 0 3px 6px rgba(255, 152, 0, 0.4);
-            border: 2px dashed #fffdde;
         }
 
-        .status-notification { background: #e1f2fe; border: 1px solid #90caf9; padding: 10px; border-radius: 6px; margin-bottom: 12px; font-size: 14px; color: #0d47a1; text-align: center; }
-        .close-notif-btn { background: none; border: none; font-size: 16px; font-weight: bold; cursor: pointer; color: #c62828; float: right; }
-        .catalog-title { font-size: 15px; color: #2e7d32; border-bottom: 2px solid #c8e6c9; padding-bottom: 5px; margin-bottom: 12px; font-weight: bold; }
+        .catalog-title { font-size: 15px; color: #2e7d32; border-bottom: 2px solid #c8e6c9; padding-bottom: 5px; margin: 15px 0 10px 0; font-weight: bold; }
 
-        .product-card { display: flex; align-items: center; background: #fafafa; border: 1px solid #ddd; padding: 12px 10px; border-radius: 8px; margin-bottom: 10px; }
-        .product-emoji { font-size: 32px; width: 45px; text-align: center; flex-shrink: 0; }
-        .product-info { flex-grow: 1; font-size: 14px; }
+        .product-card { display: flex; align-items: center; background: #fafafa; border: 1px solid #ddd; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+        .product-emoji { font-size: 30px; width: 40px; text-align: center; flex-shrink: 0; }
+        .product-info { flex-grow: 1; font-size: 14px; padding: 0 8px; }
         .product-name { font-weight: bold; color: #222; font-size: 15px; }
-        .product-eng-name { font-size: 12px; color: #1976d2; font-weight: bold; margin-top: 2px; }
         .product-price { color: #d32f2f; font-weight: bold; font-size: 13px; margin-top: 3px; }
-
-        .qty-select { padding: 7px; border: 1px solid #bbb; border-radius: 6px; font-size: 13px; background: white; }
-        .add-btn { background: #2e7d32; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
+        .add-btn { background: #2e7d32; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
 
         .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2e7d32; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.2); z-index: 1000; }
         .checkout-btn { background: #ff9800; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 20px; width: 100%; max-width: 420px; border-radius: 10px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .close-modal { position: absolute; top: 10px; right: 10px; font-size: 18px; font-weight: bold; cursor: pointer; color: #555; }
+        .modal-content { background: white; padding: 20px; width: 92%; max-width: 420px; border-radius: 10px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 20px; font-weight: bold; cursor: pointer; color: #555; }
 
-        .form-group { margin-bottom: 10px; text-align: left; }
+        .form-group { margin-bottom: 12px; text-align: left; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 13px; color: #333; }
         .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
 
         .btn-main { background: #2e7d32; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; }
-        .btn-main:disabled { background: #9e9e9e; cursor: not-allowed; opacity: 0.7; }
-
-        .upi-pay-btn { display: block; background: #1976d2; color: white; text-align: center; padding: 12px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 10px; font-size: 15px; }
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #ddd; padding: 8px 0; font-size: 13px; }
         .remove-cart-item { background: #c62828; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+        
+        #adminPanel { display: none; background: #fff3e0; border: 2px solid #ffb74d; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
+        .admin-product-row { display: flex; justify-content: space-between; align-items: center; background: white; padding: 8px; border-radius: 6px; margin-bottom: 6px; border: 1px solid #ffe0b2; font-size: 13px; }
+        .delete-item-btn { background: #d32f2f; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; }
+        
+        /* इंस्टॉल प्रॉम्प्ट बटन स्टाइल */
+        #installBanner { display: none; background: #e8f5e9; border: 1px solid #a5d6a7; padding: 10px; border-radius: 8px; margin-bottom: 10px; text-align: center; font-size: 13px; color: #2e7d32; font-weight: bold; }
+        #installAppBtn { background: #2e7d32; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-top: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="container" id="mainAppContainer">
+<div class="container">
     <div class="header">
-        <a href="tel:9997077062" id="shopCallBtn" class="shop-btn">🛒 कॉल करें</a>
+        <a href="tel:9997077062" class="shop-btn">🛒 कॉल करें</a>
         <div class="shop-title">अजय कूपन वेजीटेबल्स</div>
-        <a href="tel:9997077062" class="help-btn">Help</a>
+        <button class="admin-toggle-btn" onclick="toggleAdminPanel()">दुकानदार</button>
     </div>
 
-    <div class="banner">
-        🎉 ताज़ी सब्ज़ियाँ - सीधा आपके द्वार!
+    <div class="banner">🎉 ताज़ी सब्ज़ियाँ - सीधा आपके द्वार!</div>
+
+    <!-- ऐप इंस्टॉल करने का स्पेशल बटन जो क्रोम में प्रॉम्प्ट लाएगा -->
+    <div id="installBanner">
+        📱 इस ऐप को अपने फोन में असली ऐप की तरह इंस्टॉल करें!
+        <br><button id="installAppBtn" onclick="triggerInstall()">App Install करें</button>
     </div>
 
-    <div class="status-notification">
-        <button class="close-notif-btn" onclick="this.parentElement.style.display='none';">&times;</button>
-        <b>सूचना:</b> आर्डर देने के लिए नीचे लिस्ट से सामान चुनें।
+    <!-- दुकानदार पैनल -->
+    <div id="adminPanel">
+        <h3 style="margin-top: 0; color: #e65100; font-size: 16px;">⚙️ दुकानदार नियंत्रण कक्ष</h3>
+        <div class="form-group">
+            <label>सब्जी का नाम:</label>
+            <input type="text" id="newProdName" placeholder="जैसे: गोभी (Cauliflower)">
+        </div>
+        <div class="form-group">
+            <label>कीमत (प्रति Kg):</label>
+            <input type="number" id="newProdPrice" placeholder="जैसे: 30">
+        </div>
+        <div class="form-group">
+            <label>इमोजी:</label>
+            <input type="text" id="newProdEmoji" placeholder="जैसे: 🥦">
+        </div>
+        <button class="btn-main" style="background: #e65100;" onclick="addNewProduct()">नई सब्जी जोड़ें</button>
+        
+        <h4 style="margin: 15px 0 5px 0; font-size: 14px;">सूची से हटाएं:</h4>
+        <div id="adminProductList"></div>
     </div>
 
     <div class="catalog-title">उपलब्ध आइटम्स (Products)</div>
-
-    <!-- यहाँ आपके प्रोडक्ट्स की लिस्ट दिखेगी -->
     <div id="productContainer"></div>
 </div>
 
-<!-- कार्ट और चेकआउट बार -->
 <div class="cart-bar">
     <div>कुल आइटम: <span id="cartCount">0</span> | कुल: ₹<span id="cartTotal">0</span></div>
     <button class="checkout-btn" onclick="openCheckoutModal()">आर्डर दें / देखें</button>
 </div>
 
-<!-- चेकआउट मोडल -->
 <div id="checkoutModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
-        <h3>आपका आर्डर विवरण</h3>
+        <h3 style="margin-top:0;">आपका आर्डर विवरण</h3>
         <div id="cartItemsList"></div>
         <hr>
         <div class="form-group">
@@ -120,14 +140,48 @@
 </div>
 
 <script>
-    // सैंपल प्रोडक्ट्स डेटा (JSON / JavaScript Array)
-    const products = [
+    // PWA इंस्टॉलेशन लॉजिक (मजबूत ऐप अनुभव के लिए)
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('installBanner').style.display = 'block';
+    });
+
+    function triggerInstall() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                }
+                deferredPrompt = null;
+                document.getElementById('installBanner').style.display = 'none';
+            });
+        }
+    }
+
+    // सर्विस वर्कर रजिस्टर करना ताकि ब्राउज़र इसे असली PWA ऐप माने
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('data:text/javascript;base64,' + btoa(`
+            self.addEventListener('fetch', function(event) {
+                // Basic caching bypass for online first
+            });
+        `)).catch(err => console.log('SW registration failed', err));
+    }
+
+    let defaultProducts = [
         { id: 1, name: "आलू (Potato)", price: 30, emoji: "🥔" },
         { id: 2, name: "प्याज (Onion)", price: 40, emoji: "🧅" },
         { id: 3, name: "टमाटर (Tomato)", price: 25, emoji: "🍅" }
     ];
 
+    let products = JSON.parse(localStorage.getItem('ajay_veg_live_products')) || defaultProducts;
     let cart = {};
+
+    function saveData() {
+        localStorage.setItem('ajay_veg_live_products', JSON.stringify(products));
+    }
 
     function renderProducts() {
         const container = document.getElementById('productContainer');
@@ -144,11 +198,13 @@
                 </div>
             `;
         });
+        renderAdminList();
     }
 
     function addToCart(productId) {
         if (!cart[productId]) {
-            cart[productId] = { ...products.find(p => p.id === productId), qty: 1 };
+            let prod = products.find(p => p.id === productId);
+            if(prod) cart[productId] = { ...prod, qty: 1 };
         } else {
             cart[productId].qty += 1;
         }
@@ -169,19 +225,17 @@
     function openCheckoutModal() {
         let listDiv = document.getElementById('cartItemsList');
         listDiv.innerHTML = '';
-        let totalPrice = 0;
 
         if (Object.keys(cart).length === 0) {
             listDiv.innerHTML = '<p>आपका कार्ट खाली है।</p>';
         } else {
             for (let id in cart) {
                 let item = cart[id];
-                totalPrice += item.price * item.qty;
                 listDiv.innerHTML += `
                     <div class="cart-item-row">
                         <span>${item.name} (x${item.qty})</span>
                         <span>₹${item.price * item.qty}</span>
-                        <button class="remove-cart-item" onclick="removeItem(${id})">हटाएं</button>
+                        <button class="remove-cart-item" onclick="removeCartItem(${id})">हटाएं</button>
                     </div>
                 `;
             }
@@ -193,16 +247,73 @@
         document.getElementById('checkoutModal').style.display = 'none';
     }
 
-    function removeItem(id) {
+    function removeCartItem(id) {
         delete cart[id];
         updateCartUI();
         openCheckoutModal();
     }
 
+    function toggleAdminPanel() {
+        let panel = document.getElementById('adminPanel');
+        if (panel.style.display === 'block') {
+            panel.style.display = 'none';
+        } else {
+            let pin = prompt("दुकानदार का गुप्त पिन दर्ज करें:");
+            if (pin === "9997") {
+                panel.style.display = 'block';
+            } else if(pin !== null) {
+                alert("गलत पिन!");
+            }
+        }
+    }
+
+    function renderAdminList() {
+        let adminList = document.getElementById('adminProductList');
+        adminList.innerHTML = '';
+        products.forEach(p => {
+            adminList.innerHTML += `
+                <div class="admin-product-row">
+                    <span>${p.emoji} ${p.name} - ₹${p.price}</span>
+                    <button class="delete-item-btn" onclick="deleteProduct(${p.id})">हटाएं</button>
+                </div>
+            `;
+        });
+    }
+
+    function addNewProduct() {
+        let name = document.getElementById('newProdName').value;
+        let price = document.getElementById('newProdPrice').value;
+        let emoji = document.getElementById('newProdEmoji').value || "🥬";
+
+        if (!name || !price) {
+            alert("कृपया नाम और कीमत भरें।");
+            return;
+        }
+
+        let newId = products.length > 0 ? products[products.length - 1].id + 1 : 1;
+        products.push({ id: newId, name: name, price: Number(price), emoji: emoji });
+        
+        saveData();
+        renderProducts();
+
+        document.getElementById('newProdName').value = '';
+        document.getElementById('newProdPrice').value = '';
+        document.getElementById('newProdEmoji').value = '';
+        alert("सब्जी जोड़ दी गई है!");
+    }
+
+    function deleteProduct(id) {
+        if (confirm("हटाना चाहते हैं?")) {
+            products = products.filter(p => p.id !== id);
+            saveData();
+            renderProducts();
+        }
+    }
+
     function sendWhatsAppOrder() {
-        let name = document.getElementById('custName').value;
-        let phone = document.getElementById('custPhone').value;
-        let address = document.getElementById('custAddress').value;
+        let name = document.getElementById('custName', '').value;
+        let phone = document.getElementById('custPhone', '').value;
+        let address = document.getElementById('custAddress', '').value;
 
         if (!name || !phone || !address) {
             alert('कृपया अपना नाम, फोन नंबर और पता सही से भरें।');
@@ -224,7 +335,6 @@
         window.open(whatsappUrl, '_blank');
     }
 
-    // पेज लोड होने पर प्रोडक्ट्स दिखाएं
     window.onload = function() {
         renderProducts();
     };
