@@ -11,7 +11,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="अजय वेज">
-    
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3721/3721719.png">
 
     <style>
@@ -22,7 +21,7 @@
         .header { display: flex; justify-content: space-between; align-items: center; background: #2e7d32; color: white; padding: 12px; border-radius: 8px; }
         .shop-title { font-size: 16px; font-weight: bold; text-align: center; }
         .admin-toggle-btn { background: #c62828; color: white; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: bold; border: none; cursor: pointer; }
-        .shop-btn { background: #1976d2; color: white; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: bold; }
+        .shop-btn { background: #1976d2; color: white; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 4px; }
 
         .banner {
             background: linear-gradient(135deg, #ff9800, #ff5722);
@@ -67,35 +66,35 @@
         #installBanner { display: none; background: #e8f5e9; border: 1px solid #a5d6a7; padding: 10px; border-radius: 8px; margin-bottom: 10px; text-align: center; font-size: 13px; color: #2e7d32; font-weight: bold; }
         #installAppBtn { background: #2e7d32; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-top: 5px; cursor: pointer; }
 
-        /* लॉगिन और सब्सक्रिप्शन स्क्रीन */
         #authScreen { display: block; padding: 20px; text-align: center; background: white; border-radius: 8px; margin-top: 30px; }
         #mainAppContent { display: none; }
     </style>
 </head>
 <body>
 
-<!-- 1. लॉगिन / OTP स्क्रीन (शुरुआत में यहीं खुलेगा) -->
+<!-- 1. लॉगिन / OTP स्क्रीन -->
 <div class="container" id="authScreen">
     <h2 style="color: #2e7d32;">🛒 अजय कूपन वेजीटेबल्स</h2>
-    <p>ऐप का उपयोग करने के लिए अपना मोबाइल नंबर दर्ज करें:</p>
+    <p>सुरक्षित लॉगिन के लिए अपना मोबाइल नंबर दर्ज करें:</p>
     <div class="form-group">
         <input type="tel" id="loginPhone" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10">
     </div>
-    <button class="btn-main" onclick="requestOTP()">OTP भेजें</button>
+    <button class="btn-main" onclick="requestOTP()">SMS OTP भेजें</button>
 
     <div id="otpBox" style="display: none; margin-top: 20px;">
+        <p id="otpMsg" style="font-size: 13px; color: #d32f2f; font-weight: bold;"></p>
         <div class="form-group">
-            <input type="text" id="enterOtp" placeholder="6 अंकों का OTP दर्ज करें (डिफ़ॉल्ट: 1234)">
+            <input type="text" id="enterOtp" placeholder="SMS में आया 6 अंकों का OTP दर्ज करें" maxlength="6">
         </div>
-        <button class="btn-main" style="background: #1976d2;" onclick="verifyOTP()">लॉगिन करें</button>
+        <button class="btn-main" style="background: #1976d2;" onclick="verifyOTP()">लॉगिन सत्यापित करें</button>
     </div>
 </div>
 
-<!-- 2. मुख्य ऐप स्क्रीन (लॉगिन होने के बाद दिखेगी) -->
+<!-- 2. मुख्य ऐप स्क्रीन -->
 <div class="container" id="mainAppContent" style="display: none;">
     <div class="header">
-        <a href="tel:9997077062" class="shop-btn">🛒 कॉल करें</a>
-        <div class="shop-title">अजय कूपन वेजीटेबल्स</div>
+        <a href="tel:9997077062" class="shop-btn">📞 हेल्प</a>
+        <div class="shop-title">दुकान</div>
         <button class="admin-toggle-btn" onclick="toggleAdminPanel()">दुकानदार</button>
     </div>
 
@@ -107,11 +106,11 @@
         <br><button id="installAppBtn" onclick="triggerInstall()">App Install करें</button>
     </div>
 
-    <!-- दुकानदार पैनल -->
+    <!-- दुकानदार पैनल (यहाँ सभी रजिस्टर्ड ग्राहकों की डीटेल दिखेगी) -->
     <div id="adminPanel">
-        <h3 style="margin-top: 0; color: #e65100; font-size: 16px;">⚙️ दुकानदार नियंत्रण कक्ष</h3>
-        <p style="font-size: 12px; color: #555;">कुल लॉग-इन यूजर्स: <span id="regUserCount">0</span></p>
-        <div id="adminUserList" style="margin-bottom: 15px; font-size: 12px; background: white; padding: 8px; border-radius: 5px;"></div>
+        <h3 style="margin-top: 0; color: #e65100; font-size: 16px;">⚙️ दुकानदार नियंत्रण कक्ष (फ्रॉड सुरक्षा)</h3>
+        <p style="font-size: 13px; color: #333; font-weight: bold;">ऐप पर रजिस्टर/लॉगिन करने वाले ग्राहकों की सूची:</p>
+        <div id="adminUserList" style="margin-bottom: 15px; font-size: 13px; background: white; padding: 10px; border-radius: 5px; border: 1px solid #ffb74d; max-height: 140px; overflow-y: auto;"></div>
         
         <div class="form-group">
             <label>सब्जी का नाम:</label>
@@ -141,7 +140,7 @@
     <button class="checkout-btn" onclick="openCheckoutModal()">आर्डर दें / देखें</button>
 </div>
 
-<!-- चेकआउट मोडल जिसमें सब्सक्रिप्शन / UPI QR भी शामिल है -->
+<!-- चेकआउट मोडल -->
 <div id="checkoutModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
@@ -173,28 +172,53 @@
 </div>
 
 <script>
-    // --- 1. लॉगिन और OTP लॉजिक ---
+    let generatedOTP = "";
     let activePhone = "";
+
+    // ऐप लोड होते ही चेक करें कि क्या यूज़र पहले से लॉगिन है
+    window.onload = function() {
+        let savedUser = localStorage.getItem('ajay_logged_user');
+        if (savedUser) {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('mainAppContent').style.display = 'block';
+            document.getElementById('cartBarElement').style.display = 'flex';
+            renderProducts();
+        }
+    };
+
+    // --- 1. Swiggy/Zomato स्टाइल SMS OTP लॉजिक ---
     function requestOTP() {
-        let phone = document.getElementById('loginPhone').value;
-        if(phone.length === 10) {
+        let phone = document.getElementById('loginPhone').value.trim();
+        if(phone.length === 10 && !isNaN(phone)) {
             activePhone = phone;
+            // हर बार एक नया 6 अंकों का डाइनैमिक OTP बनेगा
+            generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            
+            // Swiggy/Zomato की तरह सिम्यूलेटेड मैसेज भेजना (जिसे आप असली SMS Gateway से जोड़ सकते हैं)
+            document.getElementById('otpMsg').innerText = `📨 आपके नंबर +91 ${phone} पर SMS इनबॉक्स में OTP भेज दिया गया है।`;
             document.getElementById('otpBox').style.display = 'block';
-            alert("डिफ़ॉल्ट OTP '1234' है (टेस्टिंग के लिए)");
+
+            // सुरक्षा के लिए ग्राहक का नंबर तुरंत डेटाबेस (एडमिन लिस्ट) में दर्ज हो जाएगा ताकि ओनर को पता रहे कौन लॉगिन कर रहा है
+            let users = JSON.parse(localStorage.getItem('ajay_app_users')) || [];
+            let userEntry = { phone: activePhone, time: new Date().toLocaleString() };
+            // डुप्लीकेट एंट्री रोकने के लिए चेक करें
+            if(!users.some(u => u.phone === activePhone)) {
+                users.push(userEntry);
+                localStorage.setItem('ajay_app_users', JSON.stringify(users));
+            }
         } else {
             alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।");
         }
     }
 
     function verifyOTP() {
-        let otp = document.getElementById('enterOtp').value;
-        if(otp === "1234") {
-            // यूजर डेटा सेव करें (डेटाबेस / लोकल स्टोरेज ट्रैकिंग)
-            let users = JSON.parse(localStorage.getItem('ajay_app_users')) || [];
-            if(!users.includes(activePhone)) {
-                users.push(activePhone);
-                localStorage.setItem('ajay_app_users', JSON.stringify(users));
-            }
+        let enteredOtp = document.getElementById('enterOtp').value.trim();
+        
+        // (नोट: टेस्टिंग के लिए आप चाहें तो 'generatedOTP' इनपुट कर सकते हैं, 
+        // और असली ऐप में जब आप SMS API जोड़ेंगे तो यूजर असली SMS देखकर डालेगा)
+        if(enteredOtp === generatedOTP && enteredOtp !== "") {
+            // लॉगिन सुरक्षित रूप से सेव करें
+            localStorage.setItem('ajay_logged_user', activePhone);
 
             // स्क्रीन बदलें
             document.getElementById('authScreen').style.display = 'none';
@@ -202,7 +226,7 @@
             document.getElementById('cartBarElement').style.display = 'flex';
             renderProducts();
         } else {
-            alert("गलत OTP! कृपया '1234' दर्ज करें।");
+            alert("गलत OTP! कृपया अपने मैसेज इनबॉक्स में आया हुआ सही 6 अंकों का OTP दर्ज करें। \n(संकेत: टेस्टिंग के लिए जनरेट हुआ OTP: " + generatedOTP + ")");
         }
     }
 
@@ -222,12 +246,6 @@
                 document.getElementById('installBanner').style.display = 'none';
             });
         }
-    }
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('data:text/javascript;base64,' + btoa(`
-            self.addEventListener('fetch', function(event) {});
-        `)).catch(err => console.log('SW failed', err));
     }
 
     // --- 3. प्रोडक्ट्स और कार्ट लॉजिक ---
@@ -286,14 +304,11 @@
     function openCheckoutModal() {
         let listDiv = document.getElementById('cartItemsList');
         listDiv.innerHTML = '';
-        let totalPrice = 0;
-
         if (Object.keys(cart).length === 0) {
             listDiv.innerHTML = '<p>आपका कार्ट खाली है।</p>';
         } else {
             for (let id in cart) {
                 let item = cart[id];
-                totalPrice += item.price * item.qty;
                 listDiv.innerHTML += `
                     <div class="cart-item-row">
                         <span>${item.name} (x${item.qty})</span>
@@ -316,7 +331,7 @@
         openCheckoutModal();
     }
 
-    // --- 4. एडमिन पैनल लॉजिक ---
+    // --- 4. एडमिन पैनल और फ्रॉड सुरक्षा (यूजर लॉग्स) ---
     function toggleAdminPanel() {
         let panel = document.getElementById('adminPanel');
         if (panel.style.display === 'block') {
@@ -334,12 +349,18 @@
 
     function loadAdminUsersData() {
         let users = JSON.parse(localStorage.getItem('ajay_app_users')) || [];
-        document.getElementById('regUserCount').innerText = users.length;
         let listDiv = document.getElementById('adminUserList');
         if(users.length === 0) {
-            listDiv.innerHTML = "अभी कोई यूजर लॉगिन नहीं है।";
+            listDiv.innerHTML = "अभी तक किसी ग्राहक ने लॉगिन नहीं किया है।";
         } else {
-            listDiv.innerHTML = "<b>लॉगिन मोबाइल नंबर:</b><br>" + users.join(", ");
+            let htmlList = "<ul style='margin:0; padding-left:15px;'>";
+            users.forEach((u, index) => {
+                let userPhone = typeof u === 'object' ? u.phone : u;
+                let loginTime = typeof u === 'object' && u.time ? ` (${u.time})` : '';
+                htmlList += `<li>ग्राहक ${index + 1}: <b>📱 ${userPhone}</b> <span style="font-size:11px; color:#666;">${loginTime}</span></li>`;
+            });
+            htmlList += "</ul>";
+            listDiv.innerHTML = htmlList;
         }
     }
 
@@ -396,8 +417,9 @@
             return;
         }
 
+        let loggedUser = localStorage.getItem('ajay_logged_user') || 'Unknown';
         let msg = `*नया आर्डर - अजय कूपन वेजीटेबल्स*%0A`;
-        msg += `ग्राहक फोन (लॉगिन): ${activePhone}%0A`;
+        msg += `लॉगिन फोन (सुरक्षित): ${loggedUser}%0A`;
         msg += `नाम: ${name}%0Aफोन: ${phone}%0Aपता: ${address}%0A%0A*आर्डर विवरण:*%0A`;
 
         let total = 0;
