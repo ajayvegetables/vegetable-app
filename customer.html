@@ -12,13 +12,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="अजय वेज">
     
-    <!-- ऐप आइकॉन के लिए (आप यहाँ अपना लोगो लिंक लगा सकते हैं) -->
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3721/3721719.png">
 
     <style>
         * { box-sizing: border-box; }
         html, body { margin: 0; padding: 0; width: 100%; min-height: 100vh; background: #f8f5e9; font-family: Arial, sans-serif; }
-        .container { width: 100%; min-height: 100vh; margin: 0; background: white; padding: 12px; padding-bottom: 80px; }
+        .container { width: 100%; min-height: 100vh; margin: 0; background: white; padding: 12px; padding-bottom: 90px; }
         
         .header { display: flex; justify-content: space-between; align-items: center; background: #2e7d32; color: white; padding: 12px; border-radius: 8px; }
         .shop-title { font-size: 16px; font-weight: bold; text-align: center; }
@@ -65,14 +64,35 @@
         .admin-product-row { display: flex; justify-content: space-between; align-items: center; background: white; padding: 8px; border-radius: 6px; margin-bottom: 6px; border: 1px solid #ffe0b2; font-size: 13px; }
         .delete-item-btn { background: #d32f2f; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; }
         
-        /* इंस्टॉल प्रॉम्प्ट बटन स्टाइल */
         #installBanner { display: none; background: #e8f5e9; border: 1px solid #a5d6a7; padding: 10px; border-radius: 8px; margin-bottom: 10px; text-align: center; font-size: 13px; color: #2e7d32; font-weight: bold; }
         #installAppBtn { background: #2e7d32; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-top: 5px; cursor: pointer; }
+
+        /* लॉगिन और सब्सक्रिप्शन स्क्रीन */
+        #authScreen { display: block; padding: 20px; text-align: center; background: white; border-radius: 8px; margin-top: 30px; }
+        #mainAppContent { display: none; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<!-- 1. लॉगिन / OTP स्क्रीन (शुरुआत में यहीं खुलेगा) -->
+<div class="container" id="authScreen">
+    <h2 style="color: #2e7d32;">🛒 अजय कूपन वेजीटेबल्स</h2>
+    <p>ऐप का उपयोग करने के लिए अपना मोबाइल नंबर दर्ज करें:</p>
+    <div class="form-group">
+        <input type="tel" id="loginPhone" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10">
+    </div>
+    <button class="btn-main" onclick="requestOTP()">OTP भेजें</button>
+
+    <div id="otpBox" style="display: none; margin-top: 20px;">
+        <div class="form-group">
+            <input type="text" id="enterOtp" placeholder="6 अंकों का OTP दर्ज करें (डिफ़ॉल्ट: 1234)">
+        </div>
+        <button class="btn-main" style="background: #1976d2;" onclick="verifyOTP()">लॉगिन करें</button>
+    </div>
+</div>
+
+<!-- 2. मुख्य ऐप स्क्रीन (लॉगिन होने के बाद दिखेगी) -->
+<div class="container" id="mainAppContent" style="display: none;">
     <div class="header">
         <a href="tel:9997077062" class="shop-btn">🛒 कॉल करें</a>
         <div class="shop-title">अजय कूपन वेजीटेबल्स</div>
@@ -81,7 +101,7 @@
 
     <div class="banner">🎉 ताज़ी सब्ज़ियाँ - सीधा आपके द्वार!</div>
 
-    <!-- ऐप इंस्टॉल करने का स्पेशल बटन जो क्रोम में प्रॉम्प्ट लाएगा -->
+    <!-- ऐप इंस्टॉल बैनर -->
     <div id="installBanner">
         📱 इस ऐप को अपने फोन में असली ऐप की तरह इंस्टॉल करें!
         <br><button id="installAppBtn" onclick="triggerInstall()">App Install करें</button>
@@ -90,6 +110,9 @@
     <!-- दुकानदार पैनल -->
     <div id="adminPanel">
         <h3 style="margin-top: 0; color: #e65100; font-size: 16px;">⚙️ दुकानदार नियंत्रण कक्ष</h3>
+        <p style="font-size: 12px; color: #555;">कुल लॉग-इन यूजर्स: <span id="regUserCount">0</span></p>
+        <div id="adminUserList" style="margin-bottom: 15px; font-size: 12px; background: white; padding: 8px; border-radius: 5px;"></div>
+        
         <div class="form-group">
             <label>सब्जी का नाम:</label>
             <input type="text" id="newProdName" placeholder="जैसे: गोभी (Cauliflower)">
@@ -112,17 +135,27 @@
     <div id="productContainer"></div>
 </div>
 
-<div class="cart-bar">
+<!-- कार्ट बार -->
+<div class="cart-bar" id="cartBarElement" style="display: none;">
     <div>कुल आइटम: <span id="cartCount">0</span> | कुल: ₹<span id="cartTotal">0</span></div>
     <button class="checkout-btn" onclick="openCheckoutModal()">आर्डर दें / देखें</button>
 </div>
 
+<!-- चेकआउट मोडल जिसमें सब्सक्रिप्शन / UPI QR भी शामिल है -->
 <div id="checkoutModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
         <h3 style="margin-top:0;">आपका आर्डर विवरण</h3>
         <div id="cartItemsList"></div>
         <hr>
+        
+        <!-- UPI QR कोड पेमेंट सेक्शन -->
+        <div style="text-align: center; background: #f9f9f9; padding: 10px; border-radius: 6px; margin-bottom: 12px;">
+            <p style="font-size: 13px; font-weight: bold; color: #333; margin: 0 0 5px 0;">भुगतान के लिए QR कोड स्कैन करें:</p>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=upi://pay?pa=9997077062@paytm&pn=AjayVegetables" alt="UPI QR" style="width: 130px; height: 130px;">
+            <p style="font-size: 12px; color: #1976d2; margin: 5px 0 0 0;">UPI ID: 9997077062@paytm</p>
+        </div>
+
         <div class="form-group">
             <label>आपका नाम:</label>
             <input type="text" id="custName" placeholder="अपना नाम लिखें">
@@ -140,7 +173,40 @@
 </div>
 
 <script>
-    // PWA इंस्टॉलेशन लॉजिक (मजबूत ऐप अनुभव के लिए)
+    // --- 1. लॉगिन और OTP लॉजिक ---
+    let activePhone = "";
+    function requestOTP() {
+        let phone = document.getElementById('loginPhone').value;
+        if(phone.length === 10) {
+            activePhone = phone;
+            document.getElementById('otpBox').style.display = 'block';
+            alert("डिफ़ॉल्ट OTP '1234' है (टेस्टिंग के लिए)");
+        } else {
+            alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।");
+        }
+    }
+
+    function verifyOTP() {
+        let otp = document.getElementById('enterOtp').value;
+        if(otp === "1234") {
+            // यूजर डेटा सेव करें (डेटाबेस / लोकल स्टोरेज ट्रैकिंग)
+            let users = JSON.parse(localStorage.getItem('ajay_app_users')) || [];
+            if(!users.includes(activePhone)) {
+                users.push(activePhone);
+                localStorage.setItem('ajay_app_users', JSON.stringify(users));
+            }
+
+            // स्क्रीन बदलें
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('mainAppContent').style.display = 'block';
+            document.getElementById('cartBarElement').style.display = 'flex';
+            renderProducts();
+        } else {
+            alert("गलत OTP! कृपया '1234' दर्ज करें।");
+        }
+    }
+
+    // --- 2. PWA इंस्टॉलेशन लॉजिक ---
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
@@ -152,24 +218,19 @@
         if (deferredPrompt) {
             deferredPrompt.prompt();
             deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
-                }
                 deferredPrompt = null;
                 document.getElementById('installBanner').style.display = 'none';
             });
         }
     }
 
-    // सर्विस वर्कर रजिस्टर करना ताकि ब्राउज़र इसे असली PWA ऐप माने
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('data:text/javascript;base64,' + btoa(`
-            self.addEventListener('fetch', function(event) {
-                // Basic caching bypass for online first
-            });
-        `)).catch(err => console.log('SW registration failed', err));
+            self.addEventListener('fetch', function(event) {});
+        `)).catch(err => console.log('SW failed', err));
     }
 
+    // --- 3. प्रोडक्ट्स और कार्ट लॉजिक ---
     let defaultProducts = [
         { id: 1, name: "आलू (Potato)", price: 30, emoji: "🥔" },
         { id: 2, name: "प्याज (Onion)", price: 40, emoji: "🧅" },
@@ -225,12 +286,14 @@
     function openCheckoutModal() {
         let listDiv = document.getElementById('cartItemsList');
         listDiv.innerHTML = '';
+        let totalPrice = 0;
 
         if (Object.keys(cart).length === 0) {
             listDiv.innerHTML = '<p>आपका कार्ट खाली है।</p>';
         } else {
             for (let id in cart) {
                 let item = cart[id];
+                totalPrice += item.price * item.qty;
                 listDiv.innerHTML += `
                     <div class="cart-item-row">
                         <span>${item.name} (x${item.qty})</span>
@@ -253,6 +316,7 @@
         openCheckoutModal();
     }
 
+    // --- 4. एडमिन पैनल लॉजिक ---
     function toggleAdminPanel() {
         let panel = document.getElementById('adminPanel');
         if (panel.style.display === 'block') {
@@ -261,9 +325,21 @@
             let pin = prompt("दुकानदार का गुप्त पिन दर्ज करें:");
             if (pin === "9997") {
                 panel.style.display = 'block';
+                loadAdminUsersData();
             } else if(pin !== null) {
                 alert("गलत पिन!");
             }
+        }
+    }
+
+    function loadAdminUsersData() {
+        let users = JSON.parse(localStorage.getItem('ajay_app_users')) || [];
+        document.getElementById('regUserCount').innerText = users.length;
+        let listDiv = document.getElementById('adminUserList');
+        if(users.length === 0) {
+            listDiv.innerHTML = "अभी कोई यूजर लॉगिन नहीं है।";
+        } else {
+            listDiv.innerHTML = "<b>लॉगिन मोबाइल नंबर:</b><br>" + users.join(", ");
         }
     }
 
@@ -311,9 +387,9 @@
     }
 
     function sendWhatsAppOrder() {
-        let name = document.getElementById('custName', '').value;
-        let phone = document.getElementById('custPhone', '').value;
-        let address = document.getElementById('custAddress', '').value;
+        let name = document.getElementById('custName').value;
+        let phone = document.getElementById('custPhone').value;
+        let address = document.getElementById('custAddress').value;
 
         if (!name || !phone || !address) {
             alert('कृपया अपना नाम, फोन नंबर और पता सही से भरें।');
@@ -321,6 +397,7 @@
         }
 
         let msg = `*नया आर्डर - अजय कूपन वेजीटेबल्स*%0A`;
+        msg += `ग्राहक फोन (लॉगिन): ${activePhone}%0A`;
         msg += `नाम: ${name}%0Aफोन: ${phone}%0Aपता: ${address}%0A%0A*आर्डर विवरण:*%0A`;
 
         let total = 0;
@@ -334,10 +411,6 @@
         let whatsappUrl = `https://wa.me/919997077062?text=${msg}`;
         window.open(whatsappUrl, '_blank');
     }
-
-    window.onload = function() {
-        renderProducts();
-    };
 </script>
 
 </body>
