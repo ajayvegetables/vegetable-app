@@ -9,7 +9,7 @@
     
     <style>
         * { box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #e8f5e9; margin: 0; padding: 5px; color: #333; padding-bottom: 70px; }
+        body { font-family: Arial, sans-serif; background: #e8f5e9; margin: 0; padding: 5px; color: #333; padding-bottom: 75px; }
         .container { width: 100%; max-width: 480px; margin: auto; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         
         .header { display: flex; justify-content: space-between; align-items: center; background: #2e7d32; color: white; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; }
@@ -17,7 +17,6 @@
         .help-btn { background: #c62828; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; }
         .shop-btn { background: #1976d2; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; }
 
-        /* आकर्षक और बड़ा लाइव ऑफर बैनर */
         .banner { 
             background: linear-gradient(135deg, #ff9800, #ff5722); 
             color: white; 
@@ -63,7 +62,6 @@
         
         .upi-pay-link-btn { display: block; background: #1976d2; color: white; text-decoration: none; padding: 8px; border-radius: 5px; font-size: 11px; font-weight: bold; margin-top: 6px; text-align: center; }
 
-        /* कार्ट आइटम रो और हटाने वाला बटन */
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #eee; padding: 6px 0; font-size: 11px; }
         .remove-cart-item { background: #c62828; color: white; border: none; padding: 2px 6px; font-size: 10px; border-radius: 3px; cursor: pointer; font-weight: bold; margin-left: 6px; }
     </style>
@@ -81,10 +79,7 @@
         </div>
     </div>
 
-    <!-- आकर्षक और बड़ा लाइव ऑफर बैनर -->
     <div class="banner" id="shopBanner">🔥 शानदार ऑफर लोड हो रहा है...</div>
-
-    <!-- आर्डर स्टेटस नोटिफिकेशन बार -->
     <div id="orderStatusNotificationContainer"></div>
 
     <div class="catalog-title">📦 उपलब्ध आइटम कैटलॉग (लाइव अपडेटेड)</div>
@@ -104,13 +99,11 @@
         <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
         <h3 style="color:#2e7d32; margin-top:0; font-size:14px;">🛍️ बिल और भुगतान विवरण</h3>
         
-        <!-- कार्ट आइटम्स की सूची जिसमें हटाने (Remove) का बटन मौजूद है -->
         <div id="cartItemsList" style="margin-bottom: 6px; max-height: 120px; overflow-y: auto;"></div>
         <hr style="border:0; border-top:1px solid #ddd; margin:6px 0;">
         
         <div id="billCalculationBox" style="font-size: 11px; background: #f1f8e9; padding: 8px; border-radius: 5px; margin-bottom: 8px; line-height: 1.4;"></div>
         
-        <!-- भुगतान अनुभाग (लाइव QR Code और UPI ऐप लिंक) -->
         <div id="paymentSection" style="text-align: center; margin-bottom: 10px; background: #fff8e1; padding: 8px; border-radius: 6px; border: 1px dashed #ffb300;">
             <p style="font-size: 11px; font-weight: bold; color: #d32f2f; margin: 4px 0;">📱 QR Code स्कैन करें या नीचे दिए गए बटन से पेमेंट करें:</p>
             <div style="background: #fff; padding: 6px; border: 1px solid #ccc; display: inline-block; border-radius: 6px; margin: 4px 0;">
@@ -118,7 +111,6 @@
                 <p style="font-size: 10px; margin: 2px 0 0 0; font-weight: bold; color: #333;">UPI ID: <span id="displayUpiId">9997077062@paytm</span></p>
             </div>
             
-            <!-- PhonePe / GooglePay ऐप खोलने वाला डायरेक्ट बटन -->
             <a id="upiAppPayLink" href="#" class="upi-pay-link-btn" target="_blank" onclick="unlockOrderButtonAfterPayment()">📲 PhonePe / GPay / Paytm से भुगतान करने के लिए यहाँ क्लिक करें</a>
         </div>
 
@@ -126,7 +118,6 @@
         <div class="form-group"><label>मोबाइल नंबर:</label><input type="tel" id="custPhone" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10" oninput="listenForOrderNotifications(this.value)"></div>
         <div class="form-group"><label>पूरा पता (Address):</label><input type="text" id="custAddress" placeholder="मोहल्ला, मकान नंबर, गली..."></div>
         
-        <!-- आर्डर भेजने वाला बटन (जब तक पेमेंट लिंक पर क्लिक नहीं होगा, बंद रहेगा) -->
         <button id="submitOrderBtn" class="btn-main" onclick="placeOrderToDatabase()" disabled>🔒 पहले UPI पेमेंट पूरा करें</button>
     </div>
 </div>
@@ -142,7 +133,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
@@ -161,34 +152,277 @@
     let currentCatalog = [];
     let cart = {};
     let shopUpiId = "9997077062@paytm";
-    let currentOfferText = "✨ विशेष ऑफर लोड हो रहा है...";
+    let shopName = "SmartStore";
+    let currentOfferText = "✨ ताज़ा सब्ज़ियाँ और शानदार ऑफर!";
     let paymentInitiated = false;
+    let currentTotalAmount = 0;
 
-    // 100% सही और बिल्कुल स्पष्ट, अलग-अलग सब्जियां व फल (पालक, मेथी, मूली और लौकी के बिल्कुल सटीक आइकन्स)
     function getItemEmoji(itemName) {
         if (!itemName) return "🛍️";
-        let name = itemName.trim().toLowerCase();
+        const name = itemName.trim().toLowerCase();
 
-        if (name.includes("पालक")) return "🥬"; 
-        if (name.includes("मेथी")) return "🌿"; 
-        if (name.includes("धनिया")) return "☘️"; 
-        if (name.includes("मूली") || name.includes("radish")) return "🥕"; 
-        if (name.includes("लौकी") || name.includes("bottle gourd")) return "🥒"; 
-        if (name.includes("गोभी")) return "🥦";
-        if (name.includes("गाजर")) return "🥕";
+        if (name.includes("भिंडी") || name.includes("ladyfinger") || name.includes("okra")) return "🫛";
+        if (name.includes("करेला") || name.includes("bitter gourd")) return "🥬";
+        if (name.includes("पालक") || name.includes("spinach")) return "🥬";
+        if (name.includes("मेथी") || name.includes("fenugreek")) return "🌿";
+        if (name.includes("धनिया") || name.includes("coriander")) return "☘️";
+        if (name.includes("मूली") || name.includes("radish")) return "🥕";
+        if (name.includes("लौकी") || name.includes("bottle gourd")) return "🥒";
+        if (name.includes("गोभी") || name.includes("cauliflower") || name.includes("broccoli")) return "🥦";
+        if (name.includes("गाजर") || name.includes("carrot")) return "🥕";
         if (name.includes("टमाटर") || name.includes("tomato")) return "🍅";
         if (name.includes("आलू") || name.includes("potato")) return "🥔";
         if (name.includes("प्याज") || name.includes("प्याज़") || name.includes("onion")) return "🧅";
-        if (name.includes("मटर") || name.includes("peas")) return "🫛"; 
+        if (name.includes("मटर") || name.includes("peas")) return "🫛";
         if (name.includes("अदरक") || name.includes("ginger")) return "🫚";
         if (name.includes("लहसुन") || name.includes("garlic")) return "🧄";
-        if (name.includes("शिमला")) return "🫑";
-        if (name.includes("मिर्च") || name.includes("chilli")) return "🌶️";
-        if (name.includes("कद्दू") || name.includes("pumpkin")) return "🎃";
-        if (name.includes("खीरा")) return "🥒";
-        if (name.includes("बैंगन")) return "🍆";
-        if (name.includes("सेब")) return "🍎";
-        if (name.includes("केला")) return "🍌";
-        if (name.includes("आम")) return "🥭";
-        if (name.includes("नींबू")) return "🍋";
-        if (name.includes("समोसा")
+        if (name.includes("शिमला") || name.includes("capsicum")) return "🫑";
+        if (name.includes("मिर्च") || name.includes("chilli") || name.includes("chili")) return "🌶️";
+        if (name.includes("कद्दू") || name.includes("pumpkin")) return "🧡";
+        if (name.includes("खीरा") || name.includes("cucumber")) return "🥒";
+        if (name.includes("बैंगन") || name.includes("brinjal") || name.includes("eggplant")) return "🍆";
+        if (name.includes("सेब") || name.includes("apple")) return "🍎";
+        if (name.includes("केला") || name.includes("banana")) return "🍌";
+        if (name.includes("आम") || name.includes("mango")) return "🥭";
+        if (name.includes("नींबू") || name.includes("lemon")) return "🍋";
+        if (name.includes("समोसा") || name.includes("samosa")) return "🥟";
+        return "🥬";
+    }
+
+    // ऑफर बैनर और UPI सेटिंग्स सुनें
+    onValue(ref(db, "storeSettings"), (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            if (data.offerText) {
+                currentOfferText = data.offerText;
+                document.getElementById("shopBanner").textContent = currentOfferText;
+            }
+            if (data.upiId) {
+                shopUpiId = data.upiId.trim();
+                document.getElementById("displayUpiId").textContent = shopUpiId;
+            }
+            if (data.shopName) {
+                shopName = data.shopName.trim();
+            }
+        } else {
+            document.getElementById("shopBanner").textContent = currentOfferText;
+        }
+    });
+
+    // लाइव कैटलॉग लोड करें
+    onValue(ref(db, "catalog"), (snapshot) => {
+        const data = snapshot.val();
+        currentCatalog = [];
+        if (data) {
+            Object.entries(data).forEach(([id, item]) => {
+                if (item && item.available !== false) {
+                    currentCatalog.push({ id, ...item });
+                }
+            });
+        }
+        renderCatalog();
+    });
+
+    function renderCatalog() {
+        const container = document.getElementById("customer-catalog-container");
+        if (!currentCatalog.length) {
+            container.innerHTML = `<p style="text-align: center; color: #777; font-size: 12px;">अभी कोई आइटम उपलब्ध नहीं है।</p>`;
+            return;
+        }
+
+        container.innerHTML = currentCatalog.map(item => {
+            const price = Number(item.price) || 0;
+            const unit = item.unit || "किलो";
+            const emoji = getItemEmoji(item.name);
+            const engName = item.engName ? `<div class="product-eng-name">(${item.engName})</div>` : "";
+
+            return `
+                <div class="product-card">
+                    <div class="product-emoji">${emoji}</div>
+                    <div class="product-info">
+                        <div class="product-name">${item.name}</div>
+                        ${engName}
+                        <div class="product-price">₹${price} / ${unit}</div>
+                    </div>
+                    <select class="qty-select" id="qty-${item.id}">
+                        <option value="0.5">500 ग्राम</option>
+                        <option value="1" selected>1 ${unit}</option>
+                        <option value="2">2 ${unit}</option>
+                        <option value="5">5 ${unit}</option>
+                    </select>
+                    <button class="add-btn" onclick="addToCart('${item.id}')">जोड़ें</button>
+                </div>
+            `;
+        }).join("");
+    }
+
+    function addToCart(itemId) {
+        const item = currentCatalog.find(i => i.id === itemId);
+        if (!item) return;
+
+        const qtySelect = document.getElementById(`qty-${itemId}`);
+        const qty = Number(qtySelect ? qtySelect.value : 1) || 1;
+        const price = Number(item.price) || 0;
+
+        if (cart[itemId]) {
+            cart[itemId].qty += qty;
+        } else {
+            cart[itemId] = {
+                id: item.id,
+                name: item.name,
+                price: price,
+                unit: item.unit || "किलो",
+                qty: qty
+            };
+        }
+        updateCartBar();
+    }
+
+    function removeCartItem(itemId) {
+        delete cart[itemId];
+        updateCartBar();
+        if (Object.keys(cart).length === 0) {
+            closeCheckoutModal();
+        } else {
+            renderCheckoutDetails();
+        }
+    }
+
+    function updateCartBar() {
+        const items = Object.values(cart);
+        const totalQty = items.reduce((sum, i) => sum + i.qty, 0);
+        const totalAmount = items.reduce((sum, i) => sum + (i.qty * i.price), 0);
+
+        currentTotalAmount = totalAmount;
+        document.getElementById("cartCount").textContent = totalQty;
+        document.getElementById("cartTotal").textContent = totalAmount;
+        document.getElementById("cartBar").style.display = items.length > 0 ? "flex" : "none";
+    }
+
+    function renderCheckoutDetails() {
+        const items = Object.values(cart);
+        const listEl = document.getElementById("cartItemsList");
+        const billEl = document.getElementById("billCalculationBox");
+
+        listEl.innerHTML = items.map(item => {
+            const lineTotal = item.qty * item.price;
+            return `
+                <div class="cart-item-row">
+                    <span><b>${item.name}</b> (${item.qty} ${item.unit}) - ₹${lineTotal}</span>
+                    <button class="remove-cart-item" onclick="removeCartItem('${item.id}')">हटाएं</button>
+                </div>
+            `;
+        }).join("");
+
+        const subtotal = items.reduce((sum, i) => sum + (i.qty * i.price), 0);
+        const deliveryCharge = 0;
+        const grandTotal = subtotal + deliveryCharge;
+        currentTotalAmount = grandTotal;
+
+        billEl.innerHTML = `
+            <div>कुल आइटम राशि: <b>₹${subtotal}</b></div>
+            <div>डिलीवरी शुल्क: <b>${deliveryCharge === 0 ? "फ्री (₹0)" : "₹" + deliveryCharge}</b></div>
+            <div style="font-size:13px; color:#2e7d32; margin-top:3px;">देय कुल राशि: <b>₹${grandTotal}</b></div>
+        `;
+
+        const upiUrl = `upi://pay?pa=${encodeURIComponent(shopUpiId)}&pn=${encodeURIComponent(shopName)}&am=${grandTotal}&cu=INR`;
+        document.getElementById("upiQrImg").src = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(upiUrl)}`;
+        document.getElementById("upiAppPayLink").href = upiUrl;
+    }
+
+    function openCheckoutModal() {
+        if (Object.keys(cart).length === 0) return;
+        renderCheckoutDetails();
+        document.getElementById("checkoutModal").style.display = "flex";
+    }
+
+    function closeCheckoutModal() {
+        document.getElementById("checkoutModal").style.display = "none";
+    }
+
+    function unlockOrderButtonAfterPayment() {
+        paymentInitiated = true;
+        const btn = document.getElementById("submitOrderBtn");
+        btn.disabled = false;
+        btn.textContent = "✅ आर्डर भेजें (Place Order)";
+    }
+
+    function listenForOrderNotifications(phone) {
+        const cleanPhone = (phone || "").replace(/\D/g, "");
+        const notifContainer = document.getElementById("orderStatusNotificationContainer");
+        if (cleanPhone.length < 10) {
+            notifContainer.innerHTML = "";
+            return;
+        }
+
+        onValue(ref(db, `customerNotifications/${cleanPhone}`), (snapshot) => {
+            const notif = snapshot.val();
+            if (notif && notif.message) {
+                notifContainer.innerHTML = `
+                    <div class="status-notification">
+                        <span>🔔 ${notif.message}</span>
+                        <button class="close-notif-btn" onclick="this.parentElement.remove()">&times;</button>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    async function placeOrderToDatabase() {
+        if (!paymentInitiated) {
+            alert("कृपया पहले UPI पेमेंट लिंक पर क्लिक करें।");
+            return;
+        }
+
+        const name = document.getElementById("custName").value.trim();
+        const phone = document.getElementById("custPhone").value.trim();
+        const address = document.getElementById("custAddress").value.trim();
+
+        if (!name || phone.length < 10 || !address) {
+            alert("कृपया अपना नाम, 10 अंकों का मोबाइल नंबर और पूरा पता भरें।");
+            return;
+        }
+
+        const btn = document.getElementById("submitOrderBtn");
+        btn.disabled = true;
+        btn.textContent = "आर्डर भेजा जा रहा है...";
+
+        try {
+            const newOrderRef = push(ref(db, "orders"));
+            const orderData = {
+                orderId: newOrderRef.key,
+                customerName: name,
+                customerPhone: phone,
+                customerAddress: address,
+                items: Object.values(cart),
+                totalAmount: currentTotalAmount,
+                upiId: shopUpiId,
+                status: "Pending Payment Verification",
+                createdAt: Date.now()
+            };
+
+            await set(newOrderRef, orderData);
+            closeCheckoutModal();
+            document.getElementById("successMsgText").innerHTML = `
+                धन्यवाद <b>${name}</b>!<br>
+                आपका <b>₹${currentTotalAmount}</b> का आर्डर दुकानदार को भेज दिया गया है।
+            `;
+            document.getElementById("successModal").style.display = "flex";
+        } catch (err) {
+            alert("आर्डर भेजने में समस्या आई: " + err.message);
+            btn.disabled = false;
+            btn.textContent = "✅ आर्डर भेजें (Place Order)";
+        }
+    }
+
+    // Inline HTML events के लिए फंक्शन्स को window पर उपलब्ध कराएं
+    window.addToCart = addToCart;
+    window.removeCartItem = removeCartItem;
+    window.openCheckoutModal = openCheckoutModal;
+    window.closeCheckoutModal = closeCheckoutModal;
+    window.unlockOrderButtonAfterPayment = unlockOrderButtonAfterPayment;
+    window.listenForOrderNotifications = listenForOrderNotifications;
+    window.placeOrderToDatabase = placeOrderToDatabase;
+</script>
+</body>
+</html>
