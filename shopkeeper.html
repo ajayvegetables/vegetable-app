@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>वेजिटेबल पार्टनर - दुकानदार डैशबोर्ड</title>
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%B5%E0%A5%87%E0%A4%9C%E0%A4%BF%E0%A4%AB%E0%A4%9F%E0%A4%AC%E0%A4%B2%20%E0%A4%AA%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%9F%E0%A4%A8%22%2C%22short_name%22%3A%22VegPartner%22%2C%22start_url%22%3A%22.%2Fshopkeeper.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fff3e0%22%2C%22theme_color%22%3A%22%23e65100%22%7D">
+    <title>अजय वेजिटेबल स्टोर पार्टनर - दुकानदार डैशबोर्ड</title>
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%A4%85%E0%A4%9C%E0%A4%AF%20%E0%A4%B5%E0%A5%87%E0%A4%9C%E0%A4%BF%E0%A4%9F%E0%A5%87%E0%A4%AC%E0%A4%B2%20%E0%A4%B8%E0%A5%8D%E0%A4%9F%E0%A5%8B%E0%A4%B0%20%E0%A4%AA%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%9F%E0%A4%A8%E0%A4%B0%22%2C%22short_name%22%3A%22AjayVegPartner%22%2C%22start_url%22%3A%22.%2Fshopkeeper.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fff3e0%22%2C%22theme_color%22%3A%22%23e65100%22%7D">
     <meta name="theme-color" content="#e65100">
     
     <style>
@@ -66,6 +66,10 @@
         .history-top-actions { display: flex; gap: 4px; align-items: center; margin-right: 35px; }
         .clear-all-btn { background: #c62828; color: white; border: none; padding: 4px 6px; font-size: 9px; border-radius: 3px; cursor: pointer; font-weight: bold; }
         .restore-btn { background: #2e7d32; color: white; border: none; padding: 4px 6px; font-size: 9px; border-radius: 3px; cursor: pointer; font-weight: bold; }
+
+        .restore-options-box { display: none; background: #f1f8e9; border: 1px solid #81c784; border-radius: 5px; padding: 8px; margin-bottom: 8px; font-size: 11px; }
+        .restore-option-btn { background: #2e7d32; color: white; border: none; padding: 5px 8px; font-size: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .restore-date-input { padding: 4px 6px; border: 1px solid #81c784; border-radius: 4px; font-size: 11px; }
 
         .history-item-box { background: #f1f8e9; border-left: 3px solid #2e7d32; padding: 8px; margin-bottom: 6px; font-size: 11px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .rejected-item-box { background: #fafafa; border-left: 3px solid #757575; padding: 8px; margin-bottom: 6px; font-size: 11px; border-radius: 3px; color: #555; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -138,10 +142,19 @@
             <h3 style="color:#e65100; margin:0; font-size:13px;">📊 आर्डर का इतिहास</h3>
             <div class="history-top-actions">
                 <button class="clear-all-btn" onclick="clearAllHistory()">🗑️ सभी हटाएं</button>
-                <button class="restore-btn" onclick="restoreAllHistory()">♻️ वापस लाएं</button>
+                <button class="restore-btn" onclick="toggleRestoreOptions()">♻️ वापस लाएं</button>
             </div>
         </div>
         <hr style="border:0; border-top:1px solid #ddd; margin-bottom:6px;">
+
+        <div id="restoreOptionsBox" class="restore-options-box">
+            <div style="font-weight:bold; color:#1b5e20; margin-bottom:6px;">वापस लाने का विकल्प चुनें (बिना समय सीमा के):</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                <button type="button" class="restore-option-btn" onclick="restoreAllHistory()">📥 सभी वापस लाएं</button>
+                <input type="date" id="restoreHistoryDateInput" class="restore-date-input">
+                <button type="button" class="restore-option-btn" style="background:#1565c0;" onclick="restoreHistoryByDate()">📅 तारीख के हिसाब से वापस लाएं</button>
+            </div>
+        </div>
         
         <h4 style="color:#2e7d32; margin:3px 0; font-size:11px;">✅ स्वीकृत आर्डर्स:</h4>
         <div id="accepted-history-container">
@@ -175,7 +188,7 @@
     </div>
 
     <div id="dashboardScreen" class="screen">
-        <h2>🔔 वेजिटेबल पार्टनर डैशबोर्ड</h2>
+        <h2>🔔 अजय वेजिटेबल स्टोर पार्टनर</h2>
         <div class="status-bar" id="connectionStatus">लाइव डेटाबेस से जुड़ रहा है...</div>
 
         <h3 style="font-size:12px; margin-top:0; color:#d32f2f;">🚨 नए आर्डर्स की सूची:</h3>
@@ -193,8 +206,6 @@
             </div>
             
             <div id="catalog-items-container"></div>
-            
-            <button class="btn-main" style="font-size:11px; padding:8px; margin-top:8px;" onclick="saveCatalogSettings()">कैटलॉग सेव करें</button>
         </div>
     </div>
 
@@ -218,12 +229,17 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    const DELETED_HISTORY_LOCAL_KEY = "AJAY_DELETED_HISTORY_PERMANENT_V1";
+    const LAST_AUTO_STOCK_DATE_KEY = "AJAY_LAST_AUTO_STOCK_DATE_V1";
+    const DAILY_MIN_STOCK_ADD_KG = 10;
+
     let generatedRandomOtp = "";
     let customerNotifications = [];
     let alarmInterval = null;
     let lastDeletedHistory = {};
     let activeOrdersData = {};
     let removedItemsTracker = {};
+    let dailyStockAdjustedOnce = false;
 
     const universalDictionary = {
         "मेथी": "Fenugreek", "कद्दू": "Pumpkin", "पालक": "Spinach", "टमाटर": "Tomato",
@@ -234,6 +250,63 @@
         "खीरा": "Cucumber", "लौकी": "Bottle Gourd", "तोरी": "Ridge Gourd", "करेला": "Bitter Gourd",
         "चुकंदर": "Beetroot", "सेब": "Apple", "केला": "Banana", "आम": "Mango"
     };
+
+    function getLocalDateIso(ts = Date.now()) {
+        const d = new Date(ts);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    }
+
+    function readPermanentDeletedStore() {
+        try {
+            const parsed = JSON.parse(localStorage.getItem(DELETED_HISTORY_LOCAL_KEY) || "{}");
+            return parsed && typeof parsed === "object" ? parsed : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function writePermanentDeletedStore(storeObj) {
+        try {
+            localStorage.setItem(DELETED_HISTORY_LOCAL_KEY, JSON.stringify(storeObj || {}));
+        } catch (e) {}
+    }
+
+    function saveDeletedItemsToPermanentStorage(itemsMap) {
+        if (!itemsMap || typeof itemsMap !== "object") return;
+        const currentStore = readPermanentDeletedStore();
+        const merged = { ...currentStore };
+        Object.keys(itemsMap).forEach((k) => {
+            const entry = itemsMap[k];
+            if (entry && typeof entry === "object") {
+                const ts = entry.timestamp || Date.now();
+                merged[k] = {
+                    ...entry,
+                    timestamp: ts,
+                    deletedDateIso: entry.deletedDateIso || getLocalDateIso(ts),
+                    orderDateIso: entry.orderDateIso || getLocalDateIso(ts)
+                };
+            }
+        });
+        writePermanentDeletedStore(merged);
+        lastDeletedHistory = merged;
+        set(ref(db, 'deletedOrderHistory'), merged).catch(() => {});
+    }
+
+    function loadPermanentDeletedHistoryFromFirebase() {
+        const localStore = readPermanentDeletedStore();
+        lastDeletedHistory = localStore;
+
+        get(ref(db, 'deletedOrderHistory')).then((snap) => {
+            if (snap.exists() && snap.val()) {
+                const merged = { ...snap.val(), ...localStore };
+                lastDeletedHistory = merged;
+                writePermanentDeletedStore(merged);
+            }
+        }).catch(() => {});
+    }
 
     function getEnglishName(hindiName) {
         if (!hindiName) return "Item";
@@ -309,6 +382,7 @@
         document.getElementById('loginScreen').classList.remove('active');
         document.getElementById('dashboardScreen').classList.add('active');
         
+        loadPermanentDeletedHistoryFromFirebase();
         loadShopSettings();
         startLiveOrders();
         loadHistoryData();
@@ -322,6 +396,41 @@
         }
     };
 
+    function applyNextDayPlusTenKgStock(catalogList, shopDataObj) {
+        if (!Array.isArray(catalogList)) return catalogList;
+        const todayIso = getLocalDateIso(Date.now());
+        const lastDate = localStorage.getItem(LAST_AUTO_STOCK_DATE_KEY) || (shopDataObj && shopDataObj.lastAutoStockDate) || "";
+
+        if (lastDate === todayIso || dailyStockAdjustedOnce) {
+            return catalogList;
+        }
+
+        dailyStockAdjustedOnce = true;
+        localStorage.setItem(LAST_AUTO_STOCK_DATE_KEY, todayIso);
+
+        const updated = catalogList.map((item) => {
+            if (!item || typeof item !== "object") return item;
+            const prevStock = parseFloat(item.stock) || 0;
+            const newStock = Number((prevStock + DAILY_MIN_STOCK_ADD_KG).toFixed(2));
+            return {
+                ...item,
+                stock: newStock,
+                outOfStock: newStock <= 0 ? true : false
+            };
+        });
+
+        const payloadToSave = {
+            upi: (shopDataObj && shopDataObj.upi) || document.getElementById('shopUpi').value.trim(),
+            whatsapp: (shopDataObj && shopDataObj.whatsapp) || document.getElementById('shopWhatsapp').value.trim(),
+            offerText: (shopDataObj && shopDataObj.offerText) || document.getElementById('shopOfferText').value.trim(),
+            catalog: updated,
+            lastAutoStockDate: todayIso
+        };
+        set(ref(db, 'shopSettings'), payloadToSave).catch(() => {});
+
+        return updated;
+    }
+
     function loadShopSettings() {
         const settingsRef = ref(db, 'shopSettings');
         onValue(settingsRef, (snapshot) => {
@@ -332,7 +441,8 @@
                 if(data.offerText) document.getElementById('shopOfferText').value = data.offerText;
                 
                 if(data.catalog) {
-                    renderCatalog(data.catalog);
+                    const adjustedCatalog = applyNextDayPlusTenKgStock(data.catalog, data);
+                    renderCatalog(adjustedCatalog);
                 } else {
                     renderCatalog([
                         {name: "टमाटर", price: 40, stock: 10, outOfStock: false},
@@ -466,7 +576,7 @@
             }
         });
 
-        let settingsData = { upi: upi, whatsapp: whatsapp, offerText: offerText, catalog: catalog };
+        let settingsData = { upi: upi, whatsapp: whatsapp, offerText: offerText, catalog: catalog, lastAutoStockDate: getLocalDateIso(Date.now()) };
         
         set(ref(db, 'shopSettings'), settingsData).then(() => {
             if(showAlert) {
@@ -725,12 +835,32 @@
         }
     };
 
+    window.toggleRestoreOptions = function() {
+        const box = document.getElementById('restoreOptionsBox');
+        if (!box) return;
+        const isOpen = box.style.display === 'block';
+        box.style.display = isOpen ? 'none' : 'block';
+        const dateInput = document.getElementById('restoreHistoryDateInput');
+        if (!isOpen && dateInput && !dateInput.value) {
+            dateInput.value = getLocalDateIso(Date.now());
+        }
+    };
+
     window.deleteHistoryItem = function(key) {
         if(confirm("क्या आप वाकई इस आर्डर को हिस्ट्री से हटाना चाहते हैं?")) {
             const itemRef = ref(db, 'orderHistory/' + key);
             get(itemRef).then((snapshot) => {
                 if(snapshot.exists()) {
-                    lastDeletedHistory[key] = snapshot.val();
+                    const val = snapshot.val() || {};
+                    const nowTs = Date.now();
+                    saveDeletedItemsToPermanentStorage({
+                        [key]: {
+                            ...val,
+                            orderDateIso: val.orderDateIso || getLocalDateIso(val.timestamp || nowTs),
+                            deletedDateIso: getLocalDateIso(nowTs),
+                            deletedAtTimestamp: nowTs
+                        }
+                    });
                 }
                 remove(itemRef);
             });
@@ -742,7 +872,19 @@
             const historyRef = ref(db, 'orderHistory');
             get(historyRef).then((snapshot) => {
                 if(snapshot.exists()) {
-                    lastDeletedHistory = snapshot.val();
+                    const allItems = snapshot.val() || {};
+                    const nowTs = Date.now();
+                    const prepared = {};
+                    Object.keys(allItems).forEach((k) => {
+                        const item = allItems[k] || {};
+                        prepared[k] = {
+                            ...item,
+                            orderDateIso: item.orderDateIso || getLocalDateIso(item.timestamp || nowTs),
+                            deletedDateIso: getLocalDateIso(nowTs),
+                            deletedAtTimestamp: nowTs
+                        };
+                    });
+                    saveDeletedItemsToPermanentStorage(prepared);
                 }
                 remove(historyRef);
             });
@@ -750,19 +892,59 @@
     };
 
     window.restoreAllHistory = function() {
-        if (Object.keys(lastDeletedHistory).length === 0) {
-            alert("वापस लाने के लिए कोई हालिया डिलीट किया गया डेटा नहीं है!");
+        const store = { ...readPermanentDeletedStore(), ...lastDeletedHistory };
+        if (Object.keys(store).length === 0) {
+            alert("वापस लाने के लिए कोई डिलीट किया गया डेटा नहीं है!");
             return;
         }
         
         let historyRef = ref(db, 'orderHistory');
         get(historyRef).then((snapshot) => {
             let existingData = snapshot.val() || {};
-            let mergedData = { ...existingData, ...lastDeletedHistory };
+            let mergedData = { ...existingData, ...store };
             
             set(historyRef, mergedData).then(() => {
-                alert("सभी डिलीट किए गए आर्डर्स सफलतापर्वक वापस आ गए हैं!");
-                lastDeletedHistory = {};
+                alert("सभी डिलीट किए गए आर्डर्स सफलतापूर्वक वापस आ गए हैं!");
+                const box = document.getElementById('restoreOptionsBox');
+                if (box) box.style.display = 'none';
+            });
+        });
+    };
+
+    window.restoreHistoryByDate = function() {
+        const dateInput = document.getElementById('restoreHistoryDateInput');
+        const selectedDate = dateInput ? dateInput.value : "";
+        if (!selectedDate) {
+            alert("कृपया पहले तारीख चुनें!");
+            return;
+        }
+
+        const store = { ...readPermanentDeletedStore(), ...lastDeletedHistory };
+        const matchedEntries = {};
+
+        Object.keys(store).forEach((k) => {
+            const item = store[k];
+            if (!item || typeof item !== "object") return;
+            const itemOrderDate = item.orderDateIso || getLocalDateIso(item.timestamp || 0);
+            const itemDeletedDate = item.deletedDateIso || getLocalDateIso(item.deletedAtTimestamp || item.timestamp || 0);
+            if (itemOrderDate === selectedDate || itemDeletedDate === selectedDate) {
+                matchedEntries[k] = item;
+            }
+        });
+
+        if (Object.keys(matchedEntries).length === 0) {
+            alert(`तारीख (${selectedDate}) के लिए कोई डिलीट किया गया आर्डर नहीं मिला!`);
+            return;
+        }
+
+        const historyRef = ref(db, 'orderHistory');
+        get(historyRef).then((snapshot) => {
+            const existingData = snapshot.val() || {};
+            const mergedData = { ...existingData, ...matchedEntries };
+            set(historyRef, mergedData).then(() => {
+                alert(`तारीख (${selectedDate}) की हिस्ट्री सफलतापूर्वक वापस आ गई है!`);
+                const box = document.getElementById('restoreOptionsBox');
+                if (box) box.style.display = 'none';
             });
         });
     };
@@ -801,6 +983,7 @@
                     }
                 });
 
+                const nowTs = Date.now();
                 let historyData = {
                     name: order.customerName,
                     amount: order.totalAmount,
@@ -809,7 +992,8 @@
                     distance: order.distance || '',
                     items: order.items || [],
                     status: 'accepted',
-                    timestamp: Date.now()
+                    timestamp: nowTs,
+                    orderDateIso: getLocalDateIso(nowTs)
                 };
 
                 let removedNames = removedItemsTracker[orderId];
@@ -821,7 +1005,7 @@
                 set(ref(db, 'customerNotification/' + order.customerPhone), {
                     status: 'accepted',
                     msg: msgText,
-                    timestamp: Date.now()
+                    timestamp: nowTs
                 }).then(() => {
                     push(ref(db, 'orderHistory'), historyData).then(() => {
                         delete removedItemsTracker[orderId];
@@ -842,6 +1026,7 @@
             get(orderRef).then((snapshot) => {
                 if (snapshot.exists()) {
                     let order = snapshot.val();
+                    const nowTs = Date.now();
                     let historyData = {
                         name: order.customerName,
                         amount: order.totalAmount,
@@ -850,13 +1035,14 @@
                         distance: order.distance || '',
                         items: order.items || [],
                         status: 'rejected',
-                        timestamp: Date.now()
+                        timestamp: nowTs,
+                        orderDateIso: getLocalDateIso(nowTs)
                     };
 
                     set(ref(db, 'customerNotification/' + order.customerPhone), {
                         status: 'rejected',
                         msg: `❌ माफ़ कीजिए, आपका ऑर्डर रद्द कर दिया गया है।`,
-                        timestamp: Date.now()
+                        timestamp: nowTs
                     }).then(() => {
                         push(ref(db, 'orderHistory'), historyData).then(() => {
                             delete removedItemsTracker[orderId];
