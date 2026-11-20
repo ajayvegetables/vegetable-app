@@ -586,8 +586,8 @@
           भुगतान के बाद विवरण भरें
         </div>
 
-        <input id="customer-phone-input" type="tel" class="input-field" placeholder="अपना मोबाइल नंबर लिखें *" oninput="subscribeToCustomerNotification(this.value)" />
-        <input id="customer-location-input" type="text" class="input-field" placeholder="अपना पता / लोकेशन लिखें *" />
+        <input id="customer-phone-input" type="tel" class="input-field" placeholder="अपना मोबाइल नंबर लिखें *" oninput="handleCustomerPhoneInput(this.value)" />
+        <input id="customer-location-input" type="text" class="input-field" placeholder="अपना पता / लोकेशन लिखें *" oninput="saveCustomerProfileDraft()" />
         <div id="customer-map-preview" class="note-small"></div>
         <button type="button" class="back-btn" style="margin-top:8px;" onclick="detectLocation()">
           📍 लोकेशन और लाइव मैप ऑटो-भरें
@@ -608,6 +608,7 @@
 
   const MASTER_HELP_PHONE = "9997077062";
   const SELLER_PREF_ORDER_KEY = "CUSTOMER_PREFERRED_SELLER_ORDER_V1";
+  const CUSTOMER_PROFILE_KEY = "CUSTOMER_SAVED_PROFILE_V1";
 
   const firebaseConfig = {
     apiKey: "AIzaSyD4LjOqIsKMH7ZOpAbMginqDuybiSIOFs",
@@ -658,6 +659,67 @@
     "केला": "Banana",
     "आम": "Mango"
   };
+
+  function getSavedCustomerProfile() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(CUSTOMER_PROFILE_KEY) || "{}");
+      return raw && typeof raw === "object" ? raw : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveCustomerProfileData(patch) {
+    try {
+      const current = getSavedCustomerProfile();
+      const updated = { ...current, ...patch };
+      localStorage.setItem(CUSTOMER_PROFILE_KEY, JSON.stringify(updated));
+    } catch (e) {}
+  }
+
+  function autofillCustomerDetails(forceOverwrite = false) {
+    const profile = getSavedCustomerProfile();
+    const phoneInput = document.getElementById("customer-phone-input");
+    const locInput = document.getElementById("customer-location-input");
+    const mapPreview = document.getElementById("customer-map-preview");
+
+    if (phoneInput && profile.phone && (forceOverwrite || !phoneInput.value.trim())) {
+      phoneInput.value = profile.phone;
+      subscribeToCustomerNotification(profile.phone);
+    }
+
+    if (locInput && profile.address && (forceOverwrite || !locInput.value.trim())) {
+      locInput.value = profile.address;
+    }
+
+    if (profile.lat !== undefined && profile.lng !== undefined && profile.lat !== null && profile.lng !== null) {
+      customerCoords = { lat: Number(profile.lat), lng: Number(profile.lng) };
+      const latStr = Number(profile.lat).toFixed(6);
+      const lngStr = Number(profile.lng).toFixed(6);
+      customerMapUrl = profile.mapUrl || `https://www.google.com/maps?q=${latStr},${lngStr}`;
+      if (mapPreview) {
+        mapPreview.innerHTML = `सेव मैप: <a href="${customerMapUrl}" target="_blank" rel="noopener noreferrer">लाइव मैप देखें (${latStr}, ${lngStr})</a>`;
+      }
+    } else if (profile.mapUrl && mapPreview) {
+      customerMapUrl = profile.mapUrl;
+      mapPreview.innerHTML = `सेव मैप: <a href="${customerMapUrl}" target="_blank" rel="noopener noreferrer">मैप लिंक देखें</a>`;
+    }
+  }
+
+  function handleCustomerPhoneInput(val) {
+    const cleanPhone = (val || "").trim();
+    saveCustomerProfileData({ phone: cleanPhone });
+    subscribeToCustomerNotification(cleanPhone);
+  }
+
+  function saveCustomerProfileDraft() {
+    const phoneInput = document.getElementById("customer-phone-input");
+    const locInput = document.getElementById("customer-location-input");
+    saveCustomerProfileData({
+      phone: phoneInput ? phoneInput.value.trim() : "",
+      address: locInput ? locInput.value.trim() : ""
+    });
+  }
 
   function extractPhoneFromUpi(upiVal) {
     if (!upiVal) return "";
@@ -1102,6 +1164,11 @@
     if (!paymentInitiated) return;
     paymentConfirmed = true;
     document.getElementById("post-payment-section").classList.remove("hidden");
+    autofillCustomerDetails(false);
+    const locInput = document.getElementById("customer-location-input");
+    if (locInput && !locInput.value.trim()) {
+      detectLocation();
+    }
     document.getElementById("post-payment-section").scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
@@ -1126,17 +1193,26 @@
         customerCoords = { lat, lng };
         customerMapUrl = `https://www.google.com/maps?q=${latStr},${lngStr}`;
 
+        let finalAddress = `${latStr}, ${lngStr}`;
         try {
           const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latStr}&lon=${lngStr}`);
           if (res.ok) {
             const data = await res.json();
-            locInput.value = data.display_name || `Lat: ${latStr}, Lng: ${lngStr}`;
+            finalAddress = data.display_name || `Lat: ${latStr}, Lng: ${lngStr}`;
           } else {
-            locInput.value = `Lat: ${latStr}, Lng: ${lngStr}`;
+            finalAddress = `Lat: ${latStr}, Lng: ${lngStr}`;
           }
         } catch (e) {
-          locInput.value = `Lat: ${latStr}, Lng: ${lngStr}`;
+          finalAddress = `Lat: ${latStr}, Lng: ${lngStr}`;
         }
+
+        locInput.value = finalAddress;
+        saveCustomerProfileData({
+          address: finalAddress,
+          lat,
+          lng,
+          mapUrl: customerMapUrl
+        });
 
         if (mapPreview) {
           mapPreview.innerHTML = `मैप तैयार: <a href="${customerMapUrl}" target="_blank" rel="noopener noreferrer">लाइव मैप देखें (${latStr}, ${lngStr})</a>`;
@@ -1230,6 +1306,14 @@
     const now = new Date();
     const orderId = "ORD-" + Date.now().toString().slice(-6);
     const mapUrl = customerMapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locVal)}`;
+
+    saveCustomerProfileData({
+      phone: phoneVal,
+      address: locVal,
+      lat: customerCoords ? customerCoords.lat : null,
+      lng: customerCoords ? customerCoords.lng : null,
+      mapUrl
+    });
 
     const formattedItems = cart.map(item => ({
       name: item.hiName || item.name,
@@ -1367,12 +1451,15 @@
   window.closeOrderSentModalAndScrollTop = closeOrderSentModalAndScrollTop;
   window.sendOrderToSeller = sendOrderToSeller;
   window.subscribeToCustomerNotification = subscribeToCustomerNotification;
+  window.handleCustomerPhoneInput = handleCustomerPhoneInput;
+  window.saveCustomerProfileDraft = saveCustomerProfileDraft;
   window.moveSellerByOffset = moveSellerByOffset;
   window.setSellerRankPosition = setSellerRankPosition;
 
-  // Always start on Seller List Screen (no login/OTP)
+  // Always start on Seller List Screen (no login/OTP) and restore saved customer profile
   goBackToSellers();
   renderSellerList();
+  autofillCustomerDetails(false);
 
   onValue(ref(db, "sellers"), (snapshot) => {
     latestSellersNode = snapshot.val() || null;
