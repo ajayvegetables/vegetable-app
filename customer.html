@@ -445,7 +445,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 1: SELLER LIST -->
+  <!-- SCREEN 1: SELLER LIST (Open directly without any login/OTP) -->
   <div id="seller-screen">
     <div class="topbar">
       <div style="width:60px;"></div>
@@ -563,7 +563,9 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getDatabase, ref, onValue, set, push, off } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  import { getDatabase, ref, onValue, push, off } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  const MASTER_HELP_PHONE = "9997077062";
 
   const firebaseConfig = {
     apiKey: "AIzaSyD4LjOqIsKMH7ZOpAbMginqDuybiSIOFs",
@@ -614,6 +616,44 @@
     "केला": "Banana",
     "आम": "Mango"
   };
+
+  function extractPhoneFromUpi(upiVal) {
+    if (!upiVal) return "";
+    const beforeAt = String(upiVal).split("@")[0] || "";
+    const digitsOnly = beforeAt.replace(/\D/g, "");
+    if (digitsOnly.length >= 10) {
+      return digitsOnly.slice(-10);
+    }
+    return "";
+  }
+
+  function resolveSellerCallNumber(sellerObj) {
+    if (!sellerObj || typeof sellerObj !== "object") return MASTER_HELP_PHONE;
+    const rawWhatsapp = (sellerObj.whatsapp || "").toString().trim();
+    const whatsappDigits = rawWhatsapp.replace(/\D/g, "");
+    if (whatsappDigits.length >= 10) {
+      return whatsappDigits;
+    }
+
+    const upiSource = sellerObj.upi || sellerObj.upiId || "";
+    const upiPhone = extractPhoneFromUpi(upiSource);
+    if (upiPhone) {
+      return upiPhone;
+    }
+
+    const rawPhone = (sellerObj.phone || "").toString().trim().replace(/\D/g, "");
+    if (rawPhone.length >= 10) {
+      return rawPhone;
+    }
+
+    return MASTER_HELP_PHONE;
+  }
+
+  function enforceMasterHelpNumber() {
+    document.querySelectorAll("a.help-call").forEach((el) => {
+      el.setAttribute("href", `tel:${MASTER_HELP_PHONE}`);
+    });
+  }
 
   function makeVegSvg(emoji, bgColor) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">
@@ -683,7 +723,8 @@
       id: "ajay",
       shopName: "अजय स्टोर",
       ownerName: "अजय कुमार",
-      phone: "9997077062",
+      whatsapp: "",
+      phone: resolveSellerCallNumber({ whatsapp: "", upiId: "8218231811@nyes" }),
       upiId: "8218231811@nyes",
       offerText: "₹200 या उससे अधिक की खरीद पर 10% छूट | ₹150 से ₹199 तक 5% छूट | ₹150 से कम पर कोई अतिरिक्त छूट नहीं।",
       minOrder10: 200,
@@ -694,18 +735,19 @@
     }
   ];
 
-  let activeSellerId = "ajay";
+  let activeSellerId = null;
   let cart = [];
   let paymentInitiated = false;
   let paymentConfirmed = false;
-  let lastSentOrderId = null;
-  let lastSentOrderItems = [];
   let lastAppliedLiveStatusKey = "";
   let activeNotifRef = null;
   let activeNotifCallback = null;
+  let latestSellersNode = null;
+  let latestShopSettingsNode = null;
 
   function getActiveSeller() {
-    return SELLERS.find(s => s.id === activeSellerId) || SELLERS[0] || null;
+    if (!activeSellerId) return null;
+    return SELLERS.find(s => s.id === activeSellerId) || null;
   }
 
   function renderSellerList() {
@@ -722,20 +764,39 @@
         <button class="select-btn" onclick="openSeller('${seller.id}')">दुकान खोलें</button>
       </div>
     `).join("");
+    enforceMasterHelpNumber();
   }
 
   function resetPaymentAndOrderFlow() {
     paymentInitiated = false;
     paymentConfirmed = false;
-    lastSentOrderId = null;
-    lastSentOrderItems = [];
     document.getElementById("qr-section").classList.add("hidden");
     document.getElementById("payment-verify-step").classList.add("hidden");
     document.getElementById("post-payment-section").classList.add("hidden");
   }
 
+  function syncShopHeaderAndQr(seller) {
+    if (!seller) return;
+    const callNum = resolveSellerCallNumber(seller);
+    const shopCallEl = document.getElementById("shop-call-link");
+    shopCallEl.href = `tel:${callNum}`;
+    shopCallEl.title = `दुकानदार को कॉल करें (${callNum})`;
+    document.getElementById("offer-banner").textContent = seller.offerText;
+    enforceMasterHelpNumber();
+
+    const subtotal = cart.reduce((sum, item) => sum + item.amount, 0);
+    const bill = calculateBill(subtotal);
+    if (!document.getElementById("qr-section").classList.contains("hidden") && bill.finalAmount > 0) {
+      const upiUri = buildLiveUpiUri(seller, bill.finalAmount);
+      document.getElementById("qr-image").src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
+      document.getElementById("upi-intent-link").href = upiUri;
+      document.getElementById("qr-summary").textContent =
+        `${seller.shopName} | UPI: ${seller.upiId} | कुल देय राशि: ₹${bill.finalAmount}`;
+    }
+  }
+
   function openSeller(sellerId) {
-    activeSellerId = sellerId || "ajay";
+    activeSellerId = sellerId;
     cart = [];
     resetPaymentAndOrderFlow();
     dismissStatusBanner();
@@ -746,9 +807,7 @@
     document.getElementById("seller-screen").classList.add("hidden");
     document.getElementById("catalog-screen").classList.remove("hidden");
 
-    document.getElementById("shop-call-link").href = `tel:${seller.phone}`;
-    document.getElementById("offer-banner").textContent = seller.offerText;
-
+    syncShopHeaderAndQr(seller);
     renderVegetables();
     renderCartAndBill();
   }
@@ -760,6 +819,7 @@
     dismissStatusBanner();
     document.getElementById("catalog-screen").classList.add("hidden");
     document.getElementById("seller-screen").classList.remove("hidden");
+    enforceMasterHelpNumber();
   }
 
   function renderVegetables() {
@@ -890,7 +950,8 @@
 
   function buildLiveUpiUri(seller, finalAmount) {
     const amountFixed = Number(finalAmount).toFixed(2);
-    return `upi://pay?pa=${encodeURIComponent(seller.upiId)}&pn=${encodeURIComponent(seller.shopName)}&am=${encodeURIComponent(amountFixed)}&cu=INR&tn=${encodeURIComponent(seller.shopName + " Order")}`;
+    const upiAddress = (seller.upiId || "").trim();
+    return `upi://pay?pa=${encodeURIComponent(upiAddress)}&pn=${encodeURIComponent(seller.shopName)}&am=${encodeURIComponent(amountFixed)}&cu=INR&tn=${encodeURIComponent(seller.shopName + " Order")}`;
   }
 
   function generatePaymentQR() {
@@ -1037,6 +1098,8 @@
     }
 
     const seller = getActiveSeller();
+    if (!seller) return;
+
     const subtotal = cart.reduce((sum, item) => sum + item.amount, 0);
     const bill = calculateBill(subtotal);
     const now = new Date();
@@ -1069,10 +1132,7 @@
       sellerResponse: null
     };
 
-    lastSentOrderId = orderId;
-    lastSentOrderItems = [...cart];
     lastAppliedLiveStatusKey = "";
-
     subscribeToCustomerNotification(phoneVal);
 
     try {
@@ -1092,55 +1152,82 @@
     openOrderSentModal();
   }
 
-  function applyFirebaseShopSettings(shopData) {
-    if (!shopData) return;
+  function rebuildSellersFromFirebase() {
+    const list = [];
 
-    const currentBase = SELLERS[0] || {
-      id: "ajay",
-      shopName: "अजय स्टोर",
-      ownerName: "अजय कुमार",
-      phone: "9997077062",
-      upiId: "8218231811@nyes",
-      offerText: "",
-      minOrder10: 200,
-      discount10: 10,
-      minOrder5: 150,
-      discount5: 5,
-      vegetables: []
-    };
+    if (latestSellersNode && typeof latestSellersNode === "object") {
+      Object.keys(latestSellersNode).forEach((key) => {
+        const s = latestSellersNode[key];
+        if (!s || typeof s !== "object") return;
+        const shopName = (s.shopName || s.name || s.storeName || key).toString().trim();
+        const ownerName = (s.ownerName || s.owner || "दुकानदार").toString().trim();
+        const whatsapp = (s.whatsapp || "").toString().trim();
+        const upiId = (s.upiId || s.upi || "").toString().trim();
+        const callPhone = resolveSellerCallNumber({ whatsapp, phone: s.phone, upiId });
+        const offerText = (s.offerText || "₹200 या उससे अधिक की खरीद पर 10% छूट | ₹150 से ₹199 तक 5% छूट।").toString();
+        const rawVeg = Array.isArray(s.vegetables) ? s.vegetables : (Array.isArray(s.catalog) ? s.catalog : []);
+        const vegetables = convertCatalogToVegetables(rawVeg);
 
-    const liveVegetables = convertCatalogToVegetables(shopData.catalog);
-    const updatedSeller = {
-      ...currentBase,
-      upiId: shopData.upi || currentBase.upiId,
-      phone: shopData.whatsapp || currentBase.phone,
-      offerText: shopData.offerText || currentBase.offerText,
-      vegetables: liveVegetables.length > 0 ? liveVegetables : currentBase.vegetables
-    };
+        list.push({
+          id: (s.id || key).toString(),
+          shopName,
+          ownerName,
+          whatsapp,
+          phone: callPhone,
+          upiId,
+          offerText,
+          minOrder10: Number(s.minOrder10) || 200,
+          discount10: Number(s.discount10) || 10,
+          minOrder5: Number(s.minOrder5) || 150,
+          discount5: Number(s.discount5) || 5,
+          vegetables
+        });
+      });
+    }
 
-    SELLERS = [updatedSeller, ...SELLERS.slice(1)];
+    if (latestShopSettingsNode && typeof latestShopSettingsNode === "object") {
+      const whatsapp = (latestShopSettingsNode.whatsapp || "").toString().trim();
+      const upiId = (latestShopSettingsNode.upi || latestShopSettingsNode.upiId || "8218231811@nyes").toString().trim();
+      const callPhone = resolveSellerCallNumber({ whatsapp, phone: latestShopSettingsNode.phone, upiId });
+      const liveVegetables = convertCatalogToVegetables(latestShopSettingsNode.catalog);
+
+      const ajaySeller = {
+        id: "ajay",
+        shopName: (latestShopSettingsNode.shopName || "अजय स्टोर").toString().trim(),
+        ownerName: (latestShopSettingsNode.ownerName || "अजय कुमार").toString().trim(),
+        whatsapp,
+        phone: callPhone,
+        upiId,
+        offerText: (latestShopSettingsNode.offerText || "₹200 या उससे अधिक की खरीद पर 10% छूट | ₹150 से ₹199 तक 5% छूट।").toString(),
+        minOrder10: Number(latestShopSettingsNode.minOrder10) || 200,
+        discount10: Number(latestShopSettingsNode.discount10) || 10,
+        minOrder5: Number(latestShopSettingsNode.minOrder5) || 150,
+        discount5: Number(latestShopSettingsNode.discount5) || 5,
+        vegetables: liveVegetables
+      };
+
+      const existingIdx = list.findIndex(item => item.id === "ajay" || item.shopName === ajaySeller.shopName);
+      if (existingIdx >= 0) {
+        list[existingIdx] = ajaySeller;
+      } else {
+        list.unshift(ajaySeller);
+      }
+    }
+
+    if (list.length > 0) {
+      SELLERS = list;
+    }
+
     renderSellerList();
 
-    if (activeSellerId) {
-      const activeSeller = getActiveSeller();
-      if (activeSeller) {
-        document.getElementById("shop-call-link").href = `tel:${activeSeller.phone}`;
-        document.getElementById("offer-banner").textContent = activeSeller.offerText;
-        renderVegetables();
-        const updatedBill = renderCartAndBill();
-
-        if (!document.getElementById("qr-section").classList.contains("hidden") && updatedBill.finalAmount > 0) {
-          const upiUri = buildLiveUpiUri(activeSeller, updatedBill.finalAmount);
-          document.getElementById("qr-image").src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
-          document.getElementById("upi-intent-link").href = upiUri;
-          document.getElementById("qr-summary").textContent =
-            `${activeSeller.shopName} | UPI: ${activeSeller.upiId} | कुल देय राशि: ₹${updatedBill.finalAmount}`;
-        }
-      }
+    const currentSeller = getActiveSeller();
+    if (currentSeller) {
+      syncShopHeaderAndQr(currentSeller);
+      renderVegetables();
+      renderCartAndBill();
     }
   }
 
-  // Expose handlers to inline HTML events
   window.openSeller = openSeller;
   window.goBackToSellers = goBackToSellers;
   window.addVegToCart = addVegToCart;
@@ -1154,36 +1241,19 @@
   window.sendOrderToSeller = sendOrderToSeller;
   window.subscribeToCustomerNotification = subscribeToCustomerNotification;
 
-  // Start directly on live store catalog and listen to Firebase Realtime Database
-  openSeller("ajay");
-  onValue(ref(db, "shopSettings"), (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-      applyFirebaseShopSettings(data);
-    }
+  // Always start on Seller List Screen (no login/OTP)
+  goBackToSellers();
+  renderSellerList();
+
+  onValue(ref(db, "sellers"), (snapshot) => {
+    latestSellersNode = snapshot.val() || null;
+    rebuildSellersFromFirebase();
   });
 
-  // =========================================================================
-  // USER CUSTOM UPDATES / PLUGINS (आगे के अपडेट यहाँ सीधे पेस्ट करें)
-  // =========================================================================
-  window.applyUserCustomUpdate = function(databaseRef, helpers) {
-    // जब भी नया अपडेट दूँगा, उसका कोड यहाँ पेस्ट कर दीजिएगा
-  };
-
-  try {
-    window.applyUserCustomUpdate(db, {
-      ref,
-      onValue,
-      set,
-      push,
-      getActiveSeller,
-      renderVegetables,
-      renderCartAndBill,
-      showStatusBanner
-    });
-  } catch (err) {
-    console.error("Custom update error:", err);
-  }
+  onValue(ref(db, "shopSettings"), (snapshot) => {
+    latestShopSettingsNode = snapshot.val() || null;
+    rebuildSellersFromFirebase();
+  });
 </script>
 </body>
 </html>
