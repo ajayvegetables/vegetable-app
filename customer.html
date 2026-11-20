@@ -267,6 +267,8 @@
     .veg-hi { font-size: 14px; font-weight: bold; color: #222; }
     .veg-en { font-size: 12px; color: #666; }
     .veg-rate { font-size: 12px; font-weight: bold; color: #2e7d32; margin-top: 3px; }
+    .veg-stock-ok { font-size: 11px; color: #2e7d32; font-weight: bold; margin-top: 2px; }
+    .veg-stock-out { font-size: 11px; color: #c62828; font-weight: bold; margin-top: 2px; }
     .veg-controls {
       display: flex;
       flex-direction: column;
@@ -289,6 +291,10 @@
       font-size: 12px;
       font-weight: bold;
       cursor: pointer;
+    }
+    .add-btn:disabled {
+      background: #9e9e9e;
+      cursor: not-allowed;
     }
 
     /* Cart & Bill */
@@ -540,7 +546,7 @@
           भुगतान के बाद विवरण भरें
         </div>
 
-        <input id="customer-phone-input" type="tel" class="input-field" placeholder="अपना मोबाइल नंबर लिखें *" />
+        <input id="customer-phone-input" type="tel" class="input-field" placeholder="अपना मोबाइल नंबर लिखें *" oninput="subscribeToCustomerNotification(this.value)" />
         <input id="customer-location-input" type="text" class="input-field" placeholder="अपना पता / लोकेशन लिखें *" />
         <button type="button" class="back-btn" style="margin-top:8px;" onclick="detectLocation()">
           📍 लोकेशन ऑटो-भरें
@@ -555,11 +561,58 @@
 
 </div>
 
-<script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set, push, off } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD4LjOqIsKMH7ZOpAbMginqDuybiSIOFs",
+    authDomain: "ajayvegetables-e6201.firebaseapp.com",
+    databaseURL: "https://ajayvegetables-e6201-default-rtdb.firebaseio.com",
+    projectId: "ajayvegetables-e6201",
+    storageBucket: "ajayvegetables-e6201.firebasestorage.app",
+    messagingSenderId: "735482766488",
+    appId: "1:735482766488:web:a7121605ch1fffe0fd1cad",
+    measurementId: "G-KBGKZ36RY8"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
   const LIVE_CONFIG = {
-    feedUrl: "", // लाइव डेटा/बैकएंड URL यहाँ डालें (यदि हो)
-    pollIntervalMs: 4000,
     storageKey: "ONLINE_STORE_LIVE_DATA_V2"
+  };
+
+  const hindiToEnglishMap = {
+    "मेथी": "Fenugreek",
+    "कद्दू": "Pumpkin",
+    "पालक": "Spinach",
+    "टमाटर": "Tomato",
+    "आलू": "Potato",
+    "प्याज़": "Onion",
+    "प्याज": "Onion",
+    "मटर": "Green Peas",
+    "गाजर": "Carrot",
+    "मूली": "Radish",
+    "अदरक": "Ginger",
+    "लहसुन": "Garlic",
+    "गोभी": "Cauliflower",
+    "फूलगोभी": "Cauliflower",
+    "पत्तागोभी": "Cabbage",
+    "बैंगन": "Brinjal",
+    "भिंडी": "Ladyfinger",
+    "शिमला मिर्च": "Capsicum",
+    "नींबू": "Lemon",
+    "धनिया": "Coriander",
+    "हरी मिर्च": "Green Chilli",
+    "खीरा": "Cucumber",
+    "लौकी": "Bottle Gourd",
+    "तोरई": "Ridge Gourd",
+    "करेला": "Bitter Gourd",
+    "चुकंदर": "Beetroot",
+    "सेब": "Apple",
+    "केला": "Banana",
+    "आम": "Mango"
   };
 
   function makeVegSvg(emoji, bgColor) {
@@ -568,6 +621,47 @@
       <text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" font-size="62">${emoji}</text>
     </svg>`;
     return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+  }
+
+  function guessEmojiAndBg(name) {
+    const clean = (name || "").trim();
+    if (clean.includes("आलू")) return { emoji: "🥔", bg: "#fff3e0" };
+    if (clean.includes("टमाटर")) return { emoji: "🍅", bg: "#ffebee" };
+    if (clean.includes("प्याज़") || clean.includes("प्याज")) return { emoji: "🧅", bg: "#fce4ec" };
+    if (clean.includes("मिर्च")) return { emoji: "🌶️", bg: "#e8f5e9" };
+    if (clean.includes("गोभी")) return { emoji: "🥦", bg: "#f1f8e9" };
+    if (clean.includes("गाजर")) return { emoji: "🥕", bg: "#fff8e1" };
+    if (clean.includes("बैंगन")) return { emoji: "🍆", bg: "#f3e5f5" };
+    if (clean.includes("भिंडी")) return { emoji: "🥬", bg: "#e8f5e9" };
+    if (clean.includes("करेला")) return { emoji: "🥒", bg: "#e8f5e9" };
+    if (clean.includes("धनिया") || clean.includes("मेथी") || clean.includes("पालक")) return { emoji: "🌿", bg: "#e8f5e9" };
+    if (clean.includes("कद्दू") || clean.includes("लौकी") || clean.includes("तोरई")) return { emoji: "🎃", bg: "#fff3e0" };
+    return { emoji: "🥬", bg: "#e8f5e9" };
+  }
+
+  function convertCatalogToVegetables(catalogArr) {
+    if (!Array.isArray(catalogArr)) return [];
+    return catalogArr
+      .map((item, idx) => {
+        if (!item || typeof item !== "object") return null;
+        const hiName = (item.name || "").trim();
+        if (!hiName) return null;
+        const enName = item.en || hindiToEnglishMap[hiName] || hiName;
+        const rate = parseFloat(item.price) || 0;
+        const stockQty = item.stock !== undefined ? parseFloat(item.stock) : 10;
+        const isOut = Boolean(item.outOfStock) || stockQty <= 0;
+        const visual = guessEmojiAndBg(hiName);
+        return {
+          id: item.id || `veg-${idx}-${hiName}`,
+          hi: hiName,
+          en: enName,
+          ratePerKg: rate,
+          stock: stockQty,
+          outOfStock: isOut,
+          img: item.img || makeVegSvg(visual.emoji, visual.bg)
+        };
+      })
+      .filter(Boolean);
   }
 
   const WEIGHT_OPTIONS = [
@@ -589,51 +683,29 @@
       id: "ajay",
       shopName: "अजय स्टोर",
       ownerName: "अजय कुमार",
-      phone: "9876543210",
-      upiId: "ajayvegetables@okaxis",
+      phone: "9997077062",
+      upiId: "8218231811@nyes",
       offerText: "₹200 या उससे अधिक की खरीद पर 10% छूट | ₹150 से ₹199 तक 5% छूट | ₹150 से कम पर कोई अतिरिक्त छूट नहीं।",
       minOrder10: 200,
       discount10: 10,
       minOrder5: 150,
       discount5: 5,
-      vegetables: [
-        { id: "potato", hi: "आलू", en: "Potato", ratePerKg: 30, img: makeVegSvg("🥔", "#fff3e0") },
-        { id: "tomato", hi: "टमाटर", en: "Tomato", ratePerKg: 40, img: makeVegSvg("🍅", "#ffebee") },
-        { id: "onion", hi: "प्याज़", en: "Onion", ratePerKg: 35, img: makeVegSvg("🧅", "#fce4ec") },
-        { id: "chilli", hi: "हरी मिर्च", en: "Green Chilli", ratePerKg: 80, img: makeVegSvg("🌶️", "#e8f5e9") },
-        { id: "cauliflower", hi: "फूलगोभी", en: "Cauliflower", ratePerKg: 50, img: makeVegSvg("🥦", "#f1f8e9") }
-      ]
-    },
-    {
-      id: "ramesh",
-      shopName: "रमेश भंडार",
-      ownerName: "रमेश शर्मा",
-      phone: "9811122233",
-      upiId: "rameshveg@okicici",
-      offerText: "₹200 या अधिक की सब्ज़ी पर 10% छूट।",
-      minOrder10: 200,
-      discount10: 10,
-      minOrder5: 999999,
-      discount5: 0,
-      vegetables: [
-        { id: "potato", hi: "आलू", en: "Potato", ratePerKg: 28, img: makeVegSvg("🥔", "#fff3e0") },
-        { id: "tomato", hi: "टमाटर", en: "Tomato", ratePerKg: 42, img: makeVegSvg("🍅", "#ffebee") },
-        { id: "carrot", hi: "गाजर", en: "Carrot", ratePerKg: 45, img: makeVegSvg("🥕", "#fff8e1") },
-        { id: "brinjal", hi: "बैंगन", en: "Brinjal", ratePerKg: 36, img: makeVegSvg("🍆", "#f3e5f5") }
-      ]
+      vegetables: []
     }
   ];
 
-  let activeSellerId = null;
+  let activeSellerId = "ajay";
   let cart = [];
   let paymentInitiated = false;
   let paymentConfirmed = false;
   let lastSentOrderId = null;
   let lastSentOrderItems = [];
   let lastAppliedLiveStatusKey = "";
+  let activeNotifRef = null;
+  let activeNotifCallback = null;
 
   function getActiveSeller() {
-    return SELLERS.find(s => s.id === activeSellerId) || null;
+    return SELLERS.find(s => s.id === activeSellerId) || SELLERS[0] || null;
   }
 
   function renderSellerList() {
@@ -663,7 +735,7 @@
   }
 
   function openSeller(sellerId) {
-    activeSellerId = sellerId;
+    activeSellerId = sellerId || "ajay";
     cart = [];
     resetPaymentAndOrderFlow();
     dismissStatusBanner();
@@ -695,12 +767,23 @@
     if (!seller) return;
 
     const list = document.getElementById("veg-list");
+    if (!seller.vegetables || seller.vegetables.length === 0) {
+      list.innerHTML = `<div class="note-small">लाइव कैटलॉग लोड हो रही है...</div>`;
+      return;
+    }
+
     const optionsHtml = WEIGHT_OPTIONS.map((w, idx) =>
       `<option value="${idx}" ${w.kg === 1 ? "selected" : ""}>${w.label}</option>`
     ).join("");
 
     list.innerHTML = seller.vegetables.map(veg => {
       const imgSrc = veg.img || makeVegSvg("🥬", "#e8f5e9");
+      const stockBadge = veg.outOfStock
+        ? `<div class="veg-stock-out">स्टॉक में नहीं है</div>`
+        : `<div class="veg-stock-ok">स्टॉक में उपलब्ध (${veg.stock} kg)</div>`;
+      const btnDisabled = veg.outOfStock ? "disabled" : "";
+      const btnText = veg.outOfStock ? "स्टॉक खत्म" : "+ जोड़ें";
+
       return `
         <div class="veg-card">
           <img src="${imgSrc}" alt="${veg.hi}" class="veg-img" />
@@ -708,10 +791,11 @@
             <div class="veg-hi">${veg.hi}</div>
             <div class="veg-en">${veg.en}</div>
             <div class="veg-rate">₹${veg.ratePerKg} / किलो</div>
+            ${stockBadge}
           </div>
           <div class="veg-controls">
-            <select id="weight-${veg.id}" class="weight-select">${optionsHtml}</select>
-            <button class="add-btn" onclick="addVegToCart('${veg.id}')">+ जोड़ें</button>
+            <select id="weight-${veg.id}" class="weight-select" ${btnDisabled}>${optionsHtml}</select>
+            <button class="add-btn" ${btnDisabled} onclick="addVegToCart('${veg.id}')">${btnText}</button>
           </div>
         </div>
       `;
@@ -722,7 +806,7 @@
     const seller = getActiveSeller();
     if (!seller) return;
     const veg = seller.vegetables.find(v => v.id === vegId);
-    if (!veg) return;
+    if (!veg || veg.outOfStock) return;
 
     const selectEl = document.getElementById(`weight-${vegId}`);
     const weightObj = WEIGHT_OPTIONS[parseInt(selectEl ? selectEl.value : 6, 10) || 6];
@@ -732,6 +816,10 @@
       uid: Date.now() + "-" + Math.random().toString(36).slice(2, 6),
       vegId: veg.id,
       name: `${veg.hi} (${veg.en})`,
+      hiName: veg.hi,
+      qty: weightObj.kg,
+      qtyText: weightObj.label,
+      price: veg.ratePerKg,
       weightLabel: weightObj.label,
       amount: itemPrice
     });
@@ -835,9 +923,7 @@
     const bill = calculateBill(subtotal);
     if (bill.finalAmount <= 0) return;
 
-    // Refresh live UPI intent href right on click
     document.getElementById("upi-intent-link").href = buildLiveUpiUri(seller, bill.finalAmount);
-
     paymentInitiated = true;
     document.getElementById("payment-verify-step").classList.remove("hidden");
   }
@@ -900,7 +986,35 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function sendOrderToSeller() {
+  function subscribeToCustomerNotification(phone) {
+    const cleanPhone = (phone || "").trim();
+    if (!cleanPhone) return;
+
+    if (activeNotifRef && activeNotifCallback) {
+      off(activeNotifRef, "value", activeNotifCallback);
+    }
+
+    activeNotifRef = ref(db, `customerNotification/${cleanPhone}`);
+    activeNotifCallback = (snapshot) => {
+      const notif = snapshot.val();
+      if (!notif) return;
+      const key = JSON.stringify(notif);
+      if (key === lastAppliedLiveStatusKey) return;
+      lastAppliedLiveStatusKey = key;
+
+      if (notif.status === "accepted") {
+        showStatusBanner("✅ दुकानदार ने ऑर्डर स्वीकार कर लिया है!", notif.msg || "आपका ऑर्डर स्वीकार कर लिया गया है।");
+      } else if (notif.status === "rejected") {
+        showStatusBanner("❌ दुकानदार ने ऑर्डर अस्वीकार कर दिया है!", notif.msg || "दुकानदार ने यह ऑर्डर अस्वीकार कर दिया है।");
+      } else if (notif.msg) {
+        showStatusBanner("📢 दुकानदार का अपडेट", notif.msg);
+      }
+    };
+
+    onValue(activeNotifRef, activeNotifCallback);
+  }
+
+  async function sendOrderToSeller() {
     if (!paymentConfirmed || !paymentInitiated) return;
     if (cart.length === 0) return;
 
@@ -928,17 +1042,29 @@
     const now = new Date();
     const orderId = "ORD-" + Date.now().toString().slice(-6);
 
+    const formattedItems = cart.map(item => ({
+      name: item.hiName || item.name,
+      qty: item.qty || 1,
+      qtyText: item.qtyText || item.weightLabel,
+      price: item.price || item.amount,
+      amount: item.amount
+    }));
+
     const liveOrderPayload = {
       orderId,
       sellerId: seller.id,
       shopName: seller.shopName,
+      customerName: "ग्राहक",
       customerPhone: phoneVal,
+      customerAddress: locVal,
       customerLocation: locVal,
+      distance: "",
       date: now.toLocaleDateString("hi-IN"),
       time: now.toLocaleTimeString("hi-IN"),
-      items: [...cart],
+      items: formattedItems,
       subtotal: bill.subtotal,
       discount: bill.discountAmount,
+      totalAmount: bill.finalAmount,
       paidAmount: bill.finalAmount,
       sellerResponse: null
     };
@@ -947,21 +1073,18 @@
     lastSentOrderItems = [...cart];
     lastAppliedLiveStatusKey = "";
 
+    subscribeToCustomerNotification(phoneVal);
+
+    try {
+      await push(ref(db, "orders"), liveOrderPayload);
+    } catch (e) {}
+
     try {
       const existing = JSON.parse(localStorage.getItem(LIVE_CONFIG.storageKey) || "{}");
       existing.latestOrder = liveOrderPayload;
       localStorage.setItem(LIVE_CONFIG.storageKey, JSON.stringify(existing));
     } catch (e) {}
 
-    if (LIVE_CONFIG.feedUrl) {
-      fetch(LIVE_CONFIG.feedUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "NEW_ORDER", order: liveOrderPayload })
-      }).catch(() => {});
-    }
-
-    // Set top notification banner and open popup right on click
     showStatusBanner(
       "📩 ऑर्डर दुकानदार को भेज दिया गया है!",
       "आपका ऑर्डर दुकानदार ने स्वीकार किया है या नहीं, ऊपर नोटिफिकेशन में चेक कर लें।"
@@ -969,105 +1092,98 @@
     openOrderSentModal();
   }
 
-  function applySellerResponseToBanner(responseObj) {
-    if (!responseObj || !lastSentOrderId) return;
-    if (responseObj.orderId && responseObj.orderId !== lastSentOrderId) return;
+  function applyFirebaseShopSettings(shopData) {
+    if (!shopData) return;
 
-    const key = JSON.stringify(responseObj);
-    if (key === lastAppliedLiveStatusKey) return;
-    lastAppliedLiveStatusKey = key;
+    const currentBase = SELLERS[0] || {
+      id: "ajay",
+      shopName: "अजय स्टोर",
+      ownerName: "अजय कुमार",
+      phone: "9997077062",
+      upiId: "8218231811@nyes",
+      offerText: "",
+      minOrder10: 200,
+      discount10: 10,
+      minOrder5: 150,
+      discount5: 5,
+      vegetables: []
+    };
 
-    if (responseObj.status === "accept") {
-      const acceptedList = (responseObj.acceptedItems || lastSentOrderItems)
-        .map(i => `${i.name} (${i.weightLabel})`)
-        .join(", ");
-      showStatusBanner(
-        "✅ दुकानदार ने पूरा ऑर्डर स्वीकार कर लिया है!",
-        `स्वीकृत सब्ज़ियाँ: ${acceptedList}।`
-      );
-    } else if (responseObj.status === "partial") {
-      const acceptedList = (responseObj.acceptedItems || [])
-        .map(i => `${i.name} (${i.weightLabel})`)
-        .join(", ") || "कोई नहीं";
-      const removedList = (responseObj.removedItems || [])
-        .map(i => `${i.name} (${i.weightLabel})`)
-        .join(", ") || "कोई नहीं";
-      showStatusBanner(
-        "⚠️ दुकानदार ने आंशिक ऑर्डर स्वीकार किया है!",
-        `स्वीकृत सब्ज़ियाँ: ${acceptedList} | हटाई गई सब्ज़ियाँ: ${removedList}।`
-      );
-    } else if (responseObj.status === "reject") {
-      showStatusBanner(
-        "❌ दुकानदार ने ऑर्डर अस्वीकार कर दिया है!",
-        responseObj.reason || "दुकानदार ने यह ऑर्डर अस्वीकार कर दिया है।"
-      );
-    }
-  }
+    const liveVegetables = convertCatalogToVegetables(shopData.catalog);
+    const updatedSeller = {
+      ...currentBase,
+      upiId: shopData.upi || currentBase.upiId,
+      phone: shopData.whatsapp || currentBase.phone,
+      offerText: shopData.offerText || currentBase.offerText,
+      vegetables: liveVegetables.length > 0 ? liveVegetables : currentBase.vegetables
+    };
 
-  function applyLiveStoreData(data) {
-    if (!data) return;
+    SELLERS = [updatedSeller, ...SELLERS.slice(1)];
+    renderSellerList();
 
-    let catalogChanged = false;
+    if (activeSellerId) {
+      const activeSeller = getActiveSeller();
+      if (activeSeller) {
+        document.getElementById("shop-call-link").href = `tel:${activeSeller.phone}`;
+        document.getElementById("offer-banner").textContent = activeSeller.offerText;
+        renderVegetables();
+        const updatedBill = renderCartAndBill();
 
-    if (Array.isArray(data.sellers) && data.sellers.length > 0) {
-      SELLERS = data.sellers.map(s => ({
-        ...s,
-        vegetables: (s.vegetables || []).map(v => ({
-          ...v,
-          img: v.img || makeVegSvg(v.emoji || "🥬", v.bgColor || "#e8f5e9")
-        }))
-      }));
-      catalogChanged = true;
-    }
-
-    if (catalogChanged) {
-      renderSellerList();
-      if (activeSellerId) {
-        const currentSeller = getActiveSeller();
-        if (currentSeller) {
-          document.getElementById("shop-call-link").href = `tel:${currentSeller.phone}`;
-          document.getElementById("offer-banner").textContent = currentSeller.offerText;
-          renderVegetables();
-          const updatedBill = renderCartAndBill();
-
-          if (!document.getElementById("qr-section").classList.contains("hidden") && updatedBill.finalAmount > 0) {
-            const upiUri = buildLiveUpiUri(currentSeller, updatedBill.finalAmount);
-            document.getElementById("qr-image").src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
-            document.getElementById("upi-intent-link").href = upiUri;
-            document.getElementById("qr-summary").textContent =
-              `${currentSeller.shopName} | UPI: ${currentSeller.upiId} | कुल देय राशि: ₹${updatedBill.finalAmount}`;
-          }
+        if (!document.getElementById("qr-section").classList.contains("hidden") && updatedBill.finalAmount > 0) {
+          const upiUri = buildLiveUpiUri(activeSeller, updatedBill.finalAmount);
+          document.getElementById("qr-image").src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
+          document.getElementById("upi-intent-link").href = upiUri;
+          document.getElementById("qr-summary").textContent =
+            `${activeSeller.shopName} | UPI: ${activeSeller.upiId} | कुल देय राशि: ₹${updatedBill.finalAmount}`;
         }
       }
     }
-
-    if (data.sellerResponse) {
-      applySellerResponseToBanner(data.sellerResponse);
-    }
   }
 
-  async function pollLiveFeed() {
-    try {
-      const localRaw = localStorage.getItem(LIVE_CONFIG.storageKey);
-      if (localRaw) {
-        applyLiveStoreData(JSON.parse(localRaw));
-      }
-    } catch (e) {}
+  // Expose handlers to inline HTML events
+  window.openSeller = openSeller;
+  window.goBackToSellers = goBackToSellers;
+  window.addVegToCart = addVegToCart;
+  window.removeCartItem = removeCartItem;
+  window.generatePaymentQR = generatePaymentQR;
+  window.startPaymentFlow = startPaymentFlow;
+  window.confirmPaymentCompleted = confirmPaymentCompleted;
+  window.detectLocation = detectLocation;
+  window.dismissStatusBanner = dismissStatusBanner;
+  window.closeOrderSentModalAndScrollTop = closeOrderSentModalAndScrollTop;
+  window.sendOrderToSeller = sendOrderToSeller;
+  window.subscribeToCustomerNotification = subscribeToCustomerNotification;
 
-    if (LIVE_CONFIG.feedUrl) {
-      try {
-        const res = await fetch(LIVE_CONFIG.feedUrl, { cache: "no-store" });
-        if (res.ok) {
-          const remoteData = await res.json();
-          applyLiveStoreData(remoteData);
-        }
-      } catch (e) {}
+  // Start directly on live store catalog and listen to Firebase Realtime Database
+  openSeller("ajay");
+  onValue(ref(db, "shopSettings"), (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      applyFirebaseShopSettings(data);
     }
-  }
+  });
 
-  renderSellerList();
-  pollLiveFeed();
-  setInterval(pollLiveFeed, LIVE_CONFIG.pollIntervalMs);
+  // =========================================================================
+  // USER CUSTOM UPDATES / PLUGINS (आगे के अपडेट यहाँ सीधे पेस्ट करें)
+  // =========================================================================
+  window.applyUserCustomUpdate = function(databaseRef, helpers) {
+    // जब भी नया अपडेट दूँगा, उसका कोड यहाँ पेस्ट कर दीजिएगा
+  };
+
+  try {
+    window.applyUserCustomUpdate(db, {
+      ref,
+      onValue,
+      set,
+      push,
+      getActiveSeller,
+      renderVegetables,
+      renderCartAndBill,
+      showStatusBanner
+    });
+  } catch (err) {
+    console.error("Custom update error:", err);
+  }
 </script>
 </body>
 </html>
