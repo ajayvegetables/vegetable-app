@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ताज़ा सब्ज़ी बाज़ार</title>
+  <title>ऑनलाइन स्टोर - ताज़ा सब्ज़ी बाज़ार</title>
   <meta name="theme-color" content="#2e7d32" />
   <style>
     * { box-sizing: border-box; }
@@ -13,7 +13,7 @@
       margin: 0;
       padding: 8px;
       color: #222;
-      padding-bottom: 40px;
+      padding-bottom: 50px;
     }
     .app-wrap {
       max-width: 500px;
@@ -22,6 +22,7 @@
       border-radius: 10px;
       overflow: hidden;
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      position: relative;
     }
     .topbar {
       display: flex;
@@ -36,11 +37,14 @@
       font-size: 16px;
       font-weight: bold;
       line-height: 1.2;
+      text-align: center;
+      flex: 1;
     }
     .icon-btn {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      justify-content: center;
+      gap: 4px;
       background: rgba(255,255,255,0.18);
       color: #fff;
       text-decoration: none;
@@ -55,6 +59,7 @@
     .icon-btn.call-shop {
       background: #1565c0;
       border-color: #90caf9;
+      padding: 6px 10px;
     }
     .icon-btn.help-call {
       background: #c62828;
@@ -63,13 +68,62 @@
     .screen { padding: 12px; }
     .hidden { display: none; }
 
+    /* Seller Status Notification Banner with Close (X) */
+    .status-notify-box {
+      background: #fff3cd;
+      border: 2px solid #ff9800;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    }
+    .status-notify-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .status-notify-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #bf360c;
+      line-height: 1.35;
+    }
+    .status-notify-body {
+      font-size: 14.5px;
+      font-weight: bold;
+      color: #222;
+      margin-top: 6px;
+      line-height: 1.45;
+    }
+    .close-notify-btn {
+      background: #c62828;
+      color: #fff;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
     .section-heading {
       font-size: 15px;
       font-weight: bold;
       color: #1b5e20;
-      margin: 0 0 10px;
+      margin: 0 0 8px;
       padding-bottom: 6px;
       border-bottom: 2px solid #c8e6c9;
+    }
+
+    .offer-heading {
+      font-size: 17px;
+      font-weight: bold;
+      color: #d84315;
+      margin: 4px 0 6px;
     }
 
     /* Seller List Cards */
@@ -119,12 +173,17 @@
       background: #e8f5e9;
       border: 1px solid #a5d6a7;
       border-radius: 8px;
-      padding: 10px;
+      padding: 8px 10px;
       margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 8px;
+    }
+    .seller-compact-info {
+      font-size: 12px;
+      color: #2e5a31;
+      line-height: 1.35;
     }
     .back-btn {
       background: #fff;
@@ -135,6 +194,7 @@
       font-size: 12px;
       font-weight: bold;
       cursor: pointer;
+      white-space: nowrap;
     }
     .offer-banner {
       background: linear-gradient(135deg, #ef6c00, #d84315);
@@ -281,16 +341,84 @@
       background: #2e7d32;
       color: #fff;
       text-decoration: none;
-      padding: 8px 14px;
+      padding: 9px 14px;
       border-radius: 6px;
       font-size: 13px;
       font-weight: bold;
+      cursor: pointer;
+      border: none;
+    }
+
+    /* Post-Payment Send Order Section */
+    .send-order-box {
+      margin-top: 14px;
+      background: #e8f5e9;
+      border: 2px solid #2e7d32;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: left;
+    }
+    .input-field {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      font-size: 12.5px;
+    }
+    .send-order-line-btn {
+      width: 100%;
+      margin-top: 10px;
+      background: #2e7d32;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14.5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .slip-preview {
+      margin-top: 10px;
+      background: #fff;
+      border: 1px dashed #2e7d32;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre-line;
     }
     .note-small {
       font-size: 11.5px;
       color: #555;
       margin-top: 6px;
       line-height: 1.4;
+    }
+
+    /* Demo Seller Simulator Box (bottom helper for testing accept/reject/partial) */
+    .sim-box {
+      margin-top: 16px;
+      background: #f1f5f9;
+      border: 1px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 11.5px;
+      color: #334155;
+    }
+    .sim-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .sim-btn {
+      padding: 5px 8px;
+      border: none;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #fff;
     }
   </style>
 </head>
@@ -300,7 +428,8 @@
   <!-- SCREEN 1: SELLER LIST -->
   <div id="seller-screen">
     <div class="topbar">
-      <div class="brand-title">🥬 सब्ज़ी दुकानदार सूची</div>
+      <div style="width:60px;"></div>
+      <div class="brand-title">ऑनलाइन स्टोर</div>
       <a href="tel:9997077062" class="icon-btn help-call" aria-label="हेल्प कॉल">
         <span>📞</span>
         <span>हेल्प</span>
@@ -313,14 +442,14 @@
     </div>
   </div>
 
-  <!-- SCREEN 2: SELLER CATALOG, BILL & UPI QR -->
+  <!-- SCREEN 2: SELLER CATALOG, BILL, UPI QR & POST-PAYMENT ORDER -->
   <div id="catalog-screen" class="hidden">
     <div class="topbar">
       <a id="shop-call-link" href="#" class="icon-btn call-shop" title="दुकानदार को कॉल करें">
         <span>🏪</span>
         <span>📞</span>
-        <span id="top-shop-name">दुकान</span>
       </a>
+      <div class="brand-title">ऑनलाइन स्टोर</div>
       <a href="tel:9997077062" class="icon-btn help-call" title="ऐप सहायता के लिए कॉल करें">
         <span>📞</span>
         <span>हेल्प</span>
@@ -328,14 +457,25 @@
     </div>
 
     <div class="screen">
+      <!-- Top Big Customer Notification Banner (with X close button) -->
+      <div id="customer-status-banner" class="status-notify-box hidden">
+        <div class="status-notify-header">
+          <div id="status-banner-title" class="status-notify-title"></div>
+          <button class="close-notify-btn" onclick="dismissStatusBanner()" title="बंद करें">✕</button>
+        </div>
+        <div id="status-banner-body" class="status-notify-body"></div>
+      </div>
+
+      <!-- Compact Seller Info Box (hidden seller details inside) -->
       <div class="seller-active-box">
-        <div>
-          <div id="active-seller-title" class="seller-name"></div>
-          <div id="active-seller-phone" class="seller-meta"></div>
+        <div class="seller-compact-info">
+          <span id="active-seller-compact"></span>
         </div>
         <button class="back-btn" onclick="goBackToSellers()">दुकान बदलें</button>
       </div>
 
+      <!-- Offer व शर्तें Heading above the Offer Box -->
+      <div class="offer-heading">ऑफर व शर्तें</div>
       <div id="offer-banner" class="offer-banner"></div>
 
       <div class="section-heading">सब्ज़ियाँ चुनें (वज़न के अनुसार)</div>
@@ -367,9 +507,46 @@
         <div style="font-weight:bold; font-size:14px; color:#bf360c;">UPI QR कोड से भुगतान करें</div>
         <div id="qr-summary" style="font-size:13px; margin-top:4px; font-weight:bold;"></div>
         <img id="qr-image" class="qr-img" alt="UPI QR Code" />
-        <a id="upi-intent-link" href="#" class="upi-direct-btn">UPI ऐप से सीधे भुगतान करें</a>
+        <a id="upi-intent-link" href="#" class="upi-direct-btn" onclick="onPaymentInitiated()">
+          UPI ऐप से सीधे भुगतान करें
+        </a>
         <div class="note-small">
           QR स्कैन करने पर दुकानदार की UPI ID और ऑफर के बाद की पक्की राशि अपने आप भर जाएगी।
+        </div>
+      </div>
+
+      <!-- Shown ONLY after payment action/confirmation -->
+      <div id="post-payment-section" class="send-order-box hidden">
+        <div style="font-weight:bold; font-size:14px; color:#1b5e20;">
+          भुगतान के बाद पक्की पर्ची तैयार है
+        </div>
+
+        <input id="customer-phone-input" type="tel" class="input-field" placeholder="अपना मोबाइल नंबर लिखें (वैकल्पिक)" />
+        <input id="customer-location-input" type="text" class="input-field" placeholder="अपना पता / लोकेशन लिखें या GPS लें" />
+        <button type="button" class="back-btn" style="margin-top:6px;" onclick="detectLocation()">
+          📍 लोकेशन ऑटो-भरें
+        </button>
+
+        <button id="send-order-btn" class="send-order-line-btn" onclick="sendOrderToSeller()">
+          दुकानदार को ऑर्डर भेजें
+        </button>
+
+        <div id="order-slip-box" class="slip-preview hidden"></div>
+      </div>
+
+      <!-- Demo Simulation Controls to test Seller Accept / Reject / Partial Accept -->
+      <div id="seller-sim-box" class="sim-box hidden">
+        <strong>दुकानदार रिस्पॉन्स टेस्ट (डेमो):</strong>
+        <div class="sim-btns">
+          <button class="sim-btn" style="background:#2e7d32;" onclick="simulateSellerResponse('accept')">
+            पूरा ऑर्डर स्वीकार
+          </button>
+          <button class="sim-btn" style="background:#ef6c00;" onclick="simulateSellerResponse('partial')">
+            आधी सब्ज़ियाँ स्वीकार / बाकी हटाईं
+          </button>
+          <button class="sim-btn" style="background:#c62828;" onclick="simulateSellerResponse('reject')">
+            ऑर्डर अस्वीकार
+          </button>
         </div>
       </div>
     </div>
@@ -378,7 +555,6 @@
 </div>
 
 <script>
-  // SVG फोटो बनाने का हेल्पर ताकि ऑफलाइन/ऑनलाइन हर जगह साफ़ फोटो दिखे
   function makeVegSvg(emoji, bgColor) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">
       <rect width="120" height="120" rx="16" fill="${bgColor}"/>
@@ -401,16 +577,14 @@
     { label: "10 किलो", kg: 10.00 }
   ];
 
-  // दुकानदारों का डेटा (आप यहाँ और दुकानदार जोड़ सकते हैं)
   const SELLERS = [
     {
       id: "ajay",
-      shopName: "अजय वेजिटेबल स्टोर",
+      shopName: "अजय स्टोर",
       ownerName: "अजय कुमार",
       phone: "9876543210",
       upiId: "ajayvegetables@okaxis",
-      // ऑफर नियम: यदि बिल >= 200 तो 10% छूट, वरना यदि >= 150 तो 5% छूट, वरना 0%
-      offerText: "ऑफर व शर्तें लागू: ₹200 या उससे अधिक की खरीद पर 10% छूट | ₹150 से ₹199 तक 5% छूट | ₹150 से कम पर कोई अतिरिक्त छूट नहीं।",
+      offerText: "₹200 या उससे अधिक की खरीद पर 10% छूट | ₹150 से ₹199 तक 5% छूट | ₹150 से कम पर कोई अतिरिक्त छूट नहीं।",
       minOrder10: 200,
       discount10: 10,
       minOrder5: 150,
@@ -425,11 +599,11 @@
     },
     {
       id: "ramesh",
-      shopName: "रमेश ताज़ा सब्ज़ी भंडार",
+      shopName: "रमेश भंडार",
       ownerName: "रमेश शर्मा",
       phone: "9811122233",
       upiId: "rameshveg@okicici",
-      offerText: "ऑफर व शर्तें लागू: ₹200 या अधिक की सब्ज़ी पर 10% छूट | शर्तें लागू।",
+      offerText: "₹200 या अधिक की सब्ज़ी पर 10% छूट।",
       minOrder10: 200,
       discount10: 10,
       minOrder5: 999999,
@@ -445,6 +619,7 @@
 
   let activeSeller = null;
   let cart = [];
+  let lastSentOrder = null;
 
   function renderSellerList() {
     const container = document.getElementById("seller-list");
@@ -454,7 +629,7 @@
           <div class="seller-avatar">🏪</div>
           <div>
             <div class="seller-name">${seller.shopName}</div>
-            <div class="seller-meta">दुकानदार: ${seller.ownerName}</div>
+            <div class="seller-meta">${seller.ownerName}</div>
           </div>
         </div>
         <button class="select-btn" onclick="openSeller('${seller.id}')">दुकान खोलें</button>
@@ -465,16 +640,19 @@
   function openSeller(sellerId) {
     activeSeller = SELLERS.find(s => s.id === sellerId);
     cart = [];
+    lastSentOrder = null;
+
     document.getElementById("qr-section").classList.add("hidden");
+    document.getElementById("post-payment-section").classList.add("hidden");
+    document.getElementById("order-slip-box").classList.add("hidden");
+    document.getElementById("seller-sim-box").classList.add("hidden");
 
     document.getElementById("seller-screen").classList.add("hidden");
     document.getElementById("catalog-screen").classList.remove("hidden");
 
-    // ऑटोमैटिक दुकानदार का नाम, नंबर और कॉल लिंक सेट करना
-    document.getElementById("top-shop-name").textContent = activeSeller.shopName;
     document.getElementById("shop-call-link").href = `tel:${activeSeller.phone}`;
-    document.getElementById("active-seller-title").textContent = `🏪 ${activeSeller.shopName} (${activeSeller.ownerName})`;
-    document.getElementById("active-seller-phone").textContent = `फ़ोन: ${activeSeller.phone}`;
+    document.getElementById("active-seller-compact").textContent =
+      `🏪 ${activeSeller.shopName} • ${activeSeller.ownerName} • 📞 ${activeSeller.phone}`;
     document.getElementById("offer-banner").textContent = activeSeller.offerText;
 
     renderVegetables();
@@ -484,6 +662,7 @@
   function goBackToSellers() {
     activeSeller = null;
     cart = [];
+    lastSentOrder = null;
     document.getElementById("catalog-screen").classList.add("hidden");
     document.getElementById("seller-screen").classList.remove("hidden");
   }
@@ -524,12 +703,14 @@
     });
 
     document.getElementById("qr-section").classList.add("hidden");
+    document.getElementById("post-payment-section").classList.add("hidden");
     renderCartAndBill();
   }
 
   function removeCartItem(uid) {
     cart = cart.filter(item => item.uid !== uid);
     document.getElementById("qr-section").classList.add("hidden");
+    document.getElementById("post-payment-section").classList.add("hidden");
     renderCartAndBill();
   }
 
@@ -589,8 +770,6 @@
 
     const amountFixed = bill.finalAmount.toFixed(2);
     const upiUri = `upi://pay?pa=${encodeURIComponent(activeSeller.upiId)}&pn=${encodeURIComponent(activeSeller.shopName)}&am=${encodeURIComponent(amountFixed)}&cu=INR&tn=${encodeURIComponent("Vegetable Order")}`;
-
-    // QR इमेज जनरेट करना (फिक्स अमाउंट के साथ)
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
 
     document.getElementById("qr-image").src = qrUrl;
@@ -598,6 +777,113 @@
     document.getElementById("qr-summary").textContent =
       `${activeSeller.shopName} | कुल देय राशि: ₹${bill.finalAmount}`;
     document.getElementById("qr-section").classList.remove("hidden");
+
+    // Reveal post-payment order option once user initiates payment flow
+    document.getElementById("post-payment-section").classList.remove("hidden");
+  }
+
+  function onPaymentInitiated() {
+    document.getElementById("post-payment-section").classList.remove("hidden");
+  }
+
+  function detectLocation() {
+    const locInput = document.getElementById("customer-location-input");
+    if (!navigator.geolocation) {
+      locInput.value = "लोकेशन उपलब्ध नहीं (कृपया मैन्युअल लिखें)";
+      return;
+    }
+    locInput.value = "लोकेशन खोजी जा रही है...";
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        locInput.value = `Lat: ${pos.coords.latitude.toFixed(5)}, Lng: ${pos.coords.longitude.toFixed(5)}`;
+      },
+      () => {
+        locInput.value = "लोकेशन अनुमति नहीं मिली (पता टाइप करें)";
+      }
+    );
+  }
+
+  function showStatusBanner(title, body) {
+    document.getElementById("status-banner-title").textContent = title;
+    document.getElementById("status-banner-body").textContent = body;
+    document.getElementById("customer-status-banner").classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function dismissStatusBanner() {
+    document.getElementById("customer-status-banner").classList.add("hidden");
+  }
+
+  function sendOrderToSeller() {
+    if (cart.length === 0) return;
+
+    const subtotal = cart.reduce((sum, item) => sum + item.amount, 0);
+    const bill = calculateBill(subtotal);
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("hi-IN");
+    const timeStr = now.toLocaleTimeString("hi-IN");
+    const phoneVal = document.getElementById("customer-phone-input").value.trim() || "नहीं दिया गया";
+    const locVal = document.getElementById("customer-location-input").value.trim() || "नहीं दी गई";
+
+    const itemsText = cart.map((c, i) => `${i + 1}. ${c.name} - ${c.weightLabel} (₹${c.amount})`).join("\n");
+    const slipText =
+`🧾 लाइव ऑर्डर पर्ची
+दुकान: ${activeSeller.shopName}
+दिनांक व समय: ${dateStr} | ${timeStr}
+ग्राहक फ़ोन: ${phoneVal}
+लोकेशन: ${locVal}
+-------------------------
+आइटम सूची:
+${itemsText}
+-------------------------
+कुल राशि: ₹${bill.subtotal}
+छूट: - ₹${bill.discountAmount}
+देय / भुगतान राशि: ₹${bill.finalAmount}`;
+
+    lastSentOrder = {
+      items: [...cart],
+      slipText,
+      finalAmount: bill.finalAmount
+    };
+
+    const slipBox = document.getElementById("order-slip-box");
+    slipBox.textContent = slipText;
+    slipBox.classList.remove("hidden");
+
+    // Show big notification prompt asking customer to check whether seller accepted
+    showStatusBanner(
+      "📩 ऑर्डर दुकानदार को भेज दिया गया है!",
+      "कृपया जांचें: आपका ऑर्डर दुकानदार ने स्वीकार किया है या नहीं। दुकानदार का जवाब आते ही यहाँ बड़े अक्षरों में दिख जाएगा।"
+    );
+
+    // Show demo seller response buttons so user can test accept / partial / reject
+    document.getElementById("seller-sim-box").classList.remove("hidden");
+  }
+
+  function simulateSellerResponse(type) {
+    if (!lastSentOrder) return;
+    const items = lastSentOrder.items;
+
+    if (type === "accept") {
+      const names = items.map(i => `${i.name} (${i.weightLabel})`).join(", ");
+      showStatusBanner(
+        "✅ दुकानदार ने पूरा ऑर्डर स्वीकार कर लिया है!",
+        `स्वीकृत सब्ज़ियाँ: ${names}। कुल राशि: ₹${lastSentOrder.finalAmount}।`
+      );
+    } else if (type === "partial") {
+      const half = Math.max(1, Math.ceil(items.length / 2));
+      const accepted = items.slice(0, half).map(i => `${i.name} (${i.weightLabel})`).join(", ");
+      const removed = items.slice(half).map(i => `${i.name} (${i.weightLabel})`).join(", ");
+      showStatusBanner(
+        "⚠️ दुकानदार ने आंशिक ऑर्डर स्वीकार किया है!",
+        `स्वीकृत सब्ज़ियाँ: ${accepted || "कोई नहीं"} | हटाई गई सब्ज़ियाँ: ${removed || "कोई नहीं"}।`
+      );
+    } else if (type === "reject") {
+      showStatusBanner(
+        "❌ दुकानदार ने ऑर्डर अस्वीकार कर दिया है!",
+        "कृपया दुकानदार से कॉल पर संपर्क करें या दूसरी दुकान चुनें।"
+      );
+    }
   }
 
   renderSellerList();
