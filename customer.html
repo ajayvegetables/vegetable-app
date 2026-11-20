@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ऑनलाइन स्टोर - ताज़ा सब्ज़ी बाज़ार</title>
+  <title>ऑनलाइन स्टोर</title>
   <meta name="theme-color" content="#2e7d32" />
   <style>
     * { box-sizing: border-box; }
@@ -22,7 +22,6 @@
       border-radius: 10px;
       overflow: hidden;
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-      position: relative;
     }
     .topbar {
       display: flex;
@@ -59,7 +58,6 @@
     .icon-btn.call-shop {
       background: #1565c0;
       border-color: #90caf9;
-      padding: 6px 10px;
     }
     .icon-btn.help-call {
       background: #c62828;
@@ -68,14 +66,14 @@
     .screen { padding: 12px; }
     .hidden { display: none; }
 
-    /* Seller Status Notification Banner with Close (X) */
+    /* Top Big Customer Notification Banner with Close (X) */
     .status-notify-box {
       background: #fff3cd;
       border: 2px solid #ff9800;
       border-radius: 10px;
       padding: 12px;
       margin-bottom: 12px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.14);
     }
     .status-notify-header {
       display: flex;
@@ -84,15 +82,15 @@
       gap: 8px;
     }
     .status-notify-title {
-      font-size: 16px;
+      font-size: 16.5px;
       font-weight: bold;
       color: #bf360c;
       line-height: 1.35;
     }
     .status-notify-body {
-      font-size: 14.5px;
+      font-size: 15px;
       font-weight: bold;
-      color: #222;
+      color: #1b1b1b;
       margin-top: 6px;
       line-height: 1.45;
     }
@@ -100,8 +98,8 @@
       background: #c62828;
       color: #fff;
       border: none;
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       font-size: 16px;
       font-weight: bold;
@@ -110,15 +108,21 @@
       line-height: 1;
     }
 
+    .section-heading-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 4px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #c8e6c9;
+      gap: 8px;
+    }
     .section-heading {
       font-size: 15px;
       font-weight: bold;
       color: #1b5e20;
-      margin: 0 0 8px;
-      padding-bottom: 6px;
-      border-bottom: 2px solid #c8e6c9;
+      margin: 0;
     }
-
     .offer-heading {
       font-size: 17px;
       font-weight: bold;
@@ -168,28 +172,11 @@
       cursor: pointer;
     }
 
-    /* Active Seller Info & Offer Banner */
-    .seller-active-box {
-      background: #e8f5e9;
-      border: 1px solid #a5d6a7;
-      border-radius: 8px;
-      padding: 8px 10px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
-    .seller-compact-info {
-      font-size: 12px;
-      color: #2e5a31;
-      line-height: 1.35;
-    }
     .back-btn {
       background: #fff;
       color: #2e7d32;
       border: 1px solid #2e7d32;
-      padding: 5px 9px;
+      padding: 5px 10px;
       border-radius: 5px;
       font-size: 12px;
       font-weight: bold;
@@ -349,8 +336,8 @@
       border: none;
     }
 
-    /* Post-Payment Send Order Section */
-    .send-order-box {
+    /* Post-Payment Section (Strict: only after payment confirmed) */
+    .post-payment-box {
       margin-top: 14px;
       background: #e8f5e9;
       border: 2px solid #2e7d32;
@@ -361,10 +348,11 @@
     .input-field {
       width: 100%;
       padding: 8px;
-      margin-top: 6px;
+      margin-top: 8px;
       border: 1px solid #bbb;
       border-radius: 6px;
-      font-size: 12.5px;
+      font-size: 13px;
+      background: #fff;
     }
     .send-order-line-btn {
       width: 100%;
@@ -378,16 +366,6 @@
       font-weight: bold;
       cursor: pointer;
     }
-    .slip-preview {
-      margin-top: 10px;
-      background: #fff;
-      border: 1px dashed #2e7d32;
-      border-radius: 6px;
-      padding: 10px;
-      font-size: 12px;
-      line-height: 1.5;
-      white-space: pre-line;
-    }
     .note-small {
       font-size: 11.5px;
       color: #555;
@@ -395,7 +373,7 @@
       line-height: 1.4;
     }
 
-    /* Demo Seller Simulator Box (bottom helper for testing accept/reject/partial) */
+    /* Demo Seller Response Simulator (only visible after sending order) */
     .sim-box {
       margin-top: 16px;
       background: #f1f5f9;
@@ -437,7 +415,9 @@
     </div>
 
     <div class="screen">
-      <div class="section-heading">अपना मनपसंद दुकानदार चुनें</div>
+      <div class="section-heading-row">
+        <div class="section-heading">अपना मनपसंद दुकानदार चुनें</div>
+      </div>
       <div id="seller-list"></div>
     </div>
   </div>
@@ -466,23 +446,21 @@
         <div id="status-banner-body" class="status-notify-body"></div>
       </div>
 
-      <!-- Compact Seller Info Box (hidden seller details inside) -->
-      <div class="seller-active-box">
-        <div class="seller-compact-info">
-          <span id="active-seller-compact"></span>
-        </div>
-        <button class="back-btn" onclick="goBackToSellers()">दुकान बदलें</button>
-      </div>
-
       <!-- Offer व शर्तें Heading above the Offer Box -->
       <div class="offer-heading">ऑफर व शर्तें</div>
       <div id="offer-banner" class="offer-banner"></div>
 
-      <div class="section-heading">सब्ज़ियाँ चुनें (वज़न के अनुसार)</div>
+      <!-- Just above vegetables: Heading on left, "दुकान बदलें" on right -->
+      <div class="section-heading-row">
+        <div class="section-heading">सब्ज़ियाँ चुनें (वज़न के अनुसार)</div>
+        <button class="back-btn" onclick="goBackToSellers()">दुकान बदलें</button>
+      </div>
       <div id="veg-list"></div>
 
       <div class="box">
-        <div class="section-heading" style="margin-bottom:6px;">आपका बिल (Cart)</div>
+        <div class="section-heading" style="margin-bottom:8px; padding-bottom:6px; border-bottom:2px solid #c8e6c9;">
+          आपका बिल (Cart)
+        </div>
         <div id="cart-items" class="note-small">अभी कोई सब्ज़ी नहीं जोड़ी गई है।</div>
 
         <div class="bill-line">
@@ -507,36 +485,37 @@
         <div style="font-weight:bold; font-size:14px; color:#bf360c;">UPI QR कोड से भुगतान करें</div>
         <div id="qr-summary" style="font-size:13px; margin-top:4px; font-weight:bold;"></div>
         <img id="qr-image" class="qr-img" alt="UPI QR Code" />
-        <a id="upi-intent-link" href="#" class="upi-direct-btn" onclick="onPaymentInitiated()">
+        <a id="upi-intent-link" href="#" class="upi-direct-btn" onclick="handleUpiAppClick()">
           UPI ऐप से सीधे भुगतान करें
         </a>
         <div class="note-small">
-          QR स्कैन करने पर दुकानदार की UPI ID और ऑफर के बाद की पक्की राशि अपने आप भर जाएगी।
+          QR स्कैन करने या UPI ऐप से भुगतान करने के बाद नीचे "भुगतान पूरा हुआ" दबाएं।
         </div>
+        <button type="button" class="pay-btn" style="background:#2e7d32; margin-top:10px;" onclick="confirmPaymentDone()">
+          मैंने भुगतान कर दिया है (आगे बढ़ें)
+        </button>
       </div>
 
-      <!-- Shown ONLY after payment action/confirmation -->
-      <div id="post-payment-section" class="send-order-box hidden">
-        <div style="font-weight:bold; font-size:14px; color:#1b5e20;">
-          भुगतान के बाद पक्की पर्ची तैयार है
+      <!-- STRICTLY SHOWN ONLY AFTER PAYMENT IS CONFIRMED -->
+      <div id="post-payment-section" class="post-payment-box hidden">
+        <div style="font-weight:bold; font-size:14.5px; color:#1b5e20;">
+          भुगतान पूरा हुआ — विवरण भरकर ऑर्डर भेजें
         </div>
 
-        <input id="customer-phone-input" type="tel" class="input-field" placeholder="अपना मोबाइल नंबर लिखें (वैकल्पिक)" />
-        <input id="customer-location-input" type="text" class="input-field" placeholder="अपना पता / लोकेशन लिखें या GPS लें" />
-        <button type="button" class="back-btn" style="margin-top:6px;" onclick="detectLocation()">
+        <input id="customer-phone-input" type="tel" class="input-field" placeholder="अपना मोबाइल नंबर लिखें *" />
+        <input id="customer-location-input" type="text" class="input-field" placeholder="अपना पता / लोकेशन लिखें *" />
+        <button type="button" class="back-btn" style="margin-top:8px;" onclick="detectLocation()">
           📍 लोकेशन ऑटो-भरें
         </button>
 
         <button id="send-order-btn" class="send-order-line-btn" onclick="sendOrderToSeller()">
           दुकानदार को ऑर्डर भेजें
         </button>
-
-        <div id="order-slip-box" class="slip-preview hidden"></div>
       </div>
 
-      <!-- Demo Simulation Controls to test Seller Accept / Reject / Partial Accept -->
+      <!-- Demo Simulation Controls (shown only after sending order to test live status updates) -->
       <div id="seller-sim-box" class="sim-box hidden">
-        <strong>दुकानदार रिस्पॉन्स टेस्ट (डेमो):</strong>
+        <strong>दुकानदार लाइव जवाब टेस्ट (डेमो):</strong>
         <div class="sim-btns">
           <button class="sim-btn" style="background:#2e7d32;" onclick="simulateSellerResponse('accept')">
             पूरा ऑर्डर स्वीकार
@@ -555,6 +534,15 @@
 </div>
 
 <script>
+  // Live Feed Configuration:
+  // यदि आपके पास कोई JSON API या Firebase/WebSocket URL है, तो LIVE_FEED_URL में डालें।
+  // साथ ही localStorage में "ONLINE_STORE_LIVE_DATA" अपडेट करने पर भी यह तुरंत लाइव अपडेट होगा।
+  const LIVE_CONFIG = {
+    feedUrl: "", // उदाहरण: "https://your-backend.example.com/api/store-state"
+    pollIntervalMs: 5000,
+    storageKey: "ONLINE_STORE_LIVE_DATA_V1"
+  };
+
   function makeVegSvg(emoji, bgColor) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">
       <rect width="120" height="120" rx="16" fill="${bgColor}"/>
@@ -577,7 +565,7 @@
     { label: "10 किलो", kg: 10.00 }
   ];
 
-  const SELLERS = [
+  let SELLERS = [
     {
       id: "ajay",
       shopName: "अजय स्टोर",
@@ -617,9 +605,16 @@
     }
   ];
 
-  let activeSeller = null;
+  let activeSellerId = null;
   let cart = [];
-  let lastSentOrder = null;
+  let paymentCompleted = false;
+  let lastSentOrderId = null;
+  let lastSentOrderItems = [];
+  let lastAppliedLiveStatusKey = "";
+
+  function getActiveSeller() {
+    return SELLERS.find(s => s.id === activeSellerId) || null;
+  }
 
   function renderSellerList() {
     const container = document.getElementById("seller-list");
@@ -637,61 +632,79 @@
     `).join("");
   }
 
-  function openSeller(sellerId) {
-    activeSeller = SELLERS.find(s => s.id === sellerId);
-    cart = [];
-    lastSentOrder = null;
-
+  function resetCheckoutState() {
+    paymentCompleted = false;
+    lastSentOrderId = null;
+    lastSentOrderItems = [];
     document.getElementById("qr-section").classList.add("hidden");
     document.getElementById("post-payment-section").classList.add("hidden");
-    document.getElementById("order-slip-box").classList.add("hidden");
     document.getElementById("seller-sim-box").classList.add("hidden");
+  }
+
+  function openSeller(sellerId) {
+    activeSellerId = sellerId;
+    cart = [];
+    resetCheckoutState();
+    dismissStatusBanner();
+
+    const seller = getActiveSeller();
+    if (!seller) return;
 
     document.getElementById("seller-screen").classList.add("hidden");
     document.getElementById("catalog-screen").classList.remove("hidden");
 
-    document.getElementById("shop-call-link").href = `tel:${activeSeller.phone}`;
-    document.getElementById("active-seller-compact").textContent =
-      `🏪 ${activeSeller.shopName} • ${activeSeller.ownerName} • 📞 ${activeSeller.phone}`;
-    document.getElementById("offer-banner").textContent = activeSeller.offerText;
+    document.getElementById("shop-call-link").href = `tel:${seller.phone}`;
+    document.getElementById("offer-banner").textContent = seller.offerText;
 
     renderVegetables();
     renderCartAndBill();
   }
 
   function goBackToSellers() {
-    activeSeller = null;
+    activeSellerId = null;
     cart = [];
-    lastSentOrder = null;
+    resetCheckoutState();
+    dismissStatusBanner();
     document.getElementById("catalog-screen").classList.add("hidden");
     document.getElementById("seller-screen").classList.remove("hidden");
   }
 
   function renderVegetables() {
+    const seller = getActiveSeller();
+    if (!seller) return;
+
     const list = document.getElementById("veg-list");
     const optionsHtml = WEIGHT_OPTIONS.map((w, idx) =>
       `<option value="${idx}" ${w.kg === 1 ? "selected" : ""}>${w.label}</option>`
     ).join("");
 
-    list.innerHTML = activeSeller.vegetables.map(veg => `
-      <div class="veg-card">
-        <img src="${veg.img}" alt="${veg.hi}" class="veg-img" />
-        <div class="veg-info">
-          <div class="veg-hi">${veg.hi}</div>
-          <div class="veg-en">${veg.en}</div>
-          <div class="veg-rate">₹${veg.ratePerKg} / किलो</div>
+    list.innerHTML = seller.vegetables.map(veg => {
+      const imgSrc = veg.img || makeVegSvg("🥬", "#e8f5e9");
+      return `
+        <div class="veg-card">
+          <img src="${imgSrc}" alt="${veg.hi}" class="veg-img" />
+          <div class="veg-info">
+            <div class="veg-hi">${veg.hi}</div>
+            <div class="veg-en">${veg.en}</div>
+            <div class="veg-rate">₹${veg.ratePerKg} / किलो</div>
+          </div>
+          <div class="veg-controls">
+            <select id="weight-${veg.id}" class="weight-select">${optionsHtml}</select>
+            <button class="add-btn" onclick="addVegToCart('${veg.id}')">+ जोड़ें</button>
+          </div>
         </div>
-        <div class="veg-controls">
-          <select id="weight-${veg.id}" class="weight-select">${optionsHtml}</select>
-          <button class="add-btn" onclick="addVegToCart('${veg.id}')">+ जोड़ें</button>
-        </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
   }
 
   function addVegToCart(vegId) {
-    const veg = activeSeller.vegetables.find(v => v.id === vegId);
-    const weightObj = WEIGHT_OPTIONS[parseInt(document.getElementById(`weight-${vegId}`).value, 10) || 6];
+    const seller = getActiveSeller();
+    if (!seller) return;
+    const veg = seller.vegetables.find(v => v.id === vegId);
+    if (!veg) return;
+
+    const selectEl = document.getElementById(`weight-${vegId}`);
+    const weightObj = WEIGHT_OPTIONS[parseInt(selectEl ? selectEl.value : 6, 10) || 6];
     const itemPrice = Math.round(veg.ratePerKg * weightObj.kg);
 
     cart.push({
@@ -702,28 +715,31 @@
       amount: itemPrice
     });
 
-    document.getElementById("qr-section").classList.add("hidden");
-    document.getElementById("post-payment-section").classList.add("hidden");
+    resetCheckoutState();
     renderCartAndBill();
   }
 
   function removeCartItem(uid) {
     cart = cart.filter(item => item.uid !== uid);
-    document.getElementById("qr-section").classList.add("hidden");
-    document.getElementById("post-payment-section").classList.add("hidden");
+    resetCheckoutState();
     renderCartAndBill();
   }
 
   function calculateBill(subtotal) {
+    const seller = getActiveSeller();
+    if (!seller) {
+      return { subtotal, discountAmount: 0, finalAmount: subtotal, ruleAppliedText: "कोई ऑफर लागू नहीं" };
+    }
+
     let discountPercent = 0;
     let ruleAppliedText = "कोई ऑफर लागू नहीं";
 
-    if (subtotal >= activeSeller.minOrder10 && activeSeller.discount10 > 0) {
-      discountPercent = activeSeller.discount10;
-      ruleAppliedText = `ऑफर लागू (₹${activeSeller.minOrder10}+ पर ${discountPercent}% छूट)`;
-    } else if (subtotal >= activeSeller.minOrder5 && activeSeller.discount5 > 0) {
-      discountPercent = activeSeller.discount5;
-      ruleAppliedText = `ऑफर लागू (₹${activeSeller.minOrder5}+ पर ${discountPercent}% छूट)`;
+    if (subtotal >= seller.minOrder10 && seller.discount10 > 0) {
+      discountPercent = seller.discount10;
+      ruleAppliedText = `ऑफर लागू (₹${seller.minOrder10}+ पर ${discountPercent}% छूट)`;
+    } else if (subtotal >= seller.minOrder5 && seller.discount5 > 0) {
+      discountPercent = seller.discount5;
+      ruleAppliedText = `ऑफर लागू (₹${seller.minOrder5}+ पर ${discountPercent}% छूट)`;
     }
 
     const discountAmount = Math.round((subtotal * discountPercent) / 100);
@@ -764,42 +780,67 @@
   }
 
   function generatePaymentQR() {
+    const seller = getActiveSeller();
+    if (!seller || cart.length === 0) return;
+
     const subtotal = cart.reduce((sum, item) => sum + item.amount, 0);
     const bill = calculateBill(subtotal);
     if (bill.finalAmount <= 0) return;
 
+    paymentCompleted = false;
+    document.getElementById("post-payment-section").classList.add("hidden");
+    document.getElementById("seller-sim-box").classList.add("hidden");
+
     const amountFixed = bill.finalAmount.toFixed(2);
-    const upiUri = `upi://pay?pa=${encodeURIComponent(activeSeller.upiId)}&pn=${encodeURIComponent(activeSeller.shopName)}&am=${encodeURIComponent(amountFixed)}&cu=INR&tn=${encodeURIComponent("Vegetable Order")}`;
+    const upiUri = `upi://pay?pa=${encodeURIComponent(seller.upiId)}&pn=${encodeURIComponent(seller.shopName)}&am=${encodeURIComponent(amountFixed)}&cu=INR&tn=${encodeURIComponent("Vegetable Order")}`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
 
     document.getElementById("qr-image").src = qrUrl;
     document.getElementById("upi-intent-link").href = upiUri;
     document.getElementById("qr-summary").textContent =
-      `${activeSeller.shopName} | कुल देय राशि: ₹${bill.finalAmount}`;
+      `${seller.shopName} | कुल देय राशि: ₹${bill.finalAmount}`;
     document.getElementById("qr-section").classList.remove("hidden");
-
-    // Reveal post-payment order option once user initiates payment flow
-    document.getElementById("post-payment-section").classList.remove("hidden");
   }
 
-  function onPaymentInitiated() {
+  function handleUpiAppClick() {
+    // UPI ऐप खुलने के बाद भी यूज़र को "मैंने भुगतान कर दिया है (आगे बढ़ें)" दबाने पर पक्का आगे बढ़ाया जाएगा
+  }
+
+  function confirmPaymentDone() {
+    paymentCompleted = true;
     document.getElementById("post-payment-section").classList.remove("hidden");
+    document.getElementById("post-payment-section").scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   function detectLocation() {
     const locInput = document.getElementById("customer-location-input");
     if (!navigator.geolocation) {
-      locInput.value = "लोकेशन उपलब्ध नहीं (कृपया मैन्युअल लिखें)";
+      locInput.value = "";
+      locInput.placeholder = "इस डिवाइस में GPS उपलब्ध नहीं, कृपया पता लिखें";
       return;
     }
     locInput.value = "लोकेशन खोजी जा रही है...";
     navigator.geolocation.getCurrentPosition(
-      pos => {
-        locInput.value = `Lat: ${pos.coords.latitude.toFixed(5)}, Lng: ${pos.coords.longitude.toFixed(5)}`;
+      async pos => {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lng = pos.coords.longitude.toFixed(6);
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+          if (res.ok) {
+            const data = await res.json();
+            locInput.value = data.display_name || `Lat: ${lat}, Lng: ${lng}`;
+          } else {
+            locInput.value = `Lat: ${lat}, Lng: ${lng}`;
+          }
+        } catch (e) {
+          locInput.value = `Lat: ${lat}, Lng: ${lng}`;
+        }
       },
       () => {
-        locInput.value = "लोकेशन अनुमति नहीं मिली (पता टाइप करें)";
-      }
+        locInput.value = "";
+        locInput.placeholder = "लोकेशन अनुमति नहीं मिली, कृपया अपना पता लिखें";
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
     );
   }
 
@@ -815,78 +856,194 @@
   }
 
   function sendOrderToSeller() {
+    if (!paymentCompleted) {
+      showStatusBanner(
+        "⚠️ पहले भुगतान पूरा करें",
+        "भुगतान पूरा करने के बाद ही मोबाइल नंबर, लोकेशन और ऑर्डर भेजने का विकल्प सक्रिय होता है।"
+      );
+      return;
+    }
     if (cart.length === 0) return;
 
+    const phoneInput = document.getElementById("customer-phone-input");
+    const locInput = document.getElementById("customer-location-input");
+    const phoneVal = phoneInput.value.trim();
+    const locVal = locInput.value.trim();
+
+    if (!phoneVal) {
+      phoneInput.focus();
+      showStatusBanner("📱 मोबाइल नंबर ज़रूरी है", "ऑर्डर भेजने से पहले कृपया अपना मोबाइल नंबर लिखें।");
+      return;
+    }
+    if (!locVal) {
+      locInput.focus();
+      showStatusBanner("📍 लोकेशन ज़रूरी है", "ऑर्डर भेजने से पहले कृपया अपना पता या लोकेशन भरें।");
+      return;
+    }
+
+    const seller = getActiveSeller();
     const subtotal = cart.reduce((sum, item) => sum + item.amount, 0);
     const bill = calculateBill(subtotal);
     const now = new Date();
-    const dateStr = now.toLocaleDateString("hi-IN");
-    const timeStr = now.toLocaleTimeString("hi-IN");
-    const phoneVal = document.getElementById("customer-phone-input").value.trim() || "नहीं दिया गया";
-    const locVal = document.getElementById("customer-location-input").value.trim() || "नहीं दी गई";
+    const orderId = "ORD-" + Date.now().toString().slice(-6);
 
-    const itemsText = cart.map((c, i) => `${i + 1}. ${c.name} - ${c.weightLabel} (₹${c.amount})`).join("\n");
-    const slipText =
-`🧾 लाइव ऑर्डर पर्ची
-दुकान: ${activeSeller.shopName}
-दिनांक व समय: ${dateStr} | ${timeStr}
-ग्राहक फ़ोन: ${phoneVal}
-लोकेशन: ${locVal}
--------------------------
-आइटम सूची:
-${itemsText}
--------------------------
-कुल राशि: ₹${bill.subtotal}
-छूट: - ₹${bill.discountAmount}
-देय / भुगतान राशि: ₹${bill.finalAmount}`;
-
-    lastSentOrder = {
+    const liveOrderPayload = {
+      orderId,
+      sellerId: seller.id,
+      shopName: seller.shopName,
+      customerPhone: phoneVal,
+      customerLocation: locVal,
+      date: now.toLocaleDateString("hi-IN"),
+      time: now.toLocaleTimeString("hi-IN"),
       items: [...cart],
-      slipText,
-      finalAmount: bill.finalAmount
+      subtotal: bill.subtotal,
+      discount: bill.discountAmount,
+      paidAmount: bill.finalAmount,
+      sellerResponse: null
     };
 
-    const slipBox = document.getElementById("order-slip-box");
-    slipBox.textContent = slipText;
-    slipBox.classList.remove("hidden");
+    lastSentOrderId = orderId;
+    lastSentOrderItems = [...cart];
+    lastAppliedLiveStatusKey = "";
 
-    // Show big notification prompt asking customer to check whether seller accepted
+    // Save latest order in localStorage for live sync
+    try {
+      const existing = JSON.parse(localStorage.getItem(LIVE_CONFIG.storageKey) || "{}");
+      existing.latestOrder = liveOrderPayload;
+      localStorage.setItem(LIVE_CONFIG.storageKey, JSON.stringify(existing));
+    } catch (e) {}
+
+    // If live backend URL is configured, send live order slip
+    if (LIVE_CONFIG.feedUrl) {
+      fetch(LIVE_CONFIG.feedUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "NEW_ORDER", order: liveOrderPayload })
+      }).catch(() => {});
+    }
+
+    // Top banner popup message as requested
     showStatusBanner(
       "📩 ऑर्डर दुकानदार को भेज दिया गया है!",
-      "कृपया जांचें: आपका ऑर्डर दुकानदार ने स्वीकार किया है या नहीं। दुकानदार का जवाब आते ही यहाँ बड़े अक्षरों में दिख जाएगा।"
+      "आपका ऑर्डर दुकानदार स्वीकार किया है या नहीं, ऊपर नोटिफिकेशन में चेक कर लें।"
     );
 
-    // Show demo seller response buttons so user can test accept / partial / reject
+    // Show demo response simulator below so user can test accept / partial / reject
     document.getElementById("seller-sim-box").classList.remove("hidden");
   }
 
-  function simulateSellerResponse(type) {
-    if (!lastSentOrder) return;
-    const items = lastSentOrder.items;
+  function applySellerResponseToBanner(responseObj) {
+    if (!responseObj || !lastSentOrderId) return;
+    if (responseObj.orderId && responseObj.orderId !== lastSentOrderId) return;
 
-    if (type === "accept") {
-      const names = items.map(i => `${i.name} (${i.weightLabel})`).join(", ");
+    const key = JSON.stringify(responseObj);
+    if (key === lastAppliedLiveStatusKey) return;
+    lastAppliedLiveStatusKey = key;
+
+    if (responseObj.status === "accept") {
+      const acceptedList = (responseObj.acceptedItems || lastSentOrderItems)
+        .map(i => `${i.name} (${i.weightLabel})`)
+        .join(", ");
       showStatusBanner(
         "✅ दुकानदार ने पूरा ऑर्डर स्वीकार कर लिया है!",
-        `स्वीकृत सब्ज़ियाँ: ${names}। कुल राशि: ₹${lastSentOrder.finalAmount}।`
+        `स्वीकृत सब्ज़ियाँ: ${acceptedList}।`
       );
-    } else if (type === "partial") {
-      const half = Math.max(1, Math.ceil(items.length / 2));
-      const accepted = items.slice(0, half).map(i => `${i.name} (${i.weightLabel})`).join(", ");
-      const removed = items.slice(half).map(i => `${i.name} (${i.weightLabel})`).join(", ");
+    } else if (responseObj.status === "partial") {
+      const acceptedList = (responseObj.acceptedItems || [])
+        .map(i => `${i.name} (${i.weightLabel})`)
+        .join(", ") || "कोई नहीं";
+      const removedList = (responseObj.removedItems || [])
+        .map(i => `${i.name} (${i.weightLabel})`)
+        .join(", ") || "कोई नहीं";
       showStatusBanner(
         "⚠️ दुकानदार ने आंशिक ऑर्डर स्वीकार किया है!",
-        `स्वीकृत सब्ज़ियाँ: ${accepted || "कोई नहीं"} | हटाई गई सब्ज़ियाँ: ${removed || "कोई नहीं"}।`
+        `स्वीकृत सब्ज़ियाँ: ${acceptedList} | हटाई गई सब्ज़ियाँ: ${removedList}।`
       );
-    } else if (type === "reject") {
+    } else if (responseObj.status === "reject") {
       showStatusBanner(
         "❌ दुकानदार ने ऑर्डर अस्वीकार कर दिया है!",
-        "कृपया दुकानदार से कॉल पर संपर्क करें या दूसरी दुकान चुनें।"
+        responseObj.reason || "दुकानदार ने यह ऑर्डर अस्वीकार कर दिया है।"
       );
     }
   }
 
+  function simulateSellerResponse(type) {
+    if (!lastSentOrderId || lastSentOrderItems.length === 0) return;
+
+    let resp = { orderId: lastSentOrderId, status: type };
+    if (type === "accept") {
+      resp.acceptedItems = [...lastSentOrderItems];
+    } else if (type === "partial") {
+      const half = Math.max(1, Math.ceil(lastSentOrderItems.length / 2));
+      resp.acceptedItems = lastSentOrderItems.slice(0, half);
+      resp.removedItems = lastSentOrderItems.slice(half);
+    }
+
+    try {
+      const existing = JSON.parse(localStorage.getItem(LIVE_CONFIG.storageKey) || "{}");
+      existing.sellerResponse = resp;
+      localStorage.setItem(LIVE_CONFIG.storageKey, JSON.stringify(existing));
+    } catch (e) {}
+
+    applySellerResponseToBanner(resp);
+  }
+
+  function applyLiveStoreData(data) {
+    if (!data) return;
+
+    let catalogChanged = false;
+
+    if (Array.isArray(data.sellers) && data.sellers.length > 0) {
+      SELLERS = data.sellers.map(s => ({
+        ...s,
+        vegetables: (s.vegetables || []).map(v => ({
+          ...v,
+          img: v.img || makeVegSvg(v.emoji || "🥬", v.bgColor || "#e8f5e9")
+        }))
+      }));
+      catalogChanged = true;
+    }
+
+    if (catalogChanged) {
+      renderSellerList();
+      if (activeSellerId) {
+        const currentSeller = getActiveSeller();
+        if (currentSeller) {
+          document.getElementById("shop-call-link").href = `tel:${currentSeller.phone}`;
+          document.getElementById("offer-banner").textContent = currentSeller.offerText;
+          renderVegetables();
+          renderCartAndBill();
+        }
+      }
+    }
+
+    if (data.sellerResponse) {
+      applySellerResponseToBanner(data.sellerResponse);
+    }
+  }
+
+  async function pollLiveFeed() {
+    try {
+      const localRaw = localStorage.getItem(LIVE_CONFIG.storageKey);
+      if (localRaw) {
+        applyLiveStoreData(JSON.parse(localRaw));
+      }
+    } catch (e) {}
+
+    if (LIVE_CONFIG.feedUrl) {
+      try {
+        const res = await fetch(LIVE_CONFIG.feedUrl, { cache: "no-store" });
+        if (res.ok) {
+          const remoteData = await res.json();
+          applyLiveStoreData(remoteData);
+        }
+      } catch (e) {}
+    }
+  }
+
   renderSellerList();
+  pollLiveFeed();
+  setInterval(pollLiveFeed, LIVE_CONFIG.pollIntervalMs);
 </script>
 </body>
 </html>
