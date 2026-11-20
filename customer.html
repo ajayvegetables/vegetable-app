@@ -483,7 +483,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 1: SELLER LIST (Open directly without any login/OTP) -->
+  <!-- SCREEN 1: SELLER LIST -->
   <div id="seller-screen">
     <div class="topbar">
       <div style="width:60px;"></div>
@@ -610,6 +610,7 @@
   const MASTER_HELP_PHONE = "9997077062";
   const SELLER_PREF_ORDER_KEY = "CUSTOMER_PREFERRED_SELLER_ORDER_V1";
   const CUSTOMER_PROFILE_KEY = "CUSTOMER_SAVED_PROFILE_V1";
+  const ACTIVE_SELLER_STATE_KEY = "CUSTOMER_ACTIVE_SELLER_ID_V1";
 
   const firebaseConfig = {
     apiKey: "AIzaSyD4LjOqIsKMH7ZOpAbMginqDuybiSIOFs",
@@ -660,6 +661,50 @@
     "केला": "Banana",
     "आम": "Mango"
   };
+
+  function readShopIdFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const shopParam = params.get("shop");
+      return shopParam ? String(shopParam) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function writeShopIdToUrl(id) {
+    try {
+      const url = new URL(window.location.href);
+      if (id) {
+        url.searchParams.set("shop", String(id));
+      } else {
+        url.searchParams.delete("shop");
+      }
+      window.history.replaceState({}, "", url.toString());
+    } catch (e) {}
+  }
+
+  function getSavedActiveSellerId() {
+    const fromUrl = readShopIdFromUrl();
+    if (fromUrl) return fromUrl;
+    try {
+      const id = localStorage.getItem(ACTIVE_SELLER_STATE_KEY);
+      return id ? String(id) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveActiveSellerId(id) {
+    try {
+      if (id) {
+        localStorage.setItem(ACTIVE_SELLER_STATE_KEY, String(id));
+      } else {
+        localStorage.removeItem(ACTIVE_SELLER_STATE_KEY);
+      }
+    } catch (e) {}
+    writeShopIdToUrl(id);
+  }
 
   function getSavedCustomerProfile() {
     try {
@@ -826,7 +871,7 @@
   ];
 
   let SELLERS = [];
-  let activeSellerId = null;
+  let activeSellerId = getSavedActiveSellerId();
   let cart = [];
   let paymentInitiated = false;
   let paymentConfirmed = false;
@@ -896,7 +941,7 @@
 
   function getActiveSeller() {
     if (!activeSellerId) return null;
-    return SELLERS.find(s => s.id === activeSellerId) || null;
+    return SELLERS.find(s => String(s.id) === String(activeSellerId)) || null;
   }
 
   function renderSellerList() {
@@ -963,17 +1008,36 @@
     }
   }
 
-  function openSeller(sellerId) {
-    activeSellerId = sellerId;
-    cart = [];
-    resetPaymentAndOrderFlow();
-    dismissStatusBanner();
-
-    const seller = getActiveSeller();
-    if (!seller) return;
-
+  function showCatalogScreen() {
     document.getElementById("seller-screen").classList.add("hidden");
     document.getElementById("catalog-screen").classList.remove("hidden");
+  }
+
+  function showSellerListScreen() {
+    document.getElementById("catalog-screen").classList.add("hidden");
+    document.getElementById("seller-screen").classList.remove("hidden");
+  }
+
+  function openSeller(sellerId, isResume = false) {
+    const isSwitchingSeller = activeSellerId !== null && String(activeSellerId) !== String(sellerId);
+    activeSellerId = String(sellerId);
+    saveActiveSellerId(activeSellerId);
+
+    if (!isResume && isSwitchingSeller) {
+      cart = [];
+      resetPaymentAndOrderFlow();
+      dismissStatusBanner();
+    }
+
+    showCatalogScreen();
+
+    const seller = getActiveSeller();
+    if (!seller) {
+      document.getElementById("veg-list").innerHTML = `<div class="note-small">दुकान की लाइव कैटलॉग लोड हो रही है...</div>`;
+      renderCartAndBill();
+      enforceMasterHelpNumber();
+      return;
+    }
 
     syncShopHeaderAndQr(seller);
     renderVegetables();
@@ -982,12 +1046,34 @@
 
   function goBackToSellers() {
     activeSellerId = null;
+    saveActiveSellerId(null);
     cart = [];
     resetPaymentAndOrderFlow();
     dismissStatusBanner();
-    document.getElementById("catalog-screen").classList.add("hidden");
-    document.getElementById("seller-screen").classList.remove("hidden");
+    showSellerListScreen();
     enforceMasterHelpNumber();
+  }
+
+  function restoreLastScreenState() {
+    const savedId = getSavedActiveSellerId();
+    if (savedId) {
+      activeSellerId = String(savedId);
+      writeShopIdToUrl(activeSellerId);
+      showCatalogScreen();
+      const seller = getActiveSeller();
+      if (seller) {
+        syncShopHeaderAndQr(seller);
+        renderVegetables();
+        renderCartAndBill();
+      } else {
+        document.getElementById("veg-list").innerHTML = `<div class="note-small">दुकान की लाइव कैटलॉग लोड हो रही है...</div>`;
+        renderCartAndBill();
+        enforceMasterHelpNumber();
+      }
+    } else {
+      showSellerListScreen();
+      enforceMasterHelpNumber();
+    }
   }
 
   function renderVegetables() {
@@ -999,6 +1085,12 @@
       list.innerHTML = `<div class="note-small">लाइव कैटलॉग लोड हो रही है...</div>`;
       return;
     }
+
+    const prevSelectedWeights = {};
+    seller.vegetables.forEach(veg => {
+      const el = document.getElementById(`weight-${veg.id}`);
+      if (el) prevSelectedWeights[veg.id] = el.value;
+    });
 
     const optionsHtml = WEIGHT_OPTIONS.map((w, idx) =>
       `<option value="${idx}" ${w.kg === 1 ? "selected" : ""}>${w.label}</option>`
@@ -1032,6 +1124,11 @@
         </div>
       `;
     }).join("");
+
+    Object.keys(prevSelectedWeights).forEach(vegId => {
+      const el = document.getElementById(`weight-${vegId}`);
+      if (el) el.value = prevSelectedWeights[vegId];
+    });
   }
 
   function addVegToCart(vegId) {
@@ -1441,6 +1538,9 @@
     renderSellerList();
 
     const currentSeller = getActiveSeller();
+    if (activeSellerId) {
+      showCatalogScreen();
+    }
     if (currentSeller) {
       syncShopHeaderAndQr(currentSeller);
       renderVegetables();
@@ -1465,8 +1565,7 @@
   window.moveSellerByOffset = moveSellerByOffset;
   window.setSellerRankPosition = setSellerRankPosition;
 
-  // Always start on Seller List Screen (no login/OTP) and restore saved customer profile
-  goBackToSellers();
+  restoreLastScreenState();
   renderSellerList();
   autofillCustomerDetails(false);
 
