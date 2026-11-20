@@ -304,6 +304,7 @@
     .veg-hi { font-size: 14px; font-weight: bold; color: #222; }
     .veg-en { font-size: 12px; color: #666; }
     .veg-rate { font-size: 12px; font-weight: bold; color: #2e7d32; margin-top: 3px; }
+    .veg-mrp { font-size: 11px; color: #1565c0; font-weight: bold; margin-top: 1px; }
     .veg-stock-ok { font-size: 11px; color: #2e7d32; font-weight: bold; margin-top: 2px; }
     .veg-stock-out { font-size: 11px; color: #c62828; font-weight: bold; margin-top: 2px; }
     .veg-controls {
@@ -792,6 +793,7 @@
         if (!hiName) return null;
         const enName = item.en || hindiToEnglishMap[hiName] || hiName;
         const rate = parseFloat(item.price) || 0;
+        const mrp = item.mrp !== undefined && item.mrp !== "" ? (parseFloat(item.mrp) || rate) : rate;
         const stockQty = item.stock !== undefined ? parseFloat(item.stock) : 10;
         const isOut = Boolean(item.outOfStock) || stockQty <= 0;
         const visual = guessEmojiAndBg(hiName);
@@ -800,6 +802,7 @@
           hi: hiName,
           en: enName,
           ratePerKg: rate,
+          mrpPerKg: mrp,
           stock: stockQty,
           outOfStock: isOut,
           img: item.img || makeVegSvg(visual.emoji, visual.bg)
@@ -945,7 +948,7 @@
     const callNum = resolveSellerCallNumber(seller);
     const shopCallEl = document.getElementById("shop-call-link");
     shopCallEl.href = `tel:${callNum}`;
-    shopCallEl.title = `दुकानदार को कॉल करें (${callNum})`;
+    shopCallEl.title = `${seller.shopName} को कॉल करें (${callNum})`;
     document.getElementById("offer-banner").textContent = seller.offerText;
     enforceMasterHelpNumber();
 
@@ -1003,6 +1006,9 @@
 
     list.innerHTML = seller.vegetables.map(veg => {
       const imgSrc = veg.img || makeVegSvg("🥬", "#e8f5e9");
+      const mrpHtml = veg.mrpPerKg && veg.mrpPerKg > veg.ratePerKg
+        ? `<div class="veg-mrp">MRP: <span style="text-decoration:line-through;">₹${veg.mrpPerKg}/kg</span></div>`
+        : `<div class="veg-mrp">MRP: ₹${veg.mrpPerKg || veg.ratePerKg}/kg</div>`;
       const stockBadge = veg.outOfStock
         ? `<div class="veg-stock-out">स्टॉक में नहीं है</div>`
         : `<div class="veg-stock-ok">स्टॉक में उपलब्ध (${veg.stock} kg)</div>`;
@@ -1016,6 +1022,7 @@
             <div class="veg-hi">${veg.hi}</div>
             <div class="veg-en">${veg.en}</div>
             <div class="veg-rate">₹${veg.ratePerKg} / किलो</div>
+            ${mrpHtml}
             ${stockBadge}
           </div>
           <div class="veg-controls">
@@ -1045,6 +1052,7 @@
       qty: weightObj.kg,
       qtyText: weightObj.label,
       price: veg.ratePerKg,
+      mrp: veg.mrpPerKg || veg.ratePerKg,
       weightLabel: weightObj.label,
       amount: itemPrice
     });
@@ -1320,6 +1328,7 @@
       qty: item.qty || 1,
       qtyText: item.qtyText || item.weightLabel,
       price: item.price || item.amount,
+      mrp: item.mrp || item.price || item.amount,
       amount: item.amount
     }));
 
@@ -1407,7 +1416,7 @@
 
       const ajaySeller = {
         id: "ajay",
-        shopName: (latestShopSettingsNode.shopName || "अजय स्टोर").toString().trim(),
+        shopName: (latestShopSettingsNode.shopName || "अजय वेजिटेबल स्टोर").toString().trim(),
         ownerName: (latestShopSettingsNode.ownerName || "अजय कुमार").toString().trim(),
         whatsapp,
         phone: callPhone,
