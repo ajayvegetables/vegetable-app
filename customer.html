@@ -179,7 +179,7 @@
       margin: 4px 0 6px;
     }
 
-    /* Seller List Cards */
+    /* Seller List Cards + Priority Controls */
     .seller-card {
       display: flex;
       justify-content: space-between;
@@ -189,36 +189,73 @@
       border-radius: 8px;
       padding: 10px 12px;
       margin-bottom: 10px;
-      gap: 10px;
+      gap: 8px;
+    }
+    .seller-rank-badge {
+      background: #e8f5e9;
+      color: #1b5e20;
+      border: 1px solid #a5d6a7;
+      border-radius: 6px;
+      padding: 4px 7px;
+      font-size: 12px;
+      font-weight: bold;
+      flex-shrink: 0;
     }
     .seller-main {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       flex: 1;
+      min-width: 0;
     }
     .seller-avatar {
-      width: 42px;
-      height: 42px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       background: #e8f5e9;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
+      font-size: 20px;
       flex-shrink: 0;
     }
     .seller-name { font-size: 14px; font-weight: bold; color: #1b5e20; }
     .seller-meta { font-size: 12px; color: #555; margin-top: 2px; }
+    .seller-actions {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .rank-move-btn {
+      background: #fff;
+      color: #1b5e20;
+      border: 1px solid #81c784;
+      border-radius: 5px;
+      padding: 5px 7px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .rank-select {
+      padding: 4px 5px;
+      border: 1px solid #81c784;
+      border-radius: 5px;
+      font-size: 11.5px;
+      font-weight: bold;
+      background: #fff;
+      color: #1b5e20;
+    }
     .select-btn {
       background: #2e7d32;
       color: #fff;
       border: none;
-      padding: 8px 12px;
+      padding: 8px 10px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: bold;
       cursor: pointer;
+      white-space: nowrap;
     }
 
     .back-btn {
@@ -437,7 +474,7 @@
     <div class="modal-card">
       <div class="modal-title">ऑर्डर भेजा गया</div>
       <div class="modal-text">
-        आपका ऑर्डर दुकानदार ने स्वीकार किया है या नहीं, ऊपर चेक कर लें।
+        आपका ऑर्डर दुकानदार ने स्वीकार किया है या नहीं, ऊपर नोटिफिकेशन में चेक कर लें।
       </div>
       <button type="button" class="modal-ok-btn" onclick="closeOrderSentModalAndScrollTop()">
         ठीक है, ऊपर देखें
@@ -458,7 +495,10 @@
 
     <div class="screen">
       <div class="section-heading-row">
-        <div class="section-heading">अपना मनपसंद दुकानदार चुनें</div>
+        <div class="section-heading">अपना मनपसंद दुकानदार चुनें (नंबर से क्रम सेट करें)</div>
+      </div>
+      <div class="note-small" style="margin-top:0; margin-bottom:10px;">
+        अपनी पसंद के अनुसार #1, #2, #3 क्रम चुनें या ▲ ▼ से ऊपर-नीचे करें।
       </div>
       <div id="seller-list"></div>
     </div>
@@ -548,8 +588,9 @@
 
         <input id="customer-phone-input" type="tel" class="input-field" placeholder="अपना मोबाइल नंबर लिखें *" oninput="subscribeToCustomerNotification(this.value)" />
         <input id="customer-location-input" type="text" class="input-field" placeholder="अपना पता / लोकेशन लिखें *" />
+        <div id="customer-map-preview" class="note-small"></div>
         <button type="button" class="back-btn" style="margin-top:8px;" onclick="detectLocation()">
-          📍 लोकेशन ऑटो-भरें
+          📍 लोकेशन और लाइव मैप ऑटो-भरें
         </button>
 
         <button id="send-order-btn" class="send-order-line-btn" onclick="sendOrderToSeller()">
@@ -566,6 +607,7 @@
   import { getDatabase, ref, onValue, push, off } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
   const MASTER_HELP_PHONE = "9997077062";
+  const SELLER_PREF_ORDER_KEY = "CUSTOMER_PREFERRED_SELLER_ORDER_V1";
 
   const firebaseConfig = {
     apiKey: "AIzaSyD4LjOqIsKMH7ZOpAbMginqDuybiSIOFs",
@@ -718,23 +760,7 @@
     { label: "10 किलो", kg: 10.00 }
   ];
 
-  let SELLERS = [
-    {
-      id: "ajay",
-      shopName: "अजय स्टोर",
-      ownerName: "अजय कुमार",
-      whatsapp: "",
-      phone: resolveSellerCallNumber({ whatsapp: "", upiId: "8218231811@nyes" }),
-      upiId: "8218231811@nyes",
-      offerText: "₹200 या उससे अधिक की खरीद पर 10% छूट | ₹150 से ₹199 तक 5% छूट | ₹150 से कम पर कोई अतिरिक्त छूट नहीं।",
-      minOrder10: 200,
-      discount10: 10,
-      minOrder5: 150,
-      discount5: 5,
-      vegetables: []
-    }
-  ];
-
+  let SELLERS = [];
   let activeSellerId = null;
   let cart = [];
   let paymentInitiated = false;
@@ -744,6 +770,64 @@
   let activeNotifCallback = null;
   let latestSellersNode = null;
   let latestShopSettingsNode = null;
+  let customerCoords = null;
+  let customerMapUrl = "";
+
+  function getSavedSellerOrderIds() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(SELLER_PREF_ORDER_KEY) || "[]");
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveSellerOrderIds(ids) {
+    try {
+      localStorage.setItem(SELLER_PREF_ORDER_KEY, JSON.stringify(ids));
+    } catch (e) {}
+  }
+
+  function applyCustomerPreferredOrder(list) {
+    const savedIds = getSavedSellerOrderIds();
+    if (!savedIds.length) return list;
+
+    const indexMap = new Map();
+    savedIds.forEach((id, idx) => indexMap.set(String(id), idx));
+
+    return [...list].sort((a, b) => {
+      const rankA = indexMap.has(String(a.id)) ? indexMap.get(String(a.id)) : Number.MAX_SAFE_INTEGER;
+      const rankB = indexMap.has(String(b.id)) ? indexMap.get(String(b.id)) : Number.MAX_SAFE_INTEGER;
+      return rankA - rankB;
+    });
+  }
+
+  function moveSellerByOffset(sellerId, offset) {
+    const currentIds = SELLERS.map(s => String(s.id));
+    const idx = currentIds.indexOf(String(sellerId));
+    if (idx < 0) return;
+    const targetIdx = idx + offset;
+    if (targetIdx < 0 || targetIdx >= currentIds.length) return;
+
+    const [moved] = currentIds.splice(idx, 1);
+    currentIds.splice(targetIdx, 0, moved);
+    saveSellerOrderIds(currentIds);
+    SELLERS = applyCustomerPreferredOrder(SELLERS);
+    renderSellerList();
+  }
+
+  function setSellerRankPosition(sellerId, newPositionOneBased) {
+    const currentIds = SELLERS.map(s => String(s.id));
+    const idx = currentIds.indexOf(String(sellerId));
+    if (idx < 0) return;
+
+    const clampedTarget = Math.max(0, Math.min(currentIds.length - 1, Number(newPositionOneBased) - 1));
+    const [moved] = currentIds.splice(idx, 1);
+    currentIds.splice(clampedTarget, 0, moved);
+    saveSellerOrderIds(currentIds);
+    SELLERS = applyCustomerPreferredOrder(SELLERS);
+    renderSellerList();
+  }
 
   function getActiveSeller() {
     if (!activeSellerId) return null;
@@ -752,18 +836,37 @@
 
   function renderSellerList() {
     const container = document.getElementById("seller-list");
-    container.innerHTML = SELLERS.map(seller => `
-      <div class="seller-card">
-        <div class="seller-main">
-          <div class="seller-avatar">🏪</div>
-          <div>
-            <div class="seller-name">${seller.shopName}</div>
-            <div class="seller-meta">${seller.ownerName}</div>
+    if (!SELLERS || SELLERS.length === 0) {
+      container.innerHTML = `<div class="note-small">लाइव दुकानदारों की सूची लोड हो रही है...</div>`;
+      enforceMasterHelpNumber();
+      return;
+    }
+
+    const totalCount = SELLERS.length;
+    container.innerHTML = SELLERS.map((seller, idx) => {
+      const rankOptions = Array.from({ length: totalCount }, (_, i) => i + 1)
+        .map(num => `<option value="${num}" ${num === idx + 1 ? "selected" : ""}>#${num}</option>`)
+        .join("");
+
+      return `
+        <div class="seller-card">
+          <div class="seller-main">
+            <span class="seller-rank-badge">#${idx + 1}</span>
+            <div class="seller-avatar">🏪</div>
+            <div>
+              <div class="seller-name">${seller.shopName}</div>
+              <div class="seller-meta">${seller.ownerName}</div>
+            </div>
+          </div>
+          <div class="seller-actions">
+            <button type="button" class="rank-move-btn" title="ऊपर करें" onclick="moveSellerByOffset('${seller.id}', -1)" ${idx === 0 ? "disabled" : ""}>▲</button>
+            <button type="button" class="rank-move-btn" title="नीचे करें" onclick="moveSellerByOffset('${seller.id}', 1)" ${idx === totalCount - 1 ? "disabled" : ""}>▼</button>
+            <select class="rank-select" title="क्रम नंबर चुनें" onchange="setSellerRankPosition('${seller.id}', this.value)">${rankOptions}</select>
+            <button class="select-btn" onclick="openSeller('${seller.id}')">दुकान खोलें</button>
           </div>
         </div>
-        <button class="select-btn" onclick="openSeller('${seller.id}')">दुकान खोलें</button>
-      </div>
-    `).join("");
+      `;
+    }).join("");
     enforceMasterHelpNumber();
   }
 
@@ -786,7 +889,7 @@
 
     const subtotal = cart.reduce((sum, item) => sum + item.amount, 0);
     const bill = calculateBill(subtotal);
-    if (!document.getElementById("qr-section").classList.contains("hidden") && bill.finalAmount > 0) {
+    if (!document.getElementById("qr-section").classList.contains("hidden") && bill.finalAmount > 0 && seller.upiId) {
       const upiUri = buildLiveUpiUri(seller, bill.finalAmount);
       document.getElementById("qr-image").src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
       document.getElementById("upi-intent-link").href = upiUri;
@@ -962,6 +1065,12 @@
     const bill = calculateBill(subtotal);
     if (bill.finalAmount <= 0) return;
 
+    const upiAddress = (seller.upiId || "").trim();
+    if (!upiAddress) {
+      showStatusBanner("⚠️ दुकानदार की UPI ID उपलब्ध नहीं है", "कृपया दुकानदार से संपर्क करें या थोड़ी देर बाद प्रयास करें।");
+      return;
+    }
+
     paymentInitiated = false;
     paymentConfirmed = false;
     document.getElementById("payment-verify-step").classList.add("hidden");
@@ -973,7 +1082,7 @@
     document.getElementById("qr-image").src = qrUrl;
     document.getElementById("upi-intent-link").href = upiUri;
     document.getElementById("qr-summary").textContent =
-      `${seller.shopName} | UPI: ${seller.upiId} | कुल देय राशि: ₹${bill.finalAmount}`;
+      `${seller.shopName} | UPI: ${upiAddress} | कुल देय राशि: ₹${bill.finalAmount}`;
     document.getElementById("qr-section").classList.remove("hidden");
   }
 
@@ -982,7 +1091,7 @@
     if (!seller || cart.length === 0) return;
     const subtotal = cart.reduce((sum, item) => sum + item.amount, 0);
     const bill = calculateBill(subtotal);
-    if (bill.finalAmount <= 0) return;
+    if (bill.finalAmount <= 0 || !(seller.upiId || "").trim()) return;
 
     document.getElementById("upi-intent-link").href = buildLiveUpiUri(seller, bill.finalAmount);
     paymentInitiated = true;
@@ -998,31 +1107,47 @@
 
   function detectLocation() {
     const locInput = document.getElementById("customer-location-input");
+    const mapPreview = document.getElementById("customer-map-preview");
     if (!navigator.geolocation) {
       locInput.value = "";
       locInput.placeholder = "इस डिवाइस में GPS उपलब्ध नहीं, कृपया पता लिखें";
+      if (mapPreview) mapPreview.textContent = "";
       return;
     }
     locInput.value = "लोकेशन खोजी जा रही है...";
+    if (mapPreview) mapPreview.textContent = "लाइव मैप लोकेशन ली जा रही है...";
+
     navigator.geolocation.getCurrentPosition(
       async pos => {
-        const lat = pos.coords.latitude.toFixed(6);
-        const lng = pos.coords.longitude.toFixed(6);
+        const lat = Number(pos.coords.latitude);
+        const lng = Number(pos.coords.longitude);
+        const latStr = lat.toFixed(6);
+        const lngStr = lng.toFixed(6);
+        customerCoords = { lat, lng };
+        customerMapUrl = `https://www.google.com/maps?q=${latStr},${lngStr}`;
+
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latStr}&lon=${lngStr}`);
           if (res.ok) {
             const data = await res.json();
-            locInput.value = data.display_name || `Lat: ${lat}, Lng: ${lng}`;
+            locInput.value = data.display_name || `Lat: ${latStr}, Lng: ${lngStr}`;
           } else {
-            locInput.value = `Lat: ${lat}, Lng: ${lng}`;
+            locInput.value = `Lat: ${latStr}, Lng: ${lngStr}`;
           }
         } catch (e) {
-          locInput.value = `Lat: ${lat}, Lng: ${lng}`;
+          locInput.value = `Lat: ${latStr}, Lng: ${lngStr}`;
+        }
+
+        if (mapPreview) {
+          mapPreview.innerHTML = `मैप तैयार: <a href="${customerMapUrl}" target="_blank" rel="noopener noreferrer">लाइव मैप देखें (${latStr}, ${lngStr})</a>`;
         }
       },
       () => {
+        customerCoords = null;
+        customerMapUrl = "";
         locInput.value = "";
         locInput.placeholder = "लोकेशन अनुमति नहीं मिली, कृपया अपना पता लिखें";
+        if (mapPreview) mapPreview.textContent = "";
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
@@ -1104,6 +1229,7 @@
     const bill = calculateBill(subtotal);
     const now = new Date();
     const orderId = "ORD-" + Date.now().toString().slice(-6);
+    const mapUrl = customerMapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locVal)}`;
 
     const formattedItems = cart.map(item => ({
       name: item.hiName || item.name,
@@ -1121,6 +1247,10 @@
       customerPhone: phoneVal,
       customerAddress: locVal,
       customerLocation: locVal,
+      lat: customerCoords ? customerCoords.lat : null,
+      lng: customerCoords ? customerCoords.lng : null,
+      mapLocationUrl: mapUrl,
+      mapUrl: mapUrl,
       distance: "",
       date: now.toLocaleDateString("hi-IN"),
       time: now.toLocaleTimeString("hi-IN"),
@@ -1146,8 +1276,8 @@
     } catch (e) {}
 
     showStatusBanner(
-      "📩 ऑर्डर दुकानदार को भेज दिया गया है!",
-      "आपका ऑर्डर दुकानदार ने स्वीकार किया है या नहीं, ऊपर नोटिफिकेशन में चेक कर लें।"
+      "⏳ दुकानदार स्वीकार या रिजेक्ट कर रहा है — कृपया यहाँ देखें और इंतजार करें",
+      "ऑर्डर, आपका नंबर, लोकेशन और मैप दुकानदार को भेज दिए गए हैं। दुकानदार स्वीकार करेगा, अस्वीकार करेगा या कोई आइटम हटाएगा तो यहीं तुरंत दिख जाएगा।"
     );
     openOrderSentModal();
   }
@@ -1187,7 +1317,7 @@
 
     if (latestShopSettingsNode && typeof latestShopSettingsNode === "object") {
       const whatsapp = (latestShopSettingsNode.whatsapp || "").toString().trim();
-      const upiId = (latestShopSettingsNode.upi || latestShopSettingsNode.upiId || "8218231811@nyes").toString().trim();
+      const upiId = (latestShopSettingsNode.upi || latestShopSettingsNode.upiId || "").toString().trim();
       const callPhone = resolveSellerCallNumber({ whatsapp, phone: latestShopSettingsNode.phone, upiId });
       const liveVegetables = convertCatalogToVegetables(latestShopSettingsNode.catalog);
 
@@ -1214,10 +1344,7 @@
       }
     }
 
-    if (list.length > 0) {
-      SELLERS = list;
-    }
-
+    SELLERS = applyCustomerPreferredOrder(list);
     renderSellerList();
 
     const currentSeller = getActiveSeller();
@@ -1240,6 +1367,8 @@
   window.closeOrderSentModalAndScrollTop = closeOrderSentModalAndScrollTop;
   window.sendOrderToSeller = sendOrderToSeller;
   window.subscribeToCustomerNotification = subscribeToCustomerNotification;
+  window.moveSellerByOffset = moveSellerByOffset;
+  window.setSellerRankPosition = setSellerRankPosition;
 
   // Always start on Seller List Screen (no login/OTP)
   goBackToSellers();
