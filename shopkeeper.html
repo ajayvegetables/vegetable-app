@@ -29,6 +29,7 @@
         .gear-icon-btn { background: #0277bd; color: white; padding: 4px 9px; border-radius: 10px; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid #b3e5fc; box-shadow: 0 1px 4px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
 
         .status-bar { text-align: center; background: #ffe0b2; padding: 6px; border-radius: 4px; font-weight: bold; margin-bottom: 8px; color: #bf360c; font-size: 11px; }
+        .seller-id-badge { text-align: center; background: #e8f5e9; border: 1px solid #a5d6a7; color: #1b5e20; font-size: 10.5px; font-weight: bold; padding: 4px 8px; border-radius: 4px; margin-bottom: 8px; }
         .section-box { background: #fafafa; border: 1px solid #ddd; padding: 8px; border-radius: 6px; margin-bottom: 10px; }
         .section-box h3 { margin-top: 0; color: #e65100; font-size: 12px; border-bottom: 2px solid #ffe0b2; padding-bottom: 3px; }
         
@@ -52,6 +53,7 @@
         
         .item-bottom { display: flex; align-items: center; gap: 4px; width: 100%; border-top: 1px dashed #f0f0f0; padding-top: 6px; flex-wrap: wrap; }
         .item-row input.item-price { width: 45px; border: 1px solid #ccc; background: #fff; padding: 3px; font-size: 11px; text-align: center; border-radius: 3px; outline: none; font-weight: bold; color: #e65100; }
+        .item-row input.item-mrp { width: 48px; border: 1px solid #90caf9; background: #e3f2fd; padding: 3px; font-size: 11px; text-align: center; border-radius: 3px; outline: none; font-weight: bold; color: #0d47a1; }
         .item-row input.item-stock { width: 55px; border: 1px solid #2e7d32; background: #f1f8e9; padding: 3px; font-size: 11px; text-align: center; border-radius: 3px; outline: none; font-weight: bold; color: #2e7d32; }
         .item-row span { font-size: 10px; color: #666; }
         
@@ -103,11 +105,19 @@
         <hr style="border:0; border-top:1px solid #ddd; margin-bottom:8px;">
         
         <div class="form-group">
-            <label>आपका UPI ID:</label>
+            <label>दुकान का नाम:</label>
+            <input type="text" id="shopNameInput" placeholder="जैसे: अजय वेजिटेबल स्टोर">
+        </div>
+        <div class="form-group">
+            <label>दुकानदार का नाम:</label>
+            <input type="text" id="ownerNameInput" placeholder="जैसे: अजय कुमार">
+        </div>
+        <div class="form-group">
+            <label>आपका UPI ID (QR कोड इसी से बनेगा):</label>
             <input type="text" id="shopUpi" value="9997077062@paytm">
         </div>
         <div class="form-group">
-            <label>WhatsApp नंबर:</label>
+            <label>WhatsApp / फ़ोन नंबर:</label>
             <input type="tel" id="shopWhatsapp" value="9997077062">
         </div>
         <div class="form-group">
@@ -190,6 +200,7 @@
     <div id="dashboardScreen" class="screen">
         <h2>🔔 अजय वेजिटेबल स्टोर पार्टनर</h2>
         <div class="status-bar" id="connectionStatus">लाइव डेटाबेस से जुड़ रहा है...</div>
+        <div class="seller-id-badge" id="sellerIdBadge">दुकान आईडी: ajay</div>
 
         <h3 style="font-size:12px; margin-top:0; color:#d32f2f;">🚨 नए आर्डर्स की सूची:</h3>
         <div id="orders-container">
@@ -198,7 +209,7 @@
 
         <div class="section-box" style="margin-top: 10px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <h3 style="margin: 0; color:#e65100; font-size:12px;">कैटलॉग और रेट मैनेज करें:</h3>
+                <h3 style="margin: 0; color:#e65100; font-size:12px;">कैटलॉग, MRP और रेट मैनेज करें:</h3>
                 <div style="display: flex; gap: 4px;">
                     <button class="btn-main" style="background:#2e7d32; font-size:10px; padding:5px 8px; width:auto;" onclick="addNewItemRow()">+ नया आइटम</button>
                     <button class="btn-main" style="background:#e65100; font-size:10px; padding:5px 8px; width:auto;" onclick="saveCatalogSettings()">💾 सेव करें</button>
@@ -229,6 +240,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    const AJAY_OWNER_PHONE = "9997077062";
     const DELETED_HISTORY_LOCAL_KEY = "AJAY_DELETED_HISTORY_PERMANENT_V1";
     const LAST_AUTO_STOCK_DATE_KEY = "AJAY_LAST_AUTO_STOCK_DATE_V1";
     const DAILY_MIN_STOCK_ADD_KG = 10;
@@ -240,6 +252,7 @@
     let activeOrdersData = {};
     let removedItemsTracker = {};
     let dailyStockAdjustedOnce = false;
+    let currentSellerId = "ajay";
 
     const universalDictionary = {
         "मेथी": "Fenugreek", "कद्दू": "Pumpkin", "पालक": "Spinach", "टमाटर": "Tomato",
@@ -251,6 +264,26 @@
         "चुकंदर": "Beetroot", "सेब": "Apple", "केला": "Banana", "आम": "Mango"
     };
 
+    function resolveSellerIdFromPhone(phone) {
+        const cleanDigits = (phone || "").toString().replace(/\D/g, "");
+        if (!cleanDigits || cleanDigits === AJAY_OWNER_PHONE) {
+            return "ajay";
+        }
+        return `seller_${cleanDigits}`;
+    }
+
+    function getSellerSettingsPath(sellerId = currentSellerId) {
+        return sellerId === "ajay" ? "shopSettings" : `sellers/${sellerId}`;
+    }
+
+    function getSellerHistoryPath(sellerId = currentSellerId) {
+        return sellerId === "ajay" ? "orderHistory" : `orderHistory_${sellerId}`;
+    }
+
+    function getSellerDeletedHistoryPath(sellerId = currentSellerId) {
+        return sellerId === "ajay" ? "deletedOrderHistory" : `deletedOrderHistory_${sellerId}`;
+    }
+
     function getLocalDateIso(ts = Date.now()) {
         const d = new Date(ts);
         const year = d.getFullYear();
@@ -261,7 +294,8 @@
 
     function readPermanentDeletedStore() {
         try {
-            const parsed = JSON.parse(localStorage.getItem(DELETED_HISTORY_LOCAL_KEY) || "{}");
+            const key = `${DELETED_HISTORY_LOCAL_KEY}_${currentSellerId}`;
+            const parsed = JSON.parse(localStorage.getItem(key) || "{}");
             return parsed && typeof parsed === "object" ? parsed : {};
         } catch (e) {
             return {};
@@ -270,7 +304,8 @@
 
     function writePermanentDeletedStore(storeObj) {
         try {
-            localStorage.setItem(DELETED_HISTORY_LOCAL_KEY, JSON.stringify(storeObj || {}));
+            const key = `${DELETED_HISTORY_LOCAL_KEY}_${currentSellerId}`;
+            localStorage.setItem(key, JSON.stringify(storeObj || {}));
         } catch (e) {}
     }
 
@@ -292,14 +327,14 @@
         });
         writePermanentDeletedStore(merged);
         lastDeletedHistory = merged;
-        set(ref(db, 'deletedOrderHistory'), merged).catch(() => {});
+        set(ref(db, getSellerDeletedHistoryPath(currentSellerId)), merged).catch(() => {});
     }
 
     function loadPermanentDeletedHistoryFromFirebase() {
         const localStore = readPermanentDeletedStore();
         lastDeletedHistory = localStore;
 
-        get(ref(db, 'deletedOrderHistory')).then((snap) => {
+        get(ref(db, getSellerDeletedHistoryPath(currentSellerId))).then((snap) => {
             if (snap.exists() && snap.val()) {
                 const merged = { ...snap.val(), ...localStore };
                 lastDeletedHistory = merged;
@@ -379,6 +414,19 @@
     };
 
     function showDashboard() {
+        const savedPhone = (localStorage.getItem("partnerPhone") || AJAY_OWNER_PHONE).trim();
+        currentSellerId = resolveSellerIdFromPhone(savedPhone);
+
+        const badgeEl = document.getElementById("sellerIdBadge");
+        if (badgeEl) {
+            badgeEl.innerText = `दुकान आईडी: ${currentSellerId} | फ़ोन: ${savedPhone}`;
+        }
+
+        const whatsappEl = document.getElementById("shopWhatsapp");
+        if (whatsappEl && currentSellerId !== "ajay") {
+            whatsappEl.value = savedPhone;
+        }
+
         document.getElementById('loginScreen').classList.remove('active');
         document.getElementById('dashboardScreen').classList.add('active');
         
@@ -399,14 +447,15 @@
     function applyNextDayPlusTenKgStock(catalogList, shopDataObj) {
         if (!Array.isArray(catalogList)) return catalogList;
         const todayIso = getLocalDateIso(Date.now());
-        const lastDate = localStorage.getItem(LAST_AUTO_STOCK_DATE_KEY) || (shopDataObj && shopDataObj.lastAutoStockDate) || "";
+        const stockDateKey = `${LAST_AUTO_STOCK_DATE_KEY}_${currentSellerId}`;
+        const lastDate = localStorage.getItem(stockDateKey) || (shopDataObj && shopDataObj.lastAutoStockDate) || "";
 
         if (lastDate === todayIso || dailyStockAdjustedOnce) {
             return catalogList;
         }
 
         dailyStockAdjustedOnce = true;
-        localStorage.setItem(LAST_AUTO_STOCK_DATE_KEY, todayIso);
+        localStorage.setItem(stockDateKey, todayIso);
 
         const updated = catalogList.map((item) => {
             if (!item || typeof item !== "object") return item;
@@ -420,23 +469,30 @@
         });
 
         const payloadToSave = {
+            ...(shopDataObj || {}),
+            id: currentSellerId,
+            shopName: (shopDataObj && shopDataObj.shopName) || document.getElementById('shopNameInput').value.trim() || (currentSellerId === "ajay" ? "अजय वेजिटेबल स्टोर" : `दुकान (${currentSellerId})`),
+            ownerName: (shopDataObj && shopDataObj.ownerName) || document.getElementById('ownerNameInput').value.trim() || (currentSellerId === "ajay" ? "अजय कुमार" : "दुकानदार"),
             upi: (shopDataObj && shopDataObj.upi) || document.getElementById('shopUpi').value.trim(),
+            upiId: (shopDataObj && shopDataObj.upi) || document.getElementById('shopUpi').value.trim(),
             whatsapp: (shopDataObj && shopDataObj.whatsapp) || document.getElementById('shopWhatsapp').value.trim(),
             offerText: (shopDataObj && shopDataObj.offerText) || document.getElementById('shopOfferText').value.trim(),
             catalog: updated,
             lastAutoStockDate: todayIso
         };
-        set(ref(db, 'shopSettings'), payloadToSave).catch(() => {});
+        set(ref(db, getSellerSettingsPath(currentSellerId)), payloadToSave).catch(() => {});
 
         return updated;
     }
 
     function loadShopSettings() {
-        const settingsRef = ref(db, 'shopSettings');
+        const settingsRef = ref(db, getSellerSettingsPath(currentSellerId));
         onValue(settingsRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                if(data.upi) document.getElementById('shopUpi').value = data.upi;
+                if(data.shopName) document.getElementById('shopNameInput').value = data.shopName;
+                if(data.ownerName) document.getElementById('ownerNameInput').value = data.ownerName;
+                if(data.upi || data.upiId) document.getElementById('shopUpi').value = data.upi || data.upiId;
                 if(data.whatsapp) document.getElementById('shopWhatsapp').value = data.whatsapp;
                 if(data.offerText) document.getElementById('shopOfferText').value = data.offerText;
                 
@@ -445,16 +501,16 @@
                     renderCatalog(adjustedCatalog);
                 } else {
                     renderCatalog([
-                        {name: "टमाटर", price: 40, stock: 10, outOfStock: false},
-                        {name: "आलू", price: 30, stock: 10, outOfStock: false},
-                        {name: "प्याज़", price: 50, stock: 10, outOfStock: false}
+                        {name: "टमाटर", price: 40, mrp: 50, stock: 10, outOfStock: false},
+                        {name: "आलू", price: 30, mrp: 40, stock: 10, outOfStock: false},
+                        {name: "प्याज़", price: 50, mrp: 60, stock: 10, outOfStock: false}
                     ]);
                 }
             } else {
                 renderCatalog([
-                    {name: "टमाटर", price: 40, stock: 10, outOfStock: false},
-                    {name: "आलू", price: 30, stock: 10, outOfStock: false},
-                    {name: "प्याज़", price: 50, stock: 10, outOfStock: false}
+                    {name: "टमाटर", price: 40, mrp: 50, stock: 10, outOfStock: false},
+                    {name: "आलू", price: 30, mrp: 40, stock: 10, outOfStock: false},
+                    {name: "प्याज़", price: 50, mrp: 60, stock: 10, outOfStock: false}
                 ]);
             }
         });
@@ -465,6 +521,7 @@
         container.innerHTML = "";
         items.forEach((item, index) => {
             let stockVal = item.stock !== undefined ? item.stock : 10;
+            let mrpVal = item.mrp !== undefined ? item.mrp : (parseFloat(item.price) || 0);
             
             // डेटाबेस से आने वाले 'outOfStock' स्टेटस को प्राथमिकता दें, लेकिन अगर स्टॉक 0 है तो वह अपने आप लाल हो जाए
             let isOut = item.outOfStock;
@@ -484,6 +541,8 @@
                 <div class="item-bottom">
                     <input type="number" class="item-price" value="${item.price}" placeholder="रेट">
                     <span>₹/kg</span>
+                    <input type="number" class="item-mrp" value="${mrpVal}" placeholder="MRP">
+                    <span>MRP</span>
                     <input type="number" class="item-stock" value="${stockVal}" placeholder="स्टॉक" oninput="autoCheckStock(${index})" onchange="autoCheckStock(${index})">
                     <span>kg</span>
                     <button class="${btnClass}" id="stock_btn_${index}" onclick="toggleStock(${index})">${btnText}</button>
@@ -538,6 +597,8 @@
             <div class="item-bottom">
                 <input type="number" class="item-price" placeholder="रेट">
                 <span>₹/kg</span>
+                <input type="number" class="item-mrp" placeholder="MRP">
+                <span>MRP</span>
                 <input type="number" class="item-stock" value="10" placeholder="स्टॉक" oninput="autoCheckStock(${newIndex})" onchange="autoCheckStock(${newIndex})">
                 <span>kg</span>
                 <button class="stock-toggle-btn" id="stock_btn_${newIndex}" onclick="toggleStock(${newIndex})">स्टॉक में है</button>
@@ -556,6 +617,9 @@
     }
 
     function saveCatalogSettingsData(showAlert = true) {
+        const savedPhone = (localStorage.getItem("partnerPhone") || AJAY_OWNER_PHONE).trim();
+        let shopName = document.getElementById('shopNameInput').value.trim() || (currentSellerId === "ajay" ? "अजय वेजिटेबल स्टोर" : `दुकान (${savedPhone})`);
+        let ownerName = document.getElementById('ownerNameInput').value.trim() || (currentSellerId === "ajay" ? "अजय कुमार" : "दुकानदार");
         let upi = document.getElementById('shopUpi').value.trim();
         let whatsapp = document.getElementById('shopWhatsapp').value.trim();
         let offerText = document.getElementById('shopOfferText').value.trim();
@@ -565,6 +629,8 @@
         rows.forEach(row => {
             let name = row.querySelector('.item-name').value.trim();
             let price = parseFloat(row.querySelector('.item-price').value) || 0;
+            let mrpInput = row.querySelector('.item-mrp');
+            let mrp = mrpInput && mrpInput.value !== "" ? (parseFloat(mrpInput.value) || price) : price;
             let stock = parseFloat(row.querySelector('.item-stock').value) || 0;
             let stockBtn = row.querySelector('.stock-toggle-btn');
             
@@ -572,15 +638,31 @@
             let isOut = (stock <= 0) || (stockBtn ? stockBtn.classList.contains('out-of-stock') : false);
 
             if(name) {
-                catalog.push({ name: name, price: price, stock: stock, outOfStock: isOut });
+                catalog.push({ name: name, price: price, mrp: mrp, stock: stock, outOfStock: isOut });
             }
         });
 
-        let settingsData = { upi: upi, whatsapp: whatsapp, offerText: offerText, catalog: catalog, lastAutoStockDate: getLocalDateIso(Date.now()) };
+        let settingsData = {
+            id: currentSellerId,
+            shopName: shopName,
+            ownerName: ownerName,
+            phone: savedPhone,
+            upi: upi,
+            upiId: upi,
+            whatsapp: whatsapp,
+            offerText: offerText,
+            catalog: catalog,
+            lastAutoStockDate: getLocalDateIso(Date.now())
+        };
         
-        set(ref(db, 'shopSettings'), settingsData).then(() => {
+        const targetPath = getSellerSettingsPath(currentSellerId);
+        const syncPromise = currentSellerId === "ajay"
+            ? Promise.all([set(ref(db, 'shopSettings'), settingsData), set(ref(db, 'sellers/ajay'), settingsData)])
+            : set(ref(db, targetPath), settingsData);
+
+        syncPromise.then(() => {
             if(showAlert) {
-                alert("कैटलॉग और स्टॉक सफलतापूर्वक सेव हो गए हैं!");
+                alert("दुकान आईडी, MRP, कैटलॉग और स्टॉक सफलतापूर्वक सेव हो गए हैं!");
             }
         }).catch((err) => {
             if(showAlert) {
@@ -644,6 +726,14 @@
         }
     }
 
+    function belongsToCurrentSeller(orderObj) {
+        if (!orderObj || typeof orderObj !== "object") return false;
+        if (!orderObj.sellerId) {
+            return currentSellerId === "ajay";
+        }
+        return String(orderObj.sellerId) === String(currentSellerId);
+    }
+
     function startLiveOrders() {
         const statusEl = document.getElementById('connectionStatus');
         const container = document.getElementById('orders-container');
@@ -664,7 +754,9 @@
             }
 
             activeOrdersData = data;
-            let ordersArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+            let ordersArray = Object.keys(data)
+                .map(key => ({ id: key, ...data[key] }))
+                .filter(order => belongsToCurrentSeller(order));
 
             document.getElementById('notifCount').innerText = ordersArray.length;
 
@@ -677,6 +769,11 @@
                 startContinuousAlarm();
             } else {
                 stopContinuousAlarm();
+            }
+
+            if (ordersArray.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #777; font-size:11px;">नया ऑर्डर आने का इंतज़ार है...</p>';
+                return;
             }
 
             container.innerHTML = "";
@@ -734,7 +831,7 @@
         const acceptedContainer = document.getElementById('accepted-history-container');
         const rejectedContainer = document.getElementById('rejected-history-container');
 
-        const historyRef = ref(db, 'orderHistory');
+        const historyRef = ref(db, getSellerHistoryPath(currentSellerId));
         onValue(historyRef, (snapshot) => {
             const data = snapshot.val();
             if(!data) {
@@ -790,7 +887,7 @@
 
     window.showOrderDetails = function(event, key) {
         closeHistoryModal();
-        const historyRef = ref(db, 'orderHistory/' + key);
+        const historyRef = ref(db, `${getSellerHistoryPath(currentSellerId)}/${key}`);
         get(historyRef).then((snapshot) => {
             if (snapshot.exists()) {
                 let h = snapshot.val();
@@ -848,7 +945,7 @@
 
     window.deleteHistoryItem = function(key) {
         if(confirm("क्या आप वाकई इस आर्डर को हिस्ट्री से हटाना चाहते हैं?")) {
-            const itemRef = ref(db, 'orderHistory/' + key);
+            const itemRef = ref(db, `${getSellerHistoryPath(currentSellerId)}/${key}`);
             get(itemRef).then((snapshot) => {
                 if(snapshot.exists()) {
                     const val = snapshot.val() || {};
@@ -869,7 +966,7 @@
 
     window.clearAllHistory = function() {
         if(confirm("क्या आप वाकई सभी आर्डर हिस्ट्री को साफ़ करना चाहते हैं?")) {
-            const historyRef = ref(db, 'orderHistory');
+            const historyRef = ref(db, getSellerHistoryPath(currentSellerId));
             get(historyRef).then((snapshot) => {
                 if(snapshot.exists()) {
                     const allItems = snapshot.val() || {};
@@ -898,7 +995,7 @@
             return;
         }
         
-        let historyRef = ref(db, 'orderHistory');
+        let historyRef = ref(db, getSellerHistoryPath(currentSellerId));
         get(historyRef).then((snapshot) => {
             let existingData = snapshot.val() || {};
             let mergedData = { ...existingData, ...store };
@@ -937,7 +1034,7 @@
             return;
         }
 
-        const historyRef = ref(db, 'orderHistory');
+        const historyRef = ref(db, getSellerHistoryPath(currentSellerId));
         get(historyRef).then((snapshot) => {
             const existingData = snapshot.val() || {};
             const mergedData = { ...existingData, ...matchedEntries };
@@ -958,7 +1055,7 @@
             if (snapshot.exists()) {
                 let order = snapshot.val();
                 
-                const settingsRef = ref(db, 'shopSettings');
+                const settingsRef = ref(db, getSellerSettingsPath(currentSellerId));
                 get(settingsRef).then((settingsSnap) => {
                     if (settingsSnap.exists()) {
                         let shopData = settingsSnap.val();
@@ -1007,7 +1104,7 @@
                     msg: msgText,
                     timestamp: nowTs
                 }).then(() => {
-                    push(ref(db, 'orderHistory'), historyData).then(() => {
+                    push(ref(db, getSellerHistoryPath(currentSellerId)), historyData).then(() => {
                         delete removedItemsTracker[orderId];
                         alert('ऑर्डर स्वीकार कर लिया गया है!');
                         remove(orderRef);
@@ -1044,7 +1141,7 @@
                         msg: `❌ माफ़ कीजिए, आपका ऑर्डर रद्द कर दिया गया है।`,
                         timestamp: nowTs
                     }).then(() => {
-                        push(ref(db, 'orderHistory'), historyData).then(() => {
+                        push(ref(db, getSellerHistoryPath(currentSellerId)), historyData).then(() => {
                             delete removedItemsTracker[orderId];
                             alert('ऑर्डर रद्द कर दिया गया है।');
                             remove(orderRef);
