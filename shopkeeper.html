@@ -18,6 +18,7 @@
         .form-group label { display: block; font-weight: bold; margin-bottom: 2px; font-size: 11px; }
         .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
         .btn-main { background: #e65100; color: white; border: none; width: 100%; padding: 10px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; text-align: center; }
+        .btn-main:disabled { background: #aaa; cursor: not-allowed; }
         
         .top-bar-fixed { position: fixed; top: 5px; right: 8px; display: flex; gap: 4px; z-index: 999; align-items: center; }
         .top-left-fixed { position: fixed; top: 5px; left: 8px; display: flex; gap: 4px; z-index: 999; }
@@ -87,11 +88,11 @@
 </head>
 <body>
 
-<div class="top-left-fixed">
+<div class="top-left-fixed" id="topLeftControls" style="display:none;">
     <button class="logout-circle-btn" onclick="logout()">🚪 लॉगआउट</button>
 </div>
 
-<div class="top-bar-fixed">
+<div class="top-bar-fixed" id="topRightControls" style="display:none;">
     <button class="gear-icon-btn" onclick="openSettingsModal()" title="दुकान सेटिंग्स">⚙️ सेटिंग्स</button>
     <button class="history-top-icon-btn" onclick="openHistoryModal()">📜 हिस्ट्री</button>
     <button class="notif-badge-btn" onclick="openNotifications()">🔔 <span id="notifCount">0</span></button>
@@ -182,19 +183,18 @@
     
     <div id="loginScreen" class="screen active">
         <h2>🔐 सुरक्षित दुकानदार - लॉगिन</h2>
-        <p style="text-align: center; color: #666; font-size: 11px;">लॉगिन करने के लिए 10 अंकों का मोबाइल नंबर दर्ज करें</p>
+        <p style="text-align: center; color: #666; font-size: 11px;">Firebase Authentication ईमेल और पासवर्ड से लॉगिन करें</p>
         
         <div class="form-group" style="margin-top: 8px;">
-            <label>मोबाइल नंबर:</label>
-            <input type="tel" id="loginPhone" placeholder="10 अंकों का नंबर" maxlength="10">
+            <label>ईमेल आईडी (Email):</label>
+            <input type="email" id="loginEmail" placeholder="जैसे: raazbhai9837@gmail.com" autocomplete="username">
         </div>
-        <button class="btn-main" onclick="sendRandomOtp()">नया OTP भेजें</button>
-        <div id="otpBox" style="display:none; margin-top:8px;">
-            <label id="otpLabelText">इस नंबर के लिए सुरक्षा OTP दर्ज करें:</label>
-            <input type="text" id="enteredOtp" placeholder="4 अंकों का OTP" maxlength="4">
-            <button class="btn-main" style="margin-top:5px;" onclick="verifyRandomOtp()">सत्यापित करें (Verify)</button>
+        <div class="form-group">
+            <label>पासवर्ड (Password):</label>
+            <input type="password" id="loginPassword" placeholder="अपना पासवर्ड दर्ज करें" autocomplete="current-password">
         </div>
-        <div id="loginError" style="color:red; font-size:11px; margin-top:4px;"></div>
+        <button id="loginSubmitBtn" class="btn-main" onclick="loginWithFirebaseAuth()">लॉगिन करें (Login)</button>
+        <div id="loginError" style="color:#c62828; font-size:11px; margin-top:6px; text-align:center; font-weight:bold;"></div>
     </div>
 
     <div id="dashboardScreen" class="screen">
@@ -225,6 +225,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue, remove, set, push, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
@@ -239,13 +240,13 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
 
     const AJAY_OWNER_PHONE = "9997077062";
     const DELETED_HISTORY_LOCAL_KEY = "AJAY_DELETED_HISTORY_PERMANENT_V1";
     const LAST_AUTO_STOCK_DATE_KEY = "AJAY_LAST_AUTO_STOCK_DATE_V1";
     const DAILY_MIN_STOCK_ADD_KG = 10;
 
-    let generatedRandomOtp = "";
     let customerNotifications = [];
     let alarmInterval = null;
     let lastDeletedHistory = {};
@@ -253,6 +254,7 @@
     let removedItemsTracker = {};
     let dailyStockAdjustedOnce = false;
     let currentSellerId = "ajay";
+    let listenersStarted = false;
 
     const universalDictionary = {
         "मेथी": "Fenugreek", "कद्दू": "Pumpkin", "पालक": "Spinach", "टमाटर": "Tomato",
@@ -263,14 +265,6 @@
         "खीरा": "Cucumber", "लौकी": "Bottle Gourd", "तोरी": "Ridge Gourd", "करेला": "Bitter Gourd",
         "चुकंदर": "Beetroot", "सेब": "Apple", "केला": "Banana", "आम": "Mango"
     };
-
-    function resolveSellerIdFromPhone(phone) {
-        const cleanDigits = (phone || "").toString().replace(/\D/g, "");
-        if (!cleanDigits || cleanDigits === AJAY_OWNER_PHONE) {
-            return "ajay";
-        }
-        return `seller_${cleanDigits}`;
-    }
 
     function getSellerSettingsPath(sellerId = currentSellerId) {
         return sellerId === "ajay" ? "shopSettings" : `sellers/${sellerId}`;
@@ -357,13 +351,6 @@
         }
     };
 
-    window.onload = function() {
-        let savedPhone = localStorage.getItem("partnerPhone");
-        if (savedPhone) {
-            showDashboard();
-        }
-    };
-
     window.openSettingsModal = function() {
         document.getElementById('settingsModal').style.display = 'flex';
     };
@@ -379,67 +366,82 @@
         }
     };
 
-    window.sendRandomOtp = function() {
-        let phone = document.getElementById('loginPhone').value.trim();
-        let errorEl = document.getElementById('loginError');
+    window.loginWithFirebaseAuth = async function() {
+        const emailEl = document.getElementById('loginEmail');
+        const passEl = document.getElementById('loginPassword');
+        const errorEl = document.getElementById('loginError');
+        const btnEl = document.getElementById('loginSubmitBtn');
 
-        if (phone.length !== 10) {
-            errorEl.innerText = "कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!";
+        const email = (emailEl.value || "").trim();
+        const password = passEl.value || "";
+
+        errorEl.innerText = "";
+        if (!email || !email.includes("@")) {
+            errorEl.innerText = "कृपया सही ईमेल आईडी दर्ज करें!";
+            return;
+        }
+        if (!password) {
+            errorEl.innerText = "कृपया पासवर्ड दर्ज करें!";
             return;
         }
 
-        generatedRandomOtp = Math.floor(1000 + Math.random() * 9000).toString();
-        
-        localStorage.setItem("partnerPhone", phone);
-        localStorage.setItem("currentSessionOtp", generatedRandomOtp);
+        btnEl.disabled = true;
+        btnEl.innerText = "लॉगिन हो रहा है...";
 
-        alert(`सुरक्षा संदेश: आपके मोबाइल (${phone}) के लिए नया OTP है: ${generatedRandomOtp}`);
-        
-        document.getElementById('otpBox').style.display = 'block';
-        document.getElementById('otpLabelText').innerText = `नंबर (${phone}) के लिए OTP दर्ज करें:`;
-        errorEl.innerText = "";
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            errorEl.innerText = "";
+        } catch (err) {
+            console.error("Auth login error:", err);
+            errorEl.innerText = "लॉगिन असफल: ईमेल या पासवर्ड गलत है, या Firebase में यूज़र मौजूद नहीं है।";
+        } finally {
+            btnEl.disabled = false;
+            btnEl.innerText = "लॉगिन करें (Login)";
+        }
     };
 
-    window.verifyRandomOtp = function() {
-        let entered = document.getElementById('enteredOtp').value.trim();
-        let savedOtp = localStorage.getItem("currentSessionOtp") || generatedRandomOtp;
-        let errorEl = document.getElementById('loginError');
+    onAuthStateChanged(auth, (user) => {
+        const loginScreen = document.getElementById('loginScreen');
+        const dashboardScreen = document.getElementById('dashboardScreen');
+        const topLeft = document.getElementById('topLeftControls');
+        const topRight = document.getElementById('topRightControls');
 
-        if (entered === savedOtp && entered !== "") {
-            localStorage.setItem("isSubscribed", "true");
-            showDashboard();
+        if (user) {
+            currentSellerId = "ajay";
+            loginScreen.classList.remove('active');
+            dashboardScreen.classList.add('active');
+            topLeft.style.display = 'flex';
+            topRight.style.display = 'flex';
+
+            const badgeEl = document.getElementById("sellerIdBadge");
+            if (badgeEl) {
+                badgeEl.innerText = `दुकान आईडी: ${currentSellerId} | लॉगिन: ${user.email || "Verified"}`;
+            }
+
+            if (!listenersStarted) {
+                listenersStarted = true;
+                loadPermanentDeletedHistoryFromFirebase();
+                loadShopSettings();
+                startLiveOrders();
+                loadHistoryData();
+            }
         } else {
-            errorEl.innerText = "गलत ओटीपी! कृपया सही 4 अंकों का कोड दर्ज करें।";
+            stopContinuousAlarm();
+            dashboardScreen.classList.remove('active');
+            loginScreen.classList.add('active');
+            topLeft.style.display = 'none';
+            topRight.style.display = 'none';
         }
-    };
+    });
 
-    function showDashboard() {
-        const savedPhone = (localStorage.getItem("partnerPhone") || AJAY_OWNER_PHONE).trim();
-        currentSellerId = resolveSellerIdFromPhone(savedPhone);
-
-        const badgeEl = document.getElementById("sellerIdBadge");
-        if (badgeEl) {
-            badgeEl.innerText = `दुकान आईडी: ${currentSellerId} | फ़ोन: ${savedPhone}`;
-        }
-
-        const whatsappEl = document.getElementById("shopWhatsapp");
-        if (whatsappEl && currentSellerId !== "ajay") {
-            whatsappEl.value = savedPhone;
-        }
-
-        document.getElementById('loginScreen').classList.remove('active');
-        document.getElementById('dashboardScreen').classList.add('active');
-        
-        loadPermanentDeletedHistoryFromFirebase();
-        loadShopSettings();
-        startLiveOrders();
-        loadHistoryData();
-    }
-
-    window.logout = function() {
-        if(confirm("क्या आप वाकई लॉग आउट करना चाहते हैं?")) {
-            localStorage.removeItem("partnerPhone");
-            localStorage.removeItem("currentSessionOtp");
+    window.logout = async function() {
+        if (confirm("क्या आप वाकई लॉग आउट करना चाहते हैं?")) {
+            stopContinuousAlarm();
+            try {
+                await signOut(auth);
+            } catch (e) {
+                console.error("Logout error:", e);
+            }
             location.reload();
         }
     };
@@ -471,8 +473,8 @@
         const payloadToSave = {
             ...(shopDataObj || {}),
             id: currentSellerId,
-            shopName: (shopDataObj && shopDataObj.shopName) || document.getElementById('shopNameInput').value.trim() || (currentSellerId === "ajay" ? "अजय वेजिटेबल स्टोर" : `दुकान (${currentSellerId})`),
-            ownerName: (shopDataObj && shopDataObj.ownerName) || document.getElementById('ownerNameInput').value.trim() || (currentSellerId === "ajay" ? "अजय कुमार" : "दुकानदार"),
+            shopName: (shopDataObj && shopDataObj.shopName) || document.getElementById('shopNameInput').value.trim() || "अजय वेजिटेबल स्टोर",
+            ownerName: (shopDataObj && shopDataObj.ownerName) || document.getElementById('ownerNameInput').value.trim() || "अजय कुमार",
             upi: (shopDataObj && shopDataObj.upi) || document.getElementById('shopUpi').value.trim(),
             upiId: (shopDataObj && shopDataObj.upi) || document.getElementById('shopUpi').value.trim(),
             whatsapp: (shopDataObj && shopDataObj.whatsapp) || document.getElementById('shopWhatsapp').value.trim(),
@@ -523,7 +525,6 @@
             let stockVal = item.stock !== undefined ? item.stock : 10;
             let mrpVal = item.mrp !== undefined ? item.mrp : (parseFloat(item.price) || 0);
             
-            // डेटाबेस से आने वाले 'outOfStock' स्टेटस को प्राथमिकता दें, लेकिन अगर स्टॉक 0 है तो वह अपने आप लाल हो जाए
             let isOut = item.outOfStock;
             if (stockVal <= 0) isOut = true;
 
@@ -553,7 +554,6 @@
         });
     }
 
-    // जब दुकानदार अपनी मर्जी से बटन पर क्लिक करके लाल/हरा करना चाहे
     window.toggleStock = function(index) {
         let stockBtn = document.getElementById(`stock_btn_${index}`);
         stockBtn.classList.toggle('out-of-stock');
@@ -565,7 +565,6 @@
         saveCatalogSettingsWithoutAlert();
     };
 
-    // जब दुकानदार बॉक्स में स्टॉक की संख्या बदले (टाइप करे)
     window.autoCheckStock = function(index) {
         let rows = document.querySelectorAll('.item-row');
         let targetRow = rows[index];
@@ -573,7 +572,6 @@
         let stockBtn = targetRow.querySelector('.stock-toggle-btn');
         let stockVal = parseFloat(stockInput.value) || 0;
 
-        // यदि स्टॉक 0 से ज्यादा है, तो ऑटोमैटिक हरा हो जाए। अगर 0 या उससे कम है तो लाल हो जाए।
         if (stockVal > 0) {
             stockBtn.classList.remove('out-of-stock');
             stockBtn.innerText = "स्टॉक में है";
@@ -617,9 +615,8 @@
     }
 
     function saveCatalogSettingsData(showAlert = true) {
-        const savedPhone = (localStorage.getItem("partnerPhone") || AJAY_OWNER_PHONE).trim();
-        let shopName = document.getElementById('shopNameInput').value.trim() || (currentSellerId === "ajay" ? "अजय वेजिटेबल स्टोर" : `दुकान (${savedPhone})`);
-        let ownerName = document.getElementById('ownerNameInput').value.trim() || (currentSellerId === "ajay" ? "अजय कुमार" : "दुकानदार");
+        let shopName = document.getElementById('shopNameInput').value.trim() || "अजय वेजिटेबल स्टोर";
+        let ownerName = document.getElementById('ownerNameInput').value.trim() || "अजय कुमार";
         let upi = document.getElementById('shopUpi').value.trim();
         let whatsapp = document.getElementById('shopWhatsapp').value.trim();
         let offerText = document.getElementById('shopOfferText').value.trim();
@@ -634,7 +631,6 @@
             let stock = parseFloat(row.querySelector('.item-stock').value) || 0;
             let stockBtn = row.querySelector('.stock-toggle-btn');
             
-            // यदि बटन लाल है (यानी मैनुअल 'स्टॉक नहीं है' किया गया है) या स्टॉक 0 है, तो वह कैटलॉग में 'outOfStock: true' हो जाएगा
             let isOut = (stock <= 0) || (stockBtn ? stockBtn.classList.contains('out-of-stock') : false);
 
             if(name) {
@@ -646,7 +642,7 @@
             id: currentSellerId,
             shopName: shopName,
             ownerName: ownerName,
-            phone: savedPhone,
+            phone: AJAY_OWNER_PHONE,
             upi: upi,
             upiId: upi,
             whatsapp: whatsapp,
