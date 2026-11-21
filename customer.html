@@ -83,14 +83,6 @@
     .screen { padding: 12px; }
     .hidden { display: none; }
 
-    .otp-login-strip {
-      background: #e8f5e9;
-      border: 1px solid #81c784;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 12px;
-    }
-
     .status-notify-box {
       background: #fff3cd;
       border: 2px solid #ff9800;
@@ -609,22 +601,6 @@
     </div>
 
     <div class="screen">
-      <!-- मोबाइल नंबर + OTP लॉगिन -->
-      <div id="customer-otp-box" class="otp-login-strip">
-        <div style="font-weight:bold; font-size:13px; color:#1b5e20; margin-bottom:4px;">
-          🔐 मोबाइल नंबर + OTP लॉगिन <span id="customer-verified-badge" style="color:#1565c0;"></span>
-        </div>
-        <div id="customer-otp-form-row">
-          <input id="customer-otp-phone" type="tel" maxlength="10" class="input-field" style="margin-top:4px;" placeholder="10 अंकों का मोबाइल नंबर लिखें" />
-          <button type="button" class="select-btn" style="width:100%; margin-top:6px; background:#1565c0;" onclick="sendCustomerOtp()">OTP भेजें</button>
-          <div id="customer-otp-verify-step" class="hidden" style="margin-top:6px;">
-            <input id="customer-otp-code" type="text" maxlength="6" class="input-field" style="margin-top:2px;" placeholder="6 अंकों का OTP डालें" />
-            <button type="button" class="select-btn" style="width:100%; margin-top:6px;" onclick="verifyCustomerOtp()">OTP वेरिफ़ाई करें</button>
-          </div>
-        </div>
-        <div id="customer-otp-status" class="note-small" style="font-weight:bold; color:#1b5e20;"></div>
-      </div>
-
       <div class="section-heading-row">
         <div class="section-heading">अपना मनपसंद दुकानदार चुनें (नंबर से क्रम सेट करें)</div>
       </div>
@@ -755,7 +731,6 @@
   const CUSTOMER_PROFILE_KEY = "CUSTOMER_SAVED_PROFILE_V1";
   const ACTIVE_SELLER_STATE_KEY = "CUSTOMER_ACTIVE_SELLER_ID_V1";
   const PERMANENT_HISTORY_LS_KEY = "ONLINE_STORE_PERMANENT_ORDER_HISTORY_V1";
-  const CUSTOMER_OTP_VERIFIED_PHONE_KEY = "CUSTOMER_OTP_VERIFIED_PHONE_V1";
   const IDB_NAME = "OnlineStoreImmutableHistoryDB";
   const IDB_STORE = "orderHistory";
 
@@ -777,8 +752,6 @@
     storageKey: "ONLINE_STORE_LIVE_DATA_V2"
   };
 
-  let pendingCustomerOtp = "";
-  let pendingCustomerOtpPhone = "";
   let customerPhotoDataUrl = "";
 
   const hindiToEnglishMap = {
@@ -792,79 +765,6 @@
     "करेला": "Bitter Gourd", "चुकंदर": "Beetroot", "सेब": "Apple",
     "केला": "Banana", "आम": "Mango"
   };
-
-  function syncCustomerOtpUiState() {
-    const verifiedPhone = localStorage.getItem(CUSTOMER_OTP_VERIFIED_PHONE_KEY) || "";
-    const badge = document.getElementById("customer-verified-badge");
-    const formRow = document.getElementById("customer-otp-form-row");
-    const statusEl = document.getElementById("customer-otp-status");
-
-    if (verifiedPhone) {
-      if (badge) badge.textContent = `(वेरिफ़ाईड: +91${verifiedPhone})`;
-      if (formRow) formRow.classList.add("hidden");
-      if (statusEl && !statusEl.textContent) {
-        statusEl.textContent = `आपका नंबर +91${verifiedPhone} लॉगिन और वेरिफ़ाई है।`;
-      }
-      saveCustomerProfileData({ phone: verifiedPhone });
-      subscribeToCustomerNotification(verifiedPhone);
-    } else {
-      if (badge) badge.textContent = "";
-      if (formRow) formRow.classList.remove("hidden");
-    }
-  }
-
-  function sendCustomerOtp() {
-    const phoneInput = document.getElementById("customer-otp-phone");
-    const statusEl = document.getElementById("customer-otp-status");
-    const cleanPhone = (phoneInput ? phoneInput.value : "").replace(/\D/g, "").slice(-10);
-
-    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
-      if (statusEl) {
-        statusEl.style.color = "#c62828";
-        statusEl.textContent = "कृपया सही 10 अंकों का मोबाइल नंबर लिखें।";
-      }
-      return;
-    }
-
-    pendingCustomerOtpPhone = cleanPhone;
-    pendingCustomerOtp = String(Math.floor(100000 + Math.random() * 900000));
-    document.getElementById("customer-otp-verify-step").classList.remove("hidden");
-
-    if (typeof window.customSendSmsOtp === "function") {
-      window.customSendSmsOtp(cleanPhone, pendingCustomerOtp);
-    }
-
-    if (statusEl) {
-      statusEl.style.color = "#1565c0";
-      statusEl.textContent = `+91${cleanPhone} पर OTP भेजा गया है। (टेस्ट OTP: ${pendingCustomerOtp})`;
-    }
-  }
-
-  function verifyCustomerOtp() {
-    const codeInput = document.getElementById("customer-otp-code");
-    const statusEl = document.getElementById("customer-otp-status");
-    const entered = (codeInput ? codeInput.value : "").trim();
-
-    if (!pendingCustomerOtp || entered !== pendingCustomerOtp) {
-      if (statusEl) {
-        statusEl.style.color = "#c62828";
-        statusEl.textContent = "गलत OTP है, कृपया सही 6 अंकों का OTP डालें।";
-      }
-      return;
-    }
-
-    localStorage.setItem(CUSTOMER_OTP_VERIFIED_PHONE_KEY, pendingCustomerOtpPhone);
-    saveCustomerProfileData({ phone: pendingCustomerOtpPhone });
-    const orderPhoneEl = document.getElementById("customer-phone-input");
-    if (orderPhoneEl) orderPhoneEl.value = pendingCustomerOtpPhone;
-    subscribeToCustomerNotification(pendingCustomerOtpPhone);
-    syncCustomerOtpUiState();
-
-    if (statusEl) {
-      statusEl.style.color = "#1b5e20";
-      statusEl.textContent = `✅ +91${pendingCustomerOtpPhone} वेरिफ़ाई हो गया है! अब आप कोई भी दुकान चुन सकते हैं।`;
-    }
-  }
 
   function handleCustomerPhotoSelected(inputEl) {
     const previewEl = document.getElementById("customer-photo-preview");
@@ -2037,11 +1937,8 @@
   window.saveCustomerProfileDraft = saveCustomerProfileDraft;
   window.moveSellerByOffset = moveSellerByOffset;
   window.setSellerRankPosition = setSellerRankPosition;
-  window.sendCustomerOtp = sendCustomerOtp;
-  window.verifyCustomerOtp = verifyCustomerOtp;
   window.handleCustomerPhotoSelected = handleCustomerPhotoSelected;
 
-  syncCustomerOtpUiState();
   restoreLastScreenState();
   renderSellerList();
   autofillCustomerDetails(false);
