@@ -83,7 +83,14 @@
     .screen { padding: 12px; }
     .hidden { display: none; }
 
-    /* Top Big Customer Notification Banner with Close (X) */
+    .otp-login-strip {
+      background: #e8f5e9;
+      border: 1px solid #81c784;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+
     .status-notify-box {
       background: #fff3cd;
       border: 2px solid #ff9800;
@@ -125,7 +132,6 @@
       line-height: 1;
     }
 
-    /* Modal Popup */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -176,7 +182,6 @@
       width: 100%;
     }
 
-    /* Locked Order History & Support Message Modal Styles */
     .history-card-modal {
       text-align: left;
       border-top-color: #ef6c00;
@@ -250,7 +255,6 @@
       margin: 4px 0 6px;
     }
 
-    /* Seller List Cards + Priority Controls */
     .seller-card {
       display: flex;
       justify-content: space-between;
@@ -351,7 +355,6 @@
       font-weight: bold;
     }
 
-    /* Vegetable Cards */
     .veg-card {
       display: flex;
       align-items: center;
@@ -406,7 +409,6 @@
       cursor: not-allowed;
     }
 
-    /* Cart & Bill */
     .box {
       background: #f7faf7;
       border: 1px solid #c8e6c9;
@@ -468,7 +470,6 @@
       cursor: not-allowed;
     }
 
-    /* QR Box */
     .qr-box {
       margin-top: 14px;
       background: #fff8e1;
@@ -500,7 +501,6 @@
       border: none;
     }
 
-    /* Post-Payment Section */
     .post-payment-box {
       margin-top: 14px;
       background: #e8f5e9;
@@ -569,7 +569,7 @@
     </div>
   </div>
 
-  <!-- CUSTOMER PROBLEM / MESSAGE MODAL (WHEN CALL IS NOT ANSWERED OR PROBLEM OCCURS) -->
+  <!-- CUSTOMER PROBLEM / MESSAGE MODAL -->
   <div id="customer-message-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-label="समस्या / मैसेज भेजें">
     <div class="modal-card history-card-modal">
       <div class="history-modal-header">
@@ -609,6 +609,22 @@
     </div>
 
     <div class="screen">
+      <!-- मोबाइल नंबर + OTP लॉगिन -->
+      <div id="customer-otp-box" class="otp-login-strip">
+        <div style="font-weight:bold; font-size:13px; color:#1b5e20; margin-bottom:4px;">
+          🔐 मोबाइल नंबर + OTP लॉगिन <span id="customer-verified-badge" style="color:#1565c0;"></span>
+        </div>
+        <div id="customer-otp-form-row">
+          <input id="customer-otp-phone" type="tel" maxlength="10" class="input-field" style="margin-top:4px;" placeholder="10 अंकों का मोबाइल नंबर लिखें" />
+          <button type="button" class="select-btn" style="width:100%; margin-top:6px; background:#1565c0;" onclick="sendCustomerOtp()">OTP भेजें</button>
+          <div id="customer-otp-verify-step" class="hidden" style="margin-top:6px;">
+            <input id="customer-otp-code" type="text" maxlength="6" class="input-field" style="margin-top:2px;" placeholder="6 अंकों का OTP डालें" />
+            <button type="button" class="select-btn" style="width:100%; margin-top:6px;" onclick="verifyCustomerOtp()">OTP वेरिफ़ाई करें</button>
+          </div>
+        </div>
+        <div id="customer-otp-status" class="note-small" style="font-weight:bold; color:#1b5e20;"></div>
+      </div>
+
       <div class="section-heading-row">
         <div class="section-heading">अपना मनपसंद दुकानदार चुनें (नंबर से क्रम सेट करें)</div>
       </div>
@@ -644,7 +660,6 @@
     </div>
 
     <div class="screen">
-      <!-- Top Big Customer Notification Banner (with X close button) -->
       <div id="customer-status-banner" class="status-notify-box hidden">
         <div class="status-notify-header">
           <div id="status-banner-title" class="status-notify-title"></div>
@@ -653,11 +668,9 @@
         <div id="status-banner-body" class="status-notify-body"></div>
       </div>
 
-      <!-- Offer व शर्तें Heading above the Offer Box -->
       <div class="offer-heading">ऑफर व शर्तें</div>
       <div id="offer-banner" class="offer-banner"></div>
 
-      <!-- Just above vegetables: Heading on left, "दुकान बदलें" on right -->
       <div class="section-heading-row">
         <div class="section-heading">सब्ज़ियाँ चुनें (वज़न के अनुसार)</div>
         <button class="back-btn" onclick="goBackToSellers()">दुकान बदलें</button>
@@ -705,7 +718,6 @@
         </div>
       </div>
 
-      <!-- STRICTLY SHOWN ONLY AFTER CLICKING PAY AND CONFIRMING PAYMENT -->
       <div id="post-payment-section" class="post-payment-box hidden">
         <div style="font-weight:bold; font-size:14.5px; color:#1b5e20;">
           भुगतान के बाद विवरण भरें
@@ -717,6 +729,13 @@
         <button type="button" class="back-btn" style="margin-top:8px;" onclick="detectLocation()">
           📍 लोकेशन और लाइव मैप ऑटो-भरें
         </button>
+
+        <!-- कैमरा / फ़ोटो परमिशन व फ़ोटो अटैचमेंट -->
+        <div style="margin-top:8px;">
+          <label class="note-small" style="font-weight:bold; color:#1b5e20;">📷 फ़ोटो / कैमरा परमिशन (वैकल्पिक):</label>
+          <input id="customer-photo-input" type="file" accept="image/*" capture="environment" class="input-field" style="margin-top:4px;" onchange="handleCustomerPhotoSelected(this)" />
+          <div id="customer-photo-preview" class="note-small"></div>
+        </div>
 
         <button id="send-order-btn" class="send-order-line-btn" onclick="sendOrderToSeller()">
           दुकानदार को ऑर्डर भेजें
@@ -736,6 +755,7 @@
   const CUSTOMER_PROFILE_KEY = "CUSTOMER_SAVED_PROFILE_V1";
   const ACTIVE_SELLER_STATE_KEY = "CUSTOMER_ACTIVE_SELLER_ID_V1";
   const PERMANENT_HISTORY_LS_KEY = "ONLINE_STORE_PERMANENT_ORDER_HISTORY_V1";
+  const CUSTOMER_OTP_VERIFIED_PHONE_KEY = "CUSTOMER_OTP_VERIFIED_PHONE_V1";
   const IDB_NAME = "OnlineStoreImmutableHistoryDB";
   const IDB_STORE = "orderHistory";
 
@@ -757,37 +777,127 @@
     storageKey: "ONLINE_STORE_LIVE_DATA_V2"
   };
 
+  let pendingCustomerOtp = "";
+  let pendingCustomerOtpPhone = "";
+  let customerPhotoDataUrl = "";
+
   const hindiToEnglishMap = {
-    "मेथी": "Fenugreek",
-    "कद्दू": "Pumpkin",
-    "पालक": "Spinach",
-    "टमाटर": "Tomato",
-    "आलू": "Potato",
-    "प्याज़": "Onion",
-    "प्याज": "Onion",
-    "मटर": "Green Peas",
-    "गाजर": "Carrot",
-    "मूली": "Radish",
-    "अदरक": "Ginger",
-    "लहसुन": "Garlic",
-    "गोभी": "Cauliflower",
-    "फूलगोभी": "Cauliflower",
-    "पत्तागोभी": "Cabbage",
-    "बैंगन": "Brinjal",
-    "भिंडी": "Ladyfinger",
-    "शिमला मिर्च": "Capsicum",
-    "नींबू": "Lemon",
-    "धनिया": "Coriander",
-    "हरी मिर्च": "Green Chilli",
-    "खीरा": "Cucumber",
-    "लौकी": "Bottle Gourd",
-    "तोरई": "Ridge Gourd",
-    "करेला": "Bitter Gourd",
-    "चुकंदर": "Beetroot",
-    "सेब": "Apple",
-    "केला": "Banana",
-    "आम": "Mango"
+    "मेथी": "Fenugreek", "कद्दू": "Pumpkin", "पालक": "Spinach", "टमाटर": "Tomato",
+    "आलू": "Potato", "प्याज़": "Onion", "प्याज": "Onion", "मटर": "Green Peas",
+    "गाजर": "Carrot", "मूली": "Radish", "अदरक": "Ginger", "लहसुन": "Garlic",
+    "गोभी": "Cauliflower", "फूलगोभी": "Cauliflower", "पत्तागोभी": "Cabbage",
+    "बैंगन": "Brinjal", "भिंडी": "Ladyfinger", "शिमला मिर्च": "Capsicum",
+    "नींबू": "Lemon", "धनिया": "Coriander", "हरी मिर्च": "Green Chilli",
+    "खीरा": "Cucumber", "लौकी": "Bottle Gourd", "तोरई": "Ridge Gourd",
+    "करेला": "Bitter Gourd", "चुकंदर": "Beetroot", "सेब": "Apple",
+    "केला": "Banana", "आम": "Mango"
   };
+
+  function syncCustomerOtpUiState() {
+    const verifiedPhone = localStorage.getItem(CUSTOMER_OTP_VERIFIED_PHONE_KEY) || "";
+    const badge = document.getElementById("customer-verified-badge");
+    const formRow = document.getElementById("customer-otp-form-row");
+    const statusEl = document.getElementById("customer-otp-status");
+
+    if (verifiedPhone) {
+      if (badge) badge.textContent = `(वेरिफ़ाईड: +91${verifiedPhone})`;
+      if (formRow) formRow.classList.add("hidden");
+      if (statusEl && !statusEl.textContent) {
+        statusEl.textContent = `आपका नंबर +91${verifiedPhone} लॉगिन और वेरिफ़ाई है।`;
+      }
+      saveCustomerProfileData({ phone: verifiedPhone });
+      subscribeToCustomerNotification(verifiedPhone);
+    } else {
+      if (badge) badge.textContent = "";
+      if (formRow) formRow.classList.remove("hidden");
+    }
+  }
+
+  function sendCustomerOtp() {
+    const phoneInput = document.getElementById("customer-otp-phone");
+    const statusEl = document.getElementById("customer-otp-status");
+    const cleanPhone = (phoneInput ? phoneInput.value : "").replace(/\D/g, "").slice(-10);
+
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      if (statusEl) {
+        statusEl.style.color = "#c62828";
+        statusEl.textContent = "कृपया सही 10 अंकों का मोबाइल नंबर लिखें।";
+      }
+      return;
+    }
+
+    pendingCustomerOtpPhone = cleanPhone;
+    pendingCustomerOtp = String(Math.floor(100000 + Math.random() * 900000));
+    document.getElementById("customer-otp-verify-step").classList.remove("hidden");
+
+    if (typeof window.customSendSmsOtp === "function") {
+      window.customSendSmsOtp(cleanPhone, pendingCustomerOtp);
+    }
+
+    if (statusEl) {
+      statusEl.style.color = "#1565c0";
+      statusEl.textContent = `+91${cleanPhone} पर OTP भेजा गया है। (टेस्ट OTP: ${pendingCustomerOtp})`;
+    }
+  }
+
+  function verifyCustomerOtp() {
+    const codeInput = document.getElementById("customer-otp-code");
+    const statusEl = document.getElementById("customer-otp-status");
+    const entered = (codeInput ? codeInput.value : "").trim();
+
+    if (!pendingCustomerOtp || entered !== pendingCustomerOtp) {
+      if (statusEl) {
+        statusEl.style.color = "#c62828";
+        statusEl.textContent = "गलत OTP है, कृपया सही 6 अंकों का OTP डालें।";
+      }
+      return;
+    }
+
+    localStorage.setItem(CUSTOMER_OTP_VERIFIED_PHONE_KEY, pendingCustomerOtpPhone);
+    saveCustomerProfileData({ phone: pendingCustomerOtpPhone });
+    const orderPhoneEl = document.getElementById("customer-phone-input");
+    if (orderPhoneEl) orderPhoneEl.value = pendingCustomerOtpPhone;
+    subscribeToCustomerNotification(pendingCustomerOtpPhone);
+    syncCustomerOtpUiState();
+
+    if (statusEl) {
+      statusEl.style.color = "#1b5e20";
+      statusEl.textContent = `✅ +91${pendingCustomerOtpPhone} वेरिफ़ाई हो गया है! अब आप कोई भी दुकान चुन सकते हैं।`;
+    }
+  }
+
+  function handleCustomerPhotoSelected(inputEl) {
+    const previewEl = document.getElementById("customer-photo-preview");
+    const file = inputEl && inputEl.files && inputEl.files[0];
+    if (!file) {
+      customerPhotoDataUrl = "";
+      if (previewEl) previewEl.textContent = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      customerPhotoDataUrl = typeof reader.result === "string" ? reader.result : "";
+      if (previewEl) {
+        previewEl.textContent = `फ़ोटो जुड़ी: ${file.name}`;
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function calcDistanceKm(lat1, lon1, lat2, lon2) {
+    if ([lat1, lon1, lat2, lon2].some(v => typeof v !== "number" || Number.isNaN(v))) {
+      return "";
+    }
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const km = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return `${km.toFixed(2)} km`;
+  }
 
   function getLocalDateIso(ts = Date.now()) {
     const d = new Date(ts);
@@ -1746,6 +1856,9 @@
     const now = new Date();
     const orderId = "ORD-" + Date.now().toString().slice(-6);
     const mapUrl = customerMapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locVal)}`;
+    const computedDistance = (customerCoords && typeof seller.shopLat === "number" && typeof seller.shopLng === "number")
+      ? calcDistanceKm(seller.shopLat, seller.shopLng, customerCoords.lat, customerCoords.lng)
+      : "";
 
     saveCustomerProfileData({
       phone: phoneVal,
@@ -1777,7 +1890,8 @@
       lng: customerCoords ? customerCoords.lng : null,
       mapLocationUrl: mapUrl,
       mapUrl: mapUrl,
-      distance: "",
+      distance: computedDistance,
+      photoAttached: Boolean(customerPhotoDataUrl),
       date: now.toLocaleDateString("hi-IN"),
       time: now.toLocaleTimeString("hi-IN"),
       items: formattedItems,
@@ -1845,6 +1959,8 @@
           whatsapp,
           phone: callPhone,
           upiId,
+          shopLat: typeof s.shopLat === "number" ? s.shopLat : null,
+          shopLng: typeof s.shopLng === "number" ? s.shopLng : null,
           offerText,
           minOrder10: Number(s.minOrder10) || 200,
           discount10: Number(s.discount10) || 10,
@@ -1868,6 +1984,8 @@
         whatsapp,
         phone: callPhone,
         upiId,
+        shopLat: typeof latestShopSettingsNode.shopLat === "number" ? latestShopSettingsNode.shopLat : null,
+        shopLng: typeof latestShopSettingsNode.shopLng === "number" ? latestShopSettingsNode.shopLng : null,
         offerText: (latestShopSettingsNode.offerText || "₹200 या उससे अधिक की खरीद पर 10% छूट | ₹150 से ₹199 तक 5% छूट।").toString(),
         minOrder10: Number(latestShopSettingsNode.minOrder10) || 200,
         discount10: Number(latestShopSettingsNode.discount10) || 10,
@@ -1919,7 +2037,11 @@
   window.saveCustomerProfileDraft = saveCustomerProfileDraft;
   window.moveSellerByOffset = moveSellerByOffset;
   window.setSellerRankPosition = setSellerRankPosition;
+  window.sendCustomerOtp = sendCustomerOtp;
+  window.verifyCustomerOtp = verifyCustomerOtp;
+  window.handleCustomerPhotoSelected = handleCustomerPhotoSelected;
 
+  syncCustomerOtpUiState();
   restoreLastScreenState();
   renderSellerList();
   autofillCustomerDetails(false);
