@@ -63,10 +63,10 @@
         .remove-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 4px 6px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 9px; margin-left: auto; }
 
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 5px; }
-        .modal-content { background: white; padding: 12px; width: 95%; max-width: 400px; border-radius: 6px; max-height: 85vh; overflow-y: auto; position: relative; margin: auto; }
+        .modal-content { background: white; padding: 12px; width: 95%; max-width: 420px; border-radius: 6px; max-height: 85vh; overflow-y: auto; position: relative; margin: auto; }
         
         .close-modal { position: absolute; top: 8px; right: 8px; font-size: 14px; font-weight: bold; cursor: pointer; color: #fff; background: #c62828; padding: 2px 7px; border-radius: 50%; z-index: 10; }
-        .history-top-actions { display: flex; gap: 4px; align-items: center; margin-right: 35px; }
+        .history-top-actions { display: flex; gap: 4px; align-items: center; margin-right: 35px; flex-wrap: wrap; }
         .clear-all-btn { background: #c62828; color: white; border: none; padding: 4px 6px; font-size: 9px; border-radius: 3px; cursor: pointer; font-weight: bold; }
         .restore-btn { background: #2e7d32; color: white; border: none; padding: 4px 6px; font-size: 9px; border-radius: 3px; cursor: pointer; font-weight: bold; }
 
@@ -76,14 +76,12 @@
 
         .history-item-box { background: #f1f8e9; border-left: 3px solid #2e7d32; padding: 8px; margin-bottom: 6px; font-size: 11px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .rejected-item-box { background: #fafafa; border-left: 3px solid #757575; padding: 8px; margin-bottom: 6px; font-size: 11px; border-radius: 3px; color: #555; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .notif-msg-card { background: #fff8e1; border: 1px solid #ffe082; border-left: 4px solid #ef6c00; padding: 8px; margin-bottom: 7px; border-radius: 4px; font-size: 11.5px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
         
         .history-actions { display: flex; gap: 4px; align-items: center; }
         .action-icon-btn { background: #ddd; border: none; padding: 4px 6px; border-radius: 3px; font-size: 11px; cursor: pointer; text-decoration: none; display: inline-block; }
         .share-btn { background: #25D366; color: white; }
         .delete-btn { background: #c62828; color: white; }
-
-        .custom-alert-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 10px; }
-        .custom-alert-content { background: white; padding: 15px; width: 90%; max-width: 280px; border-radius: 8px; text-align: center; position: relative; }
     </style>
 </head>
 <body>
@@ -95,8 +93,36 @@
 <div class="top-bar-fixed" id="topRightControls" style="display:none;">
     <button class="gear-icon-btn" onclick="openSettingsModal()" title="दुकान सेटिंग्स">⚙️ सेटिंग्स</button>
     <button class="history-top-icon-btn" onclick="openHistoryModal()">📜 हिस्ट्री</button>
-    <button class="notif-badge-btn" onclick="openNotifications()">🔔 <span id="notifCount">0</span></button>
+    <button class="notif-badge-btn" onclick="openNotifications()" title="ग्राहक समस्या / मैसेज नोटिफिकेशन">🔔 <span id="notifCount">0</span></button>
     <a href="tel:9997077062" class="help-btn">📞 Help</a>
+</div>
+
+<!-- BELL ICON CUSTOMER MESSAGES MODAL -->
+<div id="bellMessagesModal" class="modal" onclick="closeBellMessagesModalOutside(event)">
+    <div class="modal-content" id="bellMessagesModalContent">
+        <span class="close-modal" onclick="closeBellMessagesModal()">&times;</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
+            <h3 style="color:#e65100; margin:0; font-size:13px;">🔔 ग्राहक समस्या / मैसेज नोटिफिकेशन</h3>
+            <div class="history-top-actions">
+                <button class="restore-btn" onclick="toggleBellRestoreOptions()">♻️ वापस लाएं</button>
+            </div>
+        </div>
+        <hr style="border:0; border-top:1px solid #ddd; margin-bottom:6px;">
+        <div style="font-size:10.5px; color:#555; margin-bottom:6px;">
+            आप किसी मैसेज को रख सकते हैं या 🗑️ से हटा सकते हैं। हटाए गए मैसेज को सभी या तारीख के हिसाब से वापस भी ला सकते हैं।
+        </div>
+        <div id="bellRestoreOptionsBox" class="restore-options-box">
+            <div style="font-weight:bold; color:#1b5e20; margin-bottom:6px;">हटाए गए नोटिफिकेशन वापस लाएं:</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                <button type="button" class="restore-option-btn" onclick="restoreAllBellMessages()">📥 सभी वापस लाएं</button>
+                <input type="date" id="restoreBellDateInput" class="restore-date-input">
+                <button type="button" class="restore-option-btn" style="background:#1565c0;" onclick="restoreBellMessagesByDate()">📅 तारीख के हिसाब से वापस लाएं</button>
+            </div>
+        </div>
+        <div id="bell-messages-list">
+            <p style="font-size:11px; color:#777;">कोई नया ग्राहक मैसेज नहीं है।</p>
+        </div>
+    </div>
 </div>
 
 <div id="settingsModal" class="modal" onclick="closeSettingsModalOutside(event)">
@@ -127,13 +153,6 @@
         </div>
 
         <button class="btn-main" style="font-size:11px; padding:8px; margin-top:6px;" onclick="saveCatalogSettings()">सेव करें (Save)</button>
-    </div>
-</div>
-
-<div id="customAlertModal" class="custom-alert-modal" onclick="closeCustomAlertOutside(event)">
-    <div class="custom-alert-content" id="customAlertBox">
-        <p id="customAlertText" style="font-size: 12px; font-weight: bold; margin-bottom: 12px; color: #333;"></p>
-        <button onclick="closeCustomAlert()" style="background: #e65100; color: white; border: none; padding: 6px 15px; font-size: 11px; border-radius: 4px; font-weight: bold; cursor: pointer;">ठीक है (OK)</button>
     </div>
 </div>
 
@@ -228,13 +247,13 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyD4LjdqlsKNH7ZU9p8NMgtnqDuybiSI0fs",
+        apiKey: "AIzaSyD4LjOqIsKMH7ZOpAbMginqDuybiSIOFs",
         authDomain: "ajayvegetables-e6201.firebaseapp.com",
         databaseURL: "https://ajayvegetables-e6201-default-rtdb.firebaseio.com",
         projectId: "ajayvegetables-e6201",
         storageBucket: "ajayvegetables-e6201.firebasestorage.app",
         messagingSenderId: "735482766488",
-        appId: "1:735482766488:web:a7121405cb15fffefd1ced",
+        appId: "1:735482766488:web:a7121605ch1fffe0fd1cad",
         measurementId: "G-KBGKZ36RY8"
     };
 
@@ -244,12 +263,14 @@
 
     const AJAY_OWNER_PHONE = "9997077062";
     const DELETED_HISTORY_LOCAL_KEY = "AJAY_DELETED_HISTORY_PERMANENT_V1";
+    const DELETED_BELL_MSG_LOCAL_KEY = "AJAY_DELETED_BELL_MSG_PERMANENT_V1";
     const LAST_AUTO_STOCK_DATE_KEY = "AJAY_LAST_AUTO_STOCK_DATE_V1";
     const DAILY_MIN_STOCK_ADD_KG = 10;
 
-    let customerNotifications = [];
     let alarmInterval = null;
     let lastDeletedHistory = {};
+    let deletedBellMessagesStore = {};
+    let liveSupportMessagesData = {};
     let activeOrdersData = {};
     let removedItemsTracker = {};
     let dailyStockAdjustedOnce = false;
@@ -278,6 +299,10 @@
         return sellerId === "ajay" ? "deletedOrderHistory" : `deletedOrderHistory_${sellerId}`;
     }
 
+    function getDeletedBellMessagesPath(sellerId = currentSellerId) {
+        return sellerId === "ajay" ? "deletedSupportMessages" : `deletedSupportMessages_${sellerId}`;
+    }
+
     function getLocalDateIso(ts = Date.now()) {
         const d = new Date(ts);
         const year = d.getFullYear();
@@ -285,6 +310,167 @@
         const day = String(d.getDate()).padStart(2, "0");
         return `${year}-${month}-${day}`;
     }
+
+    function readDeletedBellStore() {
+        try {
+            const key = `${DELETED_BELL_MSG_LOCAL_KEY}_${currentSellerId}`;
+            const parsed = JSON.parse(localStorage.getItem(key) || "{}");
+            return parsed && typeof parsed === "object" ? parsed : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function writeDeletedBellStore(storeObj) {
+        try {
+            const key = `${DELETED_BELL_MSG_LOCAL_KEY}_${currentSellerId}`;
+            localStorage.setItem(key, JSON.stringify(storeObj || {}));
+        } catch (e) {}
+    }
+
+    function loadDeletedBellMessagesStore() {
+        const localData = readDeletedBellStore();
+        deletedBellMessagesStore = localData;
+        get(ref(db, getDeletedBellMessagesPath(currentSellerId))).then((snap) => {
+            if (snap.exists() && snap.val()) {
+                deletedBellMessagesStore = { ...snap.val(), ...localData };
+                writeDeletedBellStore(deletedBellMessagesStore);
+            }
+        }).catch(() => {});
+    }
+
+    function renderBellMessagesModal() {
+        const listEl = document.getElementById("bell-messages-list");
+        const countEl = document.getElementById("notifCount");
+        const keys = Object.keys(liveSupportMessagesData || {}).sort((a, b) => {
+            const tsA = (liveSupportMessagesData[a] && liveSupportMessagesData[a].timestamp) || 0;
+            const tsB = (liveSupportMessagesData[b] && liveSupportMessagesData[b].timestamp) || 0;
+            return tsB - tsA;
+        });
+
+        if (countEl) {
+            countEl.innerText = String(keys.length);
+        }
+
+        if (!listEl) return;
+        if (!keys.length) {
+            listEl.innerHTML = `<p style="font-size:11px; color:#777;">कोई ग्राहक मैसेज नोटिफिकेशन नहीं है।</p>`;
+            return;
+        }
+
+        listEl.innerHTML = keys.map((key) => {
+            const m = liveSupportMessagesData[key] || {};
+            const timeText = m.dateTimeText || new Date(m.timestamp || Date.now()).toLocaleString("hi-IN");
+            return `
+                <div class="notif-msg-card">
+                    <div>
+                        <b>💬 ग्राहक मैसेज</b> (${m.customerPhone || "अज्ञात"})<br>
+                        <div style="margin:4px 0; color:#222; font-weight:bold;">${m.message || ""}</div>
+                        <span style="font-size:9.5px; color:#666;">⏰ ${timeText}</span>
+                    </div>
+                    <button class="action-icon-btn delete-btn" onclick="deleteBellMessage('${key}')" title="इस मैसेज को हटाएं">🗑️</button>
+                </div>
+            `;
+        }).join("");
+    }
+
+    function startLiveSupportMessages() {
+        onValue(ref(db, "supportMessages"), (snapshot) => {
+            liveSupportMessagesData = snapshot.val() || {};
+            renderBellMessagesModal();
+        });
+    }
+
+    window.openNotifications = function() {
+        renderBellMessagesModal();
+        document.getElementById("bellMessagesModal").style.display = "flex";
+    };
+
+    window.closeBellMessagesModal = function() {
+        document.getElementById("bellMessagesModal").style.display = "none";
+    };
+
+    window.closeBellMessagesModalOutside = function(event) {
+        const content = document.getElementById("bellMessagesModalContent");
+        if (content && !content.contains(event.target)) {
+            closeBellMessagesModal();
+        }
+    };
+
+    window.deleteBellMessage = function(key) {
+        if (!confirm("क्या आप इस ग्राहक मैसेज को हटाना चाहते हैं? (बाद में वापस भी लाया जा सकता है)")) return;
+        const msgObj = liveSupportMessagesData[key];
+        if (msgObj) {
+            const nowTs = Date.now();
+            deletedBellMessagesStore[key] = {
+                ...msgObj,
+                dateIso: msgObj.dateIso || getLocalDateIso(msgObj.timestamp || nowTs),
+                deletedDateIso: getLocalDateIso(nowTs),
+                deletedAtTimestamp: nowTs
+            };
+            writeDeletedBellStore(deletedBellMessagesStore);
+            set(ref(db, `${getDeletedBellMessagesPath(currentSellerId)}/${key}`), deletedBellMessagesStore[key]).catch(() => {});
+        }
+        remove(ref(db, `supportMessages/${key}`)).catch(() => {});
+    };
+
+    window.toggleBellRestoreOptions = function() {
+        const box = document.getElementById("bellRestoreOptionsBox");
+        if (!box) return;
+        const isOpen = box.style.display === "block";
+        box.style.display = isOpen ? "none" : "block";
+        const dateInput = document.getElementById("restoreBellDateInput");
+        if (!isOpen && dateInput && !dateInput.value) {
+            dateInput.value = getLocalDateIso(Date.now());
+        }
+    };
+
+    window.restoreAllBellMessages = function() {
+        const store = { ...readDeletedBellStore(), ...deletedBellMessagesStore };
+        const keys = Object.keys(store);
+        if (!keys.length) {
+            alert("वापस लाने के लिए कोई हटाया गया मैसेज नहीं है!");
+            return;
+        }
+        const updates = {};
+        keys.forEach((k) => {
+            updates[`supportMessages/${k}`] = store[k];
+        });
+        set(ref(db, "supportMessages"), { ...(liveSupportMessagesData || {}), ...store }).then(() => {
+            alert("सभी हटाए गए मैसेज वापस आ गए हैं!");
+            const box = document.getElementById("bellRestoreOptionsBox");
+            if (box) box.style.display = "none";
+        });
+    };
+
+    window.restoreBellMessagesByDate = function() {
+        const dateInput = document.getElementById("restoreBellDateInput");
+        const selectedDate = dateInput ? dateInput.value : "";
+        if (!selectedDate) {
+            alert("कृपया पहले तारीख चुनें!");
+            return;
+        }
+        const store = { ...readDeletedBellStore(), ...deletedBellMessagesStore };
+        const matched = {};
+        Object.keys(store).forEach((k) => {
+            const item = store[k];
+            if (!item || typeof item !== "object") return;
+            const itemDate = item.dateIso || getLocalDateIso(item.timestamp || 0);
+            const delDate = item.deletedDateIso || getLocalDateIso(item.deletedAtTimestamp || item.timestamp || 0);
+            if (itemDate === selectedDate || delDate === selectedDate) {
+                matched[k] = item;
+            }
+        });
+        if (!Object.keys(matched).length) {
+            alert(`तारीख (${selectedDate}) के लिए कोई हटाया गया मैसेज नहीं मिला!`);
+            return;
+        }
+        set(ref(db, "supportMessages"), { ...(liveSupportMessagesData || {}), ...matched }).then(() => {
+            alert(`तारीख (${selectedDate}) के मैसेज वापस आ गए हैं!`);
+            const box = document.getElementById("bellRestoreOptionsBox");
+            if (box) box.style.display = "none";
+        });
+    };
 
     function readPermanentDeletedStore() {
         try {
@@ -421,8 +607,10 @@
             if (!listenersStarted) {
                 listenersStarted = true;
                 loadPermanentDeletedHistoryFromFirebase();
+                loadDeletedBellMessagesStore();
                 loadShopSettings();
                 startLiveOrders();
+                startLiveSupportMessages();
                 loadHistoryData();
             }
         } else {
@@ -667,28 +855,6 @@
         });
     }
 
-    window.openNotifications = function() {
-        customerNotifications = [];
-        document.getElementById('notifCount').innerText = "0";
-        showCustomAlert("सभी नए आर्डर्स देखे जा चुके हैं।");
-    };
-
-    function showCustomAlert(msg) {
-        document.getElementById('customAlertText').innerText = msg;
-        document.getElementById('customAlertModal').style.display = 'flex';
-    }
-
-    window.closeCustomAlert = function() {
-        document.getElementById('customAlertModal').style.display = 'none';
-    };
-
-    window.closeCustomAlertOutside = function(event) {
-        let box = document.getElementById('customAlertBox');
-        if (!box.contains(event.target)) {
-            closeCustomAlert();
-        }
-    };
-
     function startContinuousAlarm() {
         if (alarmInterval) return;
         playSpecialAlarm();
@@ -742,7 +908,6 @@
 
             if (!data) {
                 container.innerHTML = '<p style="text-align: center; color: #777; font-size:11px;">नया ऑर्डर आने का इंतज़ार है...</p>';
-                document.getElementById('notifCount').innerText = "0";
                 previousCount = 0;
                 stopContinuousAlarm();
                 activeOrdersData = {};
@@ -753,8 +918,6 @@
             let ordersArray = Object.keys(data)
                 .map(key => ({ id: key, ...data[key] }))
                 .filter(order => belongsToCurrentSeller(order));
-
-            document.getElementById('notifCount').innerText = ordersArray.length;
 
             if (previousCount !== null && ordersArray.length > previousCount) {
                 playSpecialAlarm();
